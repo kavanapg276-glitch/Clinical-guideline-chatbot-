@@ -1,0 +1,42 @@
+# ClinCoherence Guideline Chatbot — Configuration
+project:
+  name: "guideline-chatbot"
+  version: "0.1.0"
+  conditions: ["hypertension", "type_2_diabetes"]
+
+data:
+  raw_dir: "data/raw"
+  processed_dir: "data/processed"
+  inventory_dir: "data/inventory"
+  reports_dir: "data/reports"
+
+sources:
+  mohfw_stg:
+    name: "MoHFW Standard Treatment Guidelines"
+    base_url: "https://clinicalestablishments.mohfw.gov.in/en/standard-treatment-guidelines"
+    jurisdiction: "India"
+  icmr_stw:
+    name: "ICMR Standard Treatment Workflows"
+    base_url: "https://stw.icmr.org.in/stws-download"
+    jurisdiction: "India"
+  who:
+    name: "WHO Publications"
+    base_url: "https://www.who.int/publications"
+    jurisdiction: "International"
+  nice:
+    name: "NICE Guidance"
+    base_url: "https://www.nice.org.uk/guidance"
+    jurisdiction: "United Kingdom"
+
+embedding:
+  model_name: "sentence-transformers/all-MiniLM-L6-v2"
+  dimension: 384
+
+downloader:
+  user_agent: "ClinCoherence-Research/0.1 (capstone project; contact: student)"
+  retry_attempts: 3
+  retry_backoff_base: 2
+  request_delay_seconds: 2
+  timeout_seconds: 60
+
+random_seed: 42

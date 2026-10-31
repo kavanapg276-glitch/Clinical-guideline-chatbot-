@@ -1,0 +1,34 @@
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Environment variables
+.env
+
+# Raw data (may not be redistributable)
+guideline_chatbot/data/raw/
+
+# ChromaDB
+chroma/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Caches
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
