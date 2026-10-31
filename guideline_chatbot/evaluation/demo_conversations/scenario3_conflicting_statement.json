@@ -1,0 +1,41 @@
+{
+  "scenario_id": "scenario3_conflicting_statement",
+  "title": "Scenario 3: Conflicting Patient Information & Contradiction Resolution",
+  "category": "Conflicting Patient Statements",
+  "description": "Patient claims normotension in Turn 1, then presents with Grade 2 HTN (168/104 mmHg) in Turn 2.",
+  "turns": [
+    {
+      "turn_index": 1,
+      "user_message": "Patient is 46 years old with normal blood pressure and no previous medical issues.",
+      "action_type": "recommendation",
+      "is_abstention": false,
+      "disputed_facts_count": 0,
+      "citations_verified": 3,
+      "citations_total": 3,
+      "patient_state_summary": "Age: 46; Conditions: normotensive_claim",
+      "response_text": "### Guideline Recommendation(s)\n\n1. **III. (Part 3)** [MoHFW STG - Hypertension (Background Document), p. 50, \u00a7III. (Part 3), current]:\n   interventions for non-communicable diseases including screening by non-physician health workers is both feasible and effective.(11). Groups at high risk of hypertension are easily identifiable:Cohort studies in south India have identified risk factors which can be helpful in i...\n\n2. **4.8.5.5 In elderly patients less than 80 years of age, the blood pressure target for control may** [MoHFW Standard Treatment Guidelines - Hypertension (Quick Reference Guide), p. 25, \u00a74.8.5.5 In elderly patients less than 80 years of age, the blood pressure target for control may, current]:\n   4.8.5.5 In elderly patients less than 80 years of age, the blood pressure target for control may be <140 mm systolic and <90 mm diastolic if the patient is fit and the treatment is well tolerated.\n\n3. **4.9.5  In elderly patients less than 80 years of age, the blood pressure target for control** [MoHFW STG - Hypertension (Background Document), p. 96, \u00a74.9.5  In elderly patients less than 80 years of age, the blood pressure target for control, current]:\n   4.9.5  In elderly patients less than 80 years of age, the blood pressure target for control may be <140 mm systolic and <90 mm diastolic if the patient is fit and the treatment is well tolerated.\n\n\n### Patient Applicability & Context Analysis\n\n- Patient clinical parameters not yet specified. Recommendations reflect general adult population.\n\n### Missing Patient Information & Recommended Workup\n\n- **Glycemic Evaluation**: Fasting plasma glucose and HbA1c to screen for occult diabetes.\n- **Renal Function**: Serum creatinine, estimated GFR (eGFR), and serum electrolytes (potassium/sodium).\n- **Urinary Albumin**: Urine Albumin-to-Creatinine Ratio (ACR) to detect early diabetic nephropathy.\n\n### General Clinical Rationale\n\n*General Clinical Rationale \u2014 Not a Formal Guideline Recommendation*:\nHypertension and type 2 diabetes represent synergistic cardiovascular risk factors. Antihypertensive pharmacotherapy provides dual protection by reducing vascular sheer stress and preserving glomerular capillary integrity. Stepwise or initial combination therapy should be titrated at 4\u20136 week intervals until therapeutic target is reached.\n\n*Research Prototype Disclaimer: For evaluation and research purposes only. This software is not an approved medical device and does not replace certified clinical judgment.*"
+    },
+    {
+      "turn_index": 2,
+      "user_message": "Actually, their clinic blood pressure reading today was 168/104 mmHg. What should we start?",
+      "action_type": "clarify",
+      "is_abstention": false,
+      "disputed_facts_count": 1,
+      "citations_verified": 0,
+      "citations_total": 0,
+      "patient_state_summary": "Age: 46; BP: 168/104 mmHg; Conditions: hypertension; Conflicts (1): Disputed claims detected",
+      "response_text": "### Clarification Required: Conflicting Patient Information\n\n**Clinical History Discrepancy Detected**:\n- **Parameter**: Blood Pressure\n- **Prior Recorded**: Claimed normal blood pressure\n- **New Statement**: 168/104 mmHg\n- **Detail**: Patient previously claimed normal blood pressure in Turn 1, but reports elevated clinic BP 168/104 mmHg in Turn 2.\n\n**Clinical Guidance**: Clinical guidelines enforce distinct treatment thresholds and drug choices depending on confirmed diagnoses and blood pressure levels. Conflicting data introduces safety risks (such as inappropriate pharmacotherapy or contraindicated agents).\n\nPlease confirm the verified patient reading and status before proceeding with treatment recommendations.\n\n*Research Prototype Disclaimer: For evaluation and research purposes only. Not a substitute for qualified clinical judgment.*"
+    },
+    {
+      "turn_index": 3,
+      "user_message": "The 168/104 mmHg reading today is confirmed on repeated measurement, so please advise on Stage 2 hypertension management.",
+      "action_type": "recommendation",
+      "is_abstention": false,
+      "disputed_facts_count": 1,
+      "citations_verified": 3,
+      "citations_total": 3,
+      "patient_state_summary": "Age: 46; BP: 168/104 mmHg; Conditions: hypertension; Conflicts (1): Disputed claims detected",
+      "response_text": "### Guideline Recommendation(s)\n\n1. **Diagnosis of Hypertension** [ICMR Standard Treatment Workflow - Hypertension in Adults (ICD-11 BA00), p. 1, \u00a7Diagnosis of Hypertension, current]:\n   DIAGNOSIS OF HYPERTENSION: - Systolic BP >= 140 AND/OR Diastolic BP >= 90 mmHg on two different clinic visits. - Population screening BP reading may count as the first reading. - Use the higher category if only Systolic or Diastolic BP is high; manage based on the higher value...\n\n2. **1.2.2** [NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management, p. 7, \u00a71.2.2, 2019]:\n   1.2.2 If blood pressure measured in the clinic is 140/90 mmHg or higher: -  Take a second measurement during the consultation. -  If the second measurement is substantially different from the first, take a third measurement. Record the lower of the last 2 measurements as the c...\n\n3. **5 AGREE II Instrument http://www.agreetrust.org/ (Part 2)** [MoHFW STG - Hypertension (Background Document), p. 35, \u00a75 AGREE II Instrument http://www.agreetrust.org/ (Part 2), current]:\n   | the person may be advised reviewonanannualor2yearly basis or referral within a few for diagnosis or treatment of hypertension | on Prevention Detection , , Evaluation and Treatment of High Blood Pressure - SeventhReport | We have used the term \"highnormal\"forSBPof 130 -139 m...\n\n\n### Patient Applicability & Context Analysis\n\n- **Blood Pressure (168/104 mmHg)**: Grade 2 / Stage 2 hypertension. Prompt pharmacotherapy with dual combination (e.g. A+C or A+D) is indicated.\n\n### Missing Patient Information & Recommended Workup\n\n- **Out-of-office BP Confirmation**: Ambulatory Blood Pressure Monitoring (ABPM) or Home Blood Pressure Monitoring (HBPM) to confirm sustained hypertension and rule out white-coat effect.\n- **Glycemic Evaluation**: Fasting plasma glucose and HbA1c to screen for occult diabetes.\n- **Renal Function**: Serum creatinine, estimated GFR (eGFR), and serum electrolytes (potassium/sodium).\n- **Urinary Albumin**: Urine Albumin-to-Creatinine Ratio (ACR) to detect early diabetic nephropathy.\n\n### General Clinical Rationale\n\n*General Clinical Rationale \u2014 Not a Formal Guideline Recommendation*:\nHypertension and type 2 diabetes represent synergistic cardiovascular risk factors. Antihypertensive pharmacotherapy provides dual protection by reducing vascular sheer stress and preserving glomerular capillary integrity. Stepwise or initial combination therapy should be titrated at 4\u20136 week intervals until therapeutic target is reached.\n\n*Research Prototype Disclaimer: For evaluation and research purposes only. This software is not an approved medical device and does not replace certified clinical judgment.*"
+    }
+  ]
+}

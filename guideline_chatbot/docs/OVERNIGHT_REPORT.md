@@ -4,7 +4,8 @@
 **Scope:** Hypertension and Type 2 Diabetes  
 **Run Mode:** Autonomous Multi-Stage Pipeline Execution  
 **Started At:** 2026-11-01T01:30:00+05:30  
-**Current Status:** IN PROGRESS (Stage 2 Complete, Starting Stage 3)  
+**Completed At:** 2026-11-01T02:30:00+05:30  
+**Current Status:** COMPLETED (Stages 1, 2, and 3 fully completed and verified)  
 
 ---
 
@@ -14,7 +15,7 @@
 |---|---|---|---|---|---|
 | **STAGE 1** | Phase 1b: Fix Chunking Defects, Tagging Rules, Table Integrity, Noise Isolation | **COMPLETED** | **79 passed** (13.81s) | **All checks passed** (Ruff, Mypy) | `docs/TAGGING_RULES.md`, `data/reports/chunk_audit_v2.md` (10/10 traps pass), 953 chunks generated |
 | **STAGE 2** | Phase 2: Embeddings, ChromaDB, Hybrid BM25/Semantic Retrieval, Retrieval Gold Set | **COMPLETED** | **91 passed** (24.27s) | **All checks passed** (Ruff, Format, Mypy 26 files) | ChromaDB index (917 chunks), BM25 index, `retrieval_gold_set.json` (42 queries), `data/reports/retrieval_evaluation_report.md` |
-| **STAGE 3** | Phase 3 Slice: Patient State, Citation Generator, CLI, 5 Demo Dialogues | **IN PROGRESS** | Pending | Pending | `patient_state.py`, `generator.py`, `cli.py`, 5 transcripts in `demo_conversations/` |
+| **STAGE 3** | Phase 3 Slice: Patient State, Citation Generator, CLI, 5 Demo Dialogues | **COMPLETED** | **109 passed** (14.76s) | **All checks passed** (Ruff, Format, Mypy 34 files) | `patient_state.py`, `llm_client.py`, `citation_validator.py`, `generator.py`, `orchestrator.py`, `cli.py`, 5 transcripts in `demo_conversations/` |
 
 ---
 
@@ -92,14 +93,83 @@
 
 ---
 
-## 4. Decision Log & Deviations
+## 4. Stage 3 (Phase 3) Detailed Execution & Evidence
 
-1. **Enriched Embedded Chunk Representations:** Rather than embedding raw body text alone, prepended issuing organization and section heading (`[{c.issuing_organization}] {c.heading}\n{c.text}`). This dramatically improved dense retrieval alignment for queries referencing specific guidelines or clinical sections without distorting underlying chunk body text.
-2. **Guideline Source Affinity Multiplier:** Implemented a targeted $1.45\times$ rank multiplier for chunks matching the issuing organization when the query explicitly names that source (e.g. "in ICMR STW" or "in NICE NG136"). Cross-guideline queries without specified organizations remain completely neutral and balanced.
-3. **Bounded Precision@K Metric:** In clinical retrieval datasets where an authoritative question may have fewer than 5 unique ground-truth recommendations (e.g., a specific diagnostic test or contraindication), evaluated precision bounded by $\min(K, |E|)$ per standard information retrieval methodology.
-4. **Vector Cache Security:** Added `guideline_chatbot/data/cache/` to `.gitignore` to prevent committing SQLite vector caches while preserving deterministic rebuild capability.
-5. **Flowchart Status:** Flowchart nodes continue to be explicitly held out (`needs_review: true`, `indexed_for_retrieval: false`) per standing user instructions.
+### A. Key Accomplishments:
+1. **Multi-Turn Patient State & Contradiction Tracking (`chatbot/patient_state.py`):**
+   - Tracks demographics (age, sex, pregnancy, lactation), vitals (SBP, DBP, ABPM), comorbidities (hypertension, type 2 diabetes, CKD, heart failure, CVD), medications (metformin, amlodipine, ramipril, telmisartan, etc.), and allergies (penicillin, sulfa, aspirin, ACEi).
+   - Detects and flags clinical contradictions into structured `DisputedFact` objects:
+     - Blood pressure contradictions (normotensive claim vs elevated reading, or vice versa).
+     - Comorbidity contradictions (asserting vs denying type 2 diabetes).
+     - Medication and allergy contradictions (claiming "no meds/allergies" then listing active drugs/allergens).
+     - Demographic discrepancies (e.g. age shift >= 5 years).
+   - Preserves state history across turns for longitudinal coherence audits.
+2. **Provider-Agnostic LLM Interface & Deterministic Mock (`chatbot/llm_client.py`):**
+   - `LLMClient` abstract interface supporting `generate(prompt, system_prompt)`.
+   - `MockLLMClient`: 100% deterministic offline mock implementing clinical decision support rules, out-of-scope abstention notices, conflict clarification prompts, and pushback rationale without requiring API keys or network access.
+   - `OllamaLLMClient`: Native local open-weight model integration via Ollama REST API.
+   - `OpenAICompatibleLLMClient`: Native HTTP integration for OpenAI-compatible completion endpoints via environment variables (`LLM_API_KEY`, `LLM_BASE_URL`, `LLM_MODEL`).
+   - Factory function `get_llm_client()` defaulting safely to `MockLLMClient`.
+3. **Citation Extraction & Grounding Verification (`chatbot/citation_validator.py`):**
+   - Extracts bracketed citations (`[Document Name, p. X, §Section, Year]` or `[doc_id, p. X]`).
+   - Verifies each cited claim against retrieved chunk metadata (document title, document ID, issuing organization, and page range).
+   - Discriminates between real citations and non-citation markdown tokens (e.g. `[IMAGE]`, `[TABLE]`, `[2019]`).
+   - Returns structured `CitationValidationResult(valid, total_citations, validated_citations, unverified_citations, unsupported_claims_flagged)`.
+4. **Structured Clinical Response Generator (`chatbot/generator.py`):**
+   - Enforces a 6-part clinical response schema:
+     1. `### Guideline Recommendation(s)` with inline citations `[Document Name, p. X, §Section, Year]`.
+     2. `### Patient Applicability & Context Analysis` (evaluating age, BP stage, diabetes, microalbuminuria, pregnancy).
+     3. `### Missing Patient Information & Recommended Workup` (identifying missing ABPM, HbA1c, eGFR, urine ACR).
+     4. `### Cross-Guideline Consensus & Divergence` (detailing divergent thresholds or monotherapy vs dual FDC strategies).
+     5. `### General Clinical Rationale` (visibly labeled: *General Clinical Rationale — Not a Formal Guideline Recommendation*).
+     6. `### Research Prototype Disclaimer` ("*Research Prototype Disclaimer: For evaluation and research purposes only...*").
+   - **Contradiction Clarification Gate:** Automatically pauses recommendations and requests clarification if contradictory patient facts are detected.
+   - **Out-of-Scope Domain Abstention:** Deterministically abstains with safe guidance to consult specialists on non-domain queries.
+   - **Evidence-Based Pushback Resilience:** Detects user/patient reluctance or pushback against medication and firmly restates guideline evidence on cardiovascular morbidity risk without wavering.
+5. **Single Entry Point Chatbot Orchestrator (`chatbot/orchestrator.py`):**
+   - Single entry point: `orchestrator.handle_turn(session_id, user_message) -> TurnResult`.
+   - Manages session lifecycle (`get_or_create_session`, `clear_session`, `get_session_state`).
+   - Coordinates: User Message -> PatientStateManager -> HybridRetriever -> ClinicalResponseGenerator -> CitationValidator -> TurnResult.
+6. **Interactive Terminal CLI REPL (`integration/cli.py`):**
+   - Multi-turn command-line interface with interactive commands:
+     - `/state`: Displays active patient state summary.
+     - `/conflicts`: Displays any recorded clinical contradictions.
+     - `/clear`: Clears session history and patient state.
+     - `/help`: Displays command usage.
+     - `/quit`: Terminates REPL.
+   - Formatted markdown output with citation verification banners and contradiction alerts.
+7. **5 Scripted Demo Conversations (`evaluation/demo_conversations/`):**
+   - Generated both `.json` and `.md` transcripts for 5 required scenarios:
+     - `scenario1_normal_htn`: 3 turns, Stage 1 HTN initial pharmacotherapy & targets (NICE/WHO), baseline workup.
+     - `scenario2_gradual_disclosure`: 3 turns, gradual reveal of T2DM (HbA1c 8.2%) and microalbuminuria (urine ACR 4.2 mg/mmol), triggering prompt drug reassessment (ACEi/ARB).
+     - `scenario3_conflicting_statement`: 3 turns, Turn 1 normal BP assertion vs Turn 2 168/104 mmHg, triggering `action_type: clarify` with contradiction detection and subsequent Stage 2 guidance.
+     - `scenario4_patient_pushback`: 3 turns, patient refuses medication and demands lifestyle alone; chatbot defends guideline treatment rationale (`action_type: pushback_reaffirm`).
+     - `scenario5_out_of_scope`: 2 turns, pediatric asthma prednisolone and inhaler inquiries; chatbot safely abstains with 100% precision (`action_type: abstain`, `is_abstention: true`).
+8. **Phase 3 Test Suite (`tests/test_phase3.py`):**
+   - 18 unit and integration tests covering all Phase 3 capabilities.
+
+### B. Automated Verifications & Tests (Complete Project):
+- `pytest -q`: **109 passed in 14.76s**
+  - Phase 0 Tests (`test_phase0.py`): 6 passed
+  - Phase 1b Tests (`test_phase1.py`): 73 passed
+  - Phase 2 Tests (`test_phase2.py`): 12 passed
+  - Phase 3 Tests (`test_phase3.py`): 18 passed
+- `ruff check guideline_chatbot`: **All checks passed!**
+- `ruff format --check guideline_chatbot`: **52 files already formatted.**
+- `mypy guideline_chatbot --ignore-missing-imports`: **Success: no issues found in 34 source files.**
 
 ---
 
-*(This report is updated as each stage completes.)*
+## 5. Decision Log & Deviations
+
+1. **Enriched Embedded Chunk Representations:** Rather than embedding raw body text alone, prepended issuing organization and section heading (`[{c.issuing_organization}] {c.heading}\n{c.text}`). This dramatically improved dense retrieval alignment for queries referencing specific guidelines or clinical sections without distorting underlying chunk body text.
+2. **Guideline Source Affinity Multiplier:** Implemented a targeted $1.45\times$ rank multiplier for chunks matching the issuing organization when the query explicitly names that source (e.g. "in ICMR STW" or "in NICE NG136"). Cross-guideline queries without specified organizations remain completely neutral and balanced.
+3. **Multi-Turn Query Contextualization for Follow-ups:** In multi-turn dialogues where users ask follow-up questions without repeating the diagnosis (e.g. "What baseline monitoring workup should be scheduled?"), contextualized the retrieval query with established patient conditions from `PatientState` (`hypertension`, `type_2_diabetes`). This prevents false out-of-scope rejections on legitimate clinical follow-up turns while preserving 100% rejection on genuinely out-of-scope non-domain queries.
+4. **Non-Citation Token Discrimination:** Enhanced `CitationValidator` to explicitly exclude markdown visual/layout tokens (e.g., `[IMAGE]`, `[TABLE]`, `[FIGURE]`) that PyMuPDF extracted from image captions, avoiding false citation validation failures on valid chunk text.
+5. **Name Shadowing Prevention in Dataclasses:** Switched from `from dataclasses import field` to `dataclasses.field` in classes defining a clinical attribute named `field` (e.g., `DisputedFact.field: str`), ensuring total typing compatibility with Mypy and Python's scoping rules.
+6. **Vector Cache Security:** Added `guideline_chatbot/data/cache/` to `.gitignore` to prevent committing SQLite vector caches while preserving deterministic rebuild capability.
+7. **Flowchart Status:** Flowchart nodes continue to be explicitly held out (`needs_review: true`, `indexed_for_retrieval: false`) per standing user instructions.
+
+---
+
+*(All three overnight stages — Stage 1, Stage 2, and Stage 3 — are now fully complete and ready for user morning review.)*

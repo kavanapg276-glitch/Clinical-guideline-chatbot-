@@ -21,3 +21,8 @@ warn_unused_configs = true
 ignore_missing_imports = true
 exclude = ["guideline_chatbot/scratch", ".venv"]
 
+[tool.pytest.ini_options]
+testpaths = ["guideline_chatbot/tests"]
+pythonpath = ["."]
+
+

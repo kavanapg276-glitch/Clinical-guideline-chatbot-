@@ -238,21 +238,33 @@ class HybridRetriever:
                 - "disagreements": list of detected cross-source disagreements
                 - "is_out_of_scope": boolean indicating out-of-scope query
         """
-        # Step 1: Out-of-scope domain gating check
+        # Step 1: Out-of-scope domain gating check & multi-turn query contextualization
         has_clinical_keywords = bool(IN_SCOPE_TERMS.search(query))
+        search_query = query
+
+        if not has_clinical_keywords and patient_state and patient_state.get("conditions"):
+            # Contextualize follow-up questions using established patient conditions
+            context_conds = [
+                c.replace("_", " ")
+                for c in patient_state["conditions"]
+                if c in {"hypertension", "type_2_diabetes", "chronic_kidney_disease"}
+            ]
+            if context_conds:
+                search_query = f"{' '.join(context_conds)} {query}"
+                has_clinical_keywords = True
 
         # Retrieve top candidates from each retriever for fusion
         fetch_k = max(35, top_k * 5)
 
         dense_hits = self.vector_store.query_dense(
-            query_text=query,
+            query_text=search_query,
             embedding_manager=self.embedding_manager,
             top_k=fetch_k,
             where_filter=where_filter,
         )
 
         sparse_hits = self.keyword_index.query_sparse(
-            query_text=query,
+            query_text=search_query,
             top_k=fetch_k,
             where_filter=where_filter,
         )
