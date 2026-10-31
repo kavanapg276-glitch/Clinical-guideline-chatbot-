@@ -196,12 +196,14 @@ def download_mohfw(
     candidates: list[dict[str, Any]] = [
         {
             "doc_id": "mohfw_htn_001",
-            "document_name": "MoHFW STG - Hypertension (Full Document)",
+            "document_name": "MoHFW STG - Hypertension (Background Document)",
             "condition": "hypertension",
             "url": f"{base_url}/sites/default/files/standard-treatment-guidelines/5191.pdf",
             "filename": "mohfw_stg_hypertension_full.pdf",
-            "relevant_page_ranges": None,
-            "notes": "Standalone Standard Treatment Guideline for Hypertension (Full Document)",
+            "relevant_page_ranges": "1-144",
+            "notes": (
+                "Standalone Standard Treatment Guideline for Hypertension (Background Document)"
+            ),
         },
         {
             "doc_id": "mohfw_htn_002",
@@ -209,19 +211,8 @@ def download_mohfw(
             "condition": "hypertension",
             "url": f"{base_url}/sites/default/files/standard-treatment-guidelines/6591.pdf",
             "filename": "mohfw_stg_hypertension_quickref.pdf",
-            "relevant_page_ranges": None,
+            "relevant_page_ranges": "1-54",
             "notes": "Quick Reference Guide for Hypertension",
-        },
-        {
-            "doc_id": "mohfw_htn_003",
-            "document_name": "MoHFW STG - Cardiovascular Diseases in India (Part 1)",
-            "condition": "hypertension",
-            "url": f"{base_url}/sites/default/files/standard-treatment-guidelines/3811.pdf",
-            "filename": "mohfw_stg_cardiovascular_diseases_part1.pdf",
-            "relevant_page_ranges": "1-40",
-            "notes": (
-                "Comprehensive Cardiovascular volume covering hypertension diagnosis and management"
-            ),
         },
         {
             "doc_id": "mohfw_t2dm_001",
@@ -229,8 +220,11 @@ def download_mohfw(
             "condition": "type_2_diabetes",
             "url": f"{base_url}/sites/default/files/standard-treatment-guidelines/3601.pdf",
             "filename": "mohfw_stg_endocrinology_diabetes.pdf",
-            "relevant_page_ranges": "1-49",
-            "notes": "Endocrinology STG covering Type 2 Diabetes Mellitus diagnosis and management",
+            "relevant_page_ranges": "6-21",
+            "notes": (
+                "Endocrinology STG covering Type 2 Diabetes Mellitus diagnosis and "
+                "management (pages 6-21)"
+            ),
         },
     ]
 

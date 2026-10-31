@@ -63,7 +63,6 @@ In accordance with Standing Rule 4, original files are preserved untouched with 
 | `icmr_t2dm_001` | ICMR / DHR | Current | Government Clinical Reference | https://www.icmr.gov.in/standard-treatment-workflows-stws |
 | `nice_htn_001` | NICE (UK) | Current | Personal / Academic Research Permitted | https://www.nice.org.uk/terms-and-conditions#notice-of-rights |
 | `nice_t2dm_001` | NICE (UK) | Current | Personal / Academic Research Permitted | https://www.nice.org.uk/terms-and-conditions#notice-of-rights |
-| `mohfw_htn_001` | MoHFW (India) | Current (Background Document) | Open Government STG | https://clinicalestablishments.mohfw.gov.in/en/copyright-policy |
-| `mohfw_htn_002` | MoHFW (India) | Current (Quick Reference Guide) | Open Government STG | https://clinicalestablishments.mohfw.gov.in/en/copyright-policy |
-| `mohfw_htn_003` | MoHFW (India) | Current (Part 1 Volume) | Open Government STG | https://clinicalestablishments.mohfw.gov.in/en/copyright-policy |
-| `mohfw_t2dm_001` | MoHFW (India) | Current (Endocrinology STG) | Open Government STG | https://clinicalestablishments.mohfw.gov.in/en/copyright-policy |
+| `mohfw_htn_001` | MoHFW (India) | Current (Background Document) | Permission required before reproduction; source acknowledgement required | https://clinicalestablishments.mohfw.gov.in/en/copyright-policy |
+| `mohfw_htn_002` | MoHFW (India) | Current (Quick Reference Guide) | Permission required before reproduction; source acknowledgement required | https://clinicalestablishments.mohfw.gov.in/en/copyright-policy |
+| `mohfw_t2dm_001` | MoHFW (India) | Current (Endocrinology STG) | Permission required before reproduction; source acknowledgement required | https://clinicalestablishments.mohfw.gov.in/en/copyright-policy |
