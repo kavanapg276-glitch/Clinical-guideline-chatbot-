@@ -81,10 +81,18 @@ DOCUMENT_CATALOG = [
         "jurisdiction": "International",
         "source_url": "https://www.who.int/publications/i/item/9789240033986",
         "document_status": "current",
-        "licence_note": "CC BY-NC-SA 3.0 IGO",
+        "licence_note": (
+            "CC BY-NC-SA 3.0 IGO; quoted: 'Some rights reserved. This work is available under "
+            "the Creative Commons Attribution-NonCommercial-ShareAlike 3.0 IGO licence "
+            "(CC BY-NC-SA 3.0 IGO; https://creativecommons.org/licenses/by-nc-sa/3.0/igo). "
+            "Under the terms of this licence, you may copy, redistribute and adapt the work "
+            "for non-commercial purposes, provided the work is appropriately cited.' "
+            "(URL: https://www.who.int/about/policies/publishing/copyright)"
+        ),
         "rel_path": "who/who_htn_pharmacological_treatment_2021.pdf",
         "relevant_page_ranges": "1-61",
         "notes": (
+            "Status: current (latest WHO adult hypertension guideline, active 2021). "
             "Full guideline covering BP thresholds, drug classes, combination therapy, and targets."
         ),
     },
@@ -98,10 +106,18 @@ DOCUMENT_CATALOG = [
         "jurisdiction": "International",
         "source_url": "https://www.who.int/publications/i/item/WHO-UCN-NCD-20.1",
         "document_status": "current",
-        "licence_note": "CC BY-NC-SA 3.0 IGO",
+        "licence_note": (
+            "CC BY-NC-SA 3.0 IGO; quoted: 'Some rights reserved. This work is available under "
+            "the Creative Commons Attribution-NonCommercial-ShareAlike 3.0 IGO licence "
+            "(CC BY-NC-SA 3.0 IGO; https://creativecommons.org/licenses/by-nc-sa/3.0/igo). "
+            "Under the terms of this licence, you may copy, redistribute and adapt the work "
+            "for non-commercial purposes, provided the work is appropriately cited.' "
+            "(URL: https://www.who.int/about/policies/publishing/copyright)"
+        ),
         "rel_path": "who/who_t2dm_hearts_d_2020.pdf",
         "relevant_page_ranges": "1-35",
         "notes": (
+            "Status: current (active primary care module). "
             "Primary healthcare module on diagnosis, lifestyle, oral agents, insulin initiation."
         ),
     },
@@ -118,11 +134,18 @@ DOCUMENT_CATALOG = [
         ),
         "document_status": "current",
         "licence_note": (
-            "Government of India / ICMR official STW publication (public clinical reference)"
+            "Government of India / ICMR official STW publication; quoted: 'This STW has been "
+            "prepared by national experts of India with feasibility considerations for various "
+            "levels of healthcare system in the country. These broad guidelines are advisory, and "
+            "are based on expert opinions and available scientific evidence. ... (c) Indian "
+            "Council of Medical Research and Department of Health Research, Ministry of Health & "
+            "Family Welfare, Government of India.' "
+            "(URL: https://www.icmr.gov.in/standard-treatment-workflows-stws)"
         ),
         "rel_path": "icmr_stw/icmr_htn_hypertension_in_adults.pdf",
         "relevant_page_ranges": "1",
         "notes": (
+            "Status: current (May 2022 STW release, active on stw.icmr.org.in). "
             "Evidence-based clinical decision workflow for all levels of Indian healthcare system."
         ),
     },
@@ -141,11 +164,17 @@ DOCUMENT_CATALOG = [
         ),
         "document_status": "current",
         "licence_note": (
-            "Government of India / ICMR official STW publication (public clinical reference)"
+            "Government of India / ICMR official STW publication; quoted: 'This STW has been "
+            "prepared by national experts of India with feasibility considerations for various "
+            "levels of healthcare system in the country. These broad guidelines are advisory, and "
+            "are based on expert opinions and available scientific evidence. ... (c) Department "
+            "of Health Research, Ministry of Health & Family Welfare, Government of India.' "
+            "(URL: https://www.icmr.gov.in/standard-treatment-workflows-stws)"
         ),
         "rel_path": "icmr_stw/icmr_t2dm_diabetes_type2.pdf",
         "relevant_page_ranges": "1",
         "notes": (
+            "Status: current (2022 STW release, active on stw.icmr.org.in). "
             "Stepwise algorithmic management of Type 2 Diabetes Mellitus in primary/secondary care."
         ),
     },
@@ -159,10 +188,20 @@ DOCUMENT_CATALOG = [
         "jurisdiction": "United Kingdom",
         "source_url": "https://www.nice.org.uk/guidance/ng136",
         "document_status": "current",
-        "licence_note": "Crown copyright / Open Government Licence (OGL v3.0)",
+        "licence_note": (
+            "NICE UK Notice of Rights / Crown Copyright; quoted: 'Except for personal use, "
+            "study or personal research, copyright content owned by the National Institute for "
+            "Health and Care Excellence (NICE) may not be used, reproduced, translated, "
+            "distributed or transmitted in any form, in whole or in part, by any means ... "
+            "without prior written permission from NICE. Copyright content owned by NICE is "
+            "made available for reuse to individuals and commercial/non-commercial organisations "
+            "on a non-exclusive basis in the United Kingdom only under the NICE UK Open Content "
+            "Licence.' (URL: https://www.nice.org.uk/terms-and-conditions#notice-of-rights)"
+        ),
         "rel_path": "nice/nice_ng136_hypertension.pdf",
         "relevant_page_ranges": "1-52",
         "notes": (
+            "Status: current (published 28 August 2019, last updated 26 February 2026, active). "
             "Comprehensive clinical guideline covering diagnosis, risk assessment, drug therapy."
         ),
     },
@@ -176,20 +215,30 @@ DOCUMENT_CATALOG = [
         "jurisdiction": "United Kingdom",
         "source_url": "https://www.nice.org.uk/guidance/ng28",
         "document_status": "current",
-        "licence_note": "Crown copyright / Open Government Licence (OGL v3.0)",
+        "licence_note": (
+            "NICE UK Notice of Rights / Crown Copyright; quoted: 'Except for personal use, "
+            "study or personal research, copyright content owned by the National Institute for "
+            "Health and Care Excellence (NICE) may not be used, reproduced, translated, "
+            "distributed or transmitted in any form, in whole or in part, by any means ... "
+            "without prior written permission from NICE. Copyright content owned by NICE is "
+            "made available for reuse to individuals and commercial/non-commercial organisations "
+            "on a non-exclusive basis in the United Kingdom only under the NICE UK Open Content "
+            "Licence.' (URL: https://www.nice.org.uk/terms-and-conditions#notice-of-rights)"
+        ),
         "rel_path": "nice/nice_ng28_type2_diabetes.pdf",
         "relevant_page_ranges": "1-131",
         "notes": (
+            "Status: current (published 2 December 2015, last updated 18 February 2026, active). "
             "Comprehensive management guideline: individualised targets, "
             "dietary advice, drug therapy."
         ),
     },
     {
         "doc_id": "mohfw_htn_001",
-        "document_name": "MoHFW Standard Treatment Guidelines - Hypertension (Full Document)",
+        "document_name": ("MoHFW STG - Hypertension (Background Document)"),
         "issuing_organization": "Ministry of Health and Family Welfare, Government of India",
         "condition": "hypertension",
-        "publication_date": "2016",
+        "publication_date": "2016-03",
         "version": "1.0",
         "jurisdiction": "India",
         "source_url": (
@@ -197,12 +246,20 @@ DOCUMENT_CATALOG = [
             "standard-treatment-guidelines/5191.pdf"
         ),
         "document_status": "current",
-        "licence_note": "Government of India Open Data / MoHFW publication",
+        "licence_note": (
+            "Government of India MoHFW Copyright Policy; quoted: 'Material featured on this "
+            "Portal may be reproduced free of charge after taking proper permission by sending "
+            "a mail to us. However, the material has to be reproduced accurately and not to be "
+            "used in a derogatory manner or in a misleading context. Wherever the material is "
+            "being published or issued to others, the source must be prominently acknowledged.' "
+            "(URL: https://clinicalestablishments.mohfw.gov.in/en/copyright-policy)"
+        ),
         "rel_path": "mohfw_stg/mohfw_stg_hypertension_full.pdf",
         "relevant_page_ranges": "1-144",
         "notes": (
-            "National expert committee guidelines for hypertension screening, "
-            "diagnosis, and management."
+            "Status: current (March 2016). Tagged as background document. "
+            "Contains comprehensive epidemiology, pathophysiology, screening, and diagnostic "
+            "rationale for primary hypertension in adults in India."
         ),
     },
     {
@@ -212,7 +269,7 @@ DOCUMENT_CATALOG = [
         ),
         "issuing_organization": "Ministry of Health and Family Welfare, Government of India",
         "condition": "hypertension",
-        "publication_date": "2016",
+        "publication_date": "2016-05",
         "version": "1.0-QRG",
         "jurisdiction": "India",
         "source_url": (
@@ -220,10 +277,20 @@ DOCUMENT_CATALOG = [
             "standard-treatment-guidelines/6591.pdf"
         ),
         "document_status": "current",
-        "licence_note": "Government of India Open Data / MoHFW publication",
+        "licence_note": (
+            "Government of India MoHFW Copyright Policy; quoted: 'Material featured on this "
+            "Portal may be reproduced free of charge after taking proper permission by sending "
+            "a mail to us. However, the material has to be reproduced accurately and not to be "
+            "used in a derogatory manner or in a misleading context. Wherever the material is "
+            "being published or issued to others, the source must be prominently acknowledged.' "
+            "(URL: https://clinicalestablishments.mohfw.gov.in/en/copyright-policy)"
+        ),
         "rel_path": "mohfw_stg/mohfw_stg_hypertension_quickref.pdf",
         "relevant_page_ranges": "1-54",
-        "notes": "Quick reference flowcharts and dosage tables for clinical practice.",
+        "notes": (
+            "Status: current (May 2016). Clinical practice guidelines with "
+            "quick reference flowcharts and dosage tables."
+        ),
     },
     {
         "doc_id": "mohfw_htn_003",
@@ -240,11 +307,18 @@ DOCUMENT_CATALOG = [
             "standard-treatment-guidelines/3811.pdf"
         ),
         "document_status": "current",
-        "licence_note": "Government of India Open Data / MoHFW publication",
+        "licence_note": (
+            "Government of India MoHFW Copyright Policy; quoted: 'Material featured on this "
+            "Portal may be reproduced free of charge after taking proper permission by sending "
+            "a mail to us. However, the material has to be reproduced accurately and not to be "
+            "used in a derogatory manner or in a misleading context. Wherever the material is "
+            "being published or issued to others, the source must be prominently acknowledged.' "
+            "(URL: https://clinicalestablishments.mohfw.gov.in/en/copyright-policy)"
+        ),
         "rel_path": "mohfw_stg/mohfw_stg_cardiovascular_diseases_part1.pdf",
         "relevant_page_ranges": "1-40",
         "notes": (
-            "Cardiovascular volume covering HTN assessment, "
+            "Status: current. Multi-condition cardiovascular volume covering HTN assessment, "
             "risk stratification, and multi-disease context."
         ),
     },
@@ -261,11 +335,18 @@ DOCUMENT_CATALOG = [
             "standard-treatment-guidelines/3601.pdf"
         ),
         "document_status": "current",
-        "licence_note": "Government of India Open Data / MoHFW publication",
+        "licence_note": (
+            "Government of India MoHFW Copyright Policy; quoted: 'Material featured on this "
+            "Portal may be reproduced free of charge after taking proper permission by sending "
+            "a mail to us. However, the material has to be reproduced accurately and not to be "
+            "used in a derogatory manner or in a misleading context. Wherever the material is "
+            "being published or issued to others, the source must be prominently acknowledged.' "
+            "(URL: https://clinicalestablishments.mohfw.gov.in/en/copyright-policy)"
+        ),
         "rel_path": "mohfw_stg/mohfw_stg_endocrinology_diabetes.pdf",
         "relevant_page_ranges": "1-49",
         "notes": (
-            "Endocrinology STG covering diagnostic criteria, "
+            "Status: current. Endocrinology STG covering diagnostic criteria, "
             "treatment goals, and anti-diabetic regimens."
         ),
     },
