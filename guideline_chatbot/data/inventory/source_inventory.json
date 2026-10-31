@@ -5,6 +5,7 @@
     "issuing_organization": "World Health Organization",
     "condition": "hypertension",
     "publication_date": "2021",
+    "date_type": "publication",
     "version": null,
     "jurisdiction": "International",
     "source_url": "https://www.who.int/publications/i/item/9789240033986",
@@ -24,6 +25,7 @@
     "issuing_organization": "World Health Organization",
     "condition": "type_2_diabetes",
     "publication_date": "2020",
+    "date_type": "publication",
     "version": null,
     "jurisdiction": "International",
     "source_url": "https://www.who.int/publications/i/item/WHO-UCN-NCD-20.1",
@@ -43,6 +45,7 @@
     "issuing_organization": "Indian Council of Medical Research (ICMR) / DHR",
     "condition": "hypertension",
     "publication_date": "May/2026",
+    "date_type": "unspecified",
     "version": null,
     "jurisdiction": "India",
     "source_url": "https://www.icmr.gov.in/icmrobject/uploads/STWs/1778941063_hypertensioninadults_final.pdf",
@@ -54,7 +57,7 @@
     "text_extractable": true,
     "relevant_page_ranges": "1",
     "ingestion_date": "2026-10-31",
-    "notes": "Status: current (May/2026 printed review horizon date on sheet, active on stw.icmr.org.in). Evidence-based clinical decision workflow for all levels of Indian healthcare system."
+    "notes": "Status: current. Printed date: May/2026 (date_type: unspecified; printed date of unspecified type, exact meaning unstated in document). Active on stw.icmr.org.in. Evidence-based clinical decision workflow for all levels of Indian healthcare system."
   },
   {
     "doc_id": "icmr_t2dm_001",
@@ -62,6 +65,7 @@
     "issuing_organization": "Indian Council of Medical Research (ICMR) / DHR",
     "condition": "type_2_diabetes",
     "publication_date": "July/ 2022",
+    "date_type": "unspecified",
     "version": null,
     "jurisdiction": "India",
     "source_url": "https://www.icmr.gov.in/icmrobject/uploads/STWs/1726567245_diabetes_mellitus_type_2.pdf",
@@ -73,7 +77,7 @@
     "text_extractable": true,
     "relevant_page_ranges": "1",
     "ingestion_date": "2026-10-31",
-    "notes": "Status: current (July/ 2022 STW release, active on stw.icmr.org.in). Stepwise algorithmic management of Type 2 Diabetes Mellitus in primary/secondary care."
+    "notes": "Status: current. Printed date: July/ 2022 (date_type: unspecified; printed date of unspecified type, exact meaning unstated in document). Active on stw.icmr.org.in. Stepwise algorithmic management of Type 2 Diabetes Mellitus in primary/secondary care."
   },
   {
     "doc_id": "nice_htn_001",
@@ -81,6 +85,7 @@
     "issuing_organization": "National Institute for Health and Care Excellence (NICE)",
     "condition": "hypertension",
     "publication_date": "2019-08-28",
+    "date_type": "publication",
     "version": null,
     "jurisdiction": "United Kingdom",
     "source_url": "https://www.nice.org.uk/guidance/ng136",
@@ -100,6 +105,7 @@
     "issuing_organization": "National Institute for Health and Care Excellence (NICE)",
     "condition": "type_2_diabetes",
     "publication_date": "2015-12-02",
+    "date_type": "publication",
     "version": null,
     "jurisdiction": "United Kingdom",
     "source_url": "https://www.nice.org.uk/guidance/ng28",
@@ -119,6 +125,7 @@
     "issuing_organization": "Ministry of Health and Family Welfare, Government of India",
     "condition": "hypertension",
     "publication_date": "March 2016",
+    "date_type": "unspecified",
     "version": null,
     "jurisdiction": "India",
     "source_url": "https://clinicalestablishments.mohfw.gov.in/sites/default/files/standard-treatment-guidelines/5191.pdf",
@@ -130,7 +137,7 @@
     "text_extractable": true,
     "relevant_page_ranges": "1-144",
     "ingestion_date": "2026-10-31",
-    "notes": "Status: current (March 2016). Tagged as background document. Contains comprehensive epidemiology, pathophysiology, screening, and diagnostic rationale for primary hypertension in adults in India."
+    "notes": "Status: current. Printed date: March 2016 (date_type: unspecified; printed on cover, meaning unstated). Tagged as background document. Contains comprehensive epidemiology, pathophysiology, screening, and diagnostic rationale for primary hypertension in adults in India."
   },
   {
     "doc_id": "mohfw_htn_002",
@@ -138,6 +145,7 @@
     "issuing_organization": "Ministry of Health and Family Welfare, Government of India",
     "condition": "hypertension",
     "publication_date": "May 2016",
+    "date_type": "unspecified",
     "version": null,
     "jurisdiction": "India",
     "source_url": "https://clinicalestablishments.mohfw.gov.in/sites/default/files/standard-treatment-guidelines/6591.pdf",
@@ -149,7 +157,7 @@
     "text_extractable": true,
     "relevant_page_ranges": "1-54",
     "ingestion_date": "2026-10-31",
-    "notes": "Status: current (May 2016). Clinical practice guidelines with quick reference flowcharts and dosage tables."
+    "notes": "Status: current. Printed date: May 2016 (date_type: unspecified; printed on cover, meaning unstated). Clinical practice guidelines with quick reference flowcharts."
   },
   {
     "doc_id": "mohfw_t2dm_001",
@@ -157,6 +165,7 @@
     "issuing_organization": "Ministry of Health and Family Welfare, Government of India",
     "condition": "type_2_diabetes",
     "publication_date": null,
+    "date_type": null,
     "version": null,
     "jurisdiction": "India",
     "source_url": "https://clinicalestablishments.mohfw.gov.in/sites/default/files/standard-treatment-guidelines/3601.pdf",

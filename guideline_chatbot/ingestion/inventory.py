@@ -31,6 +31,7 @@ class InventoryRecord(BaseModel):
     issuing_organization: str
     condition: str
     publication_date: str | None = None
+    date_type: str | None = None  # publication | copyright | unspecified | None
     version: str | None = None
     jurisdiction: str = "unknown"
     source_url: str = ""
@@ -53,6 +54,7 @@ INVENTORY_FIELDS = [
     "issuing_organization",
     "condition",
     "publication_date",
+    "date_type",
     "version",
     "jurisdiction",
     "source_url",
@@ -120,6 +122,7 @@ DOCUMENT_CATALOG = [
         "issuing_organization": "World Health Organization",
         "condition": "hypertension",
         "publication_date": "2021",
+        "date_type": "publication",
         "version": None,
         "jurisdiction": "International",
         "source_url": "https://www.who.int/publications/i/item/9789240033986",
@@ -138,6 +141,7 @@ DOCUMENT_CATALOG = [
         "issuing_organization": "World Health Organization",
         "condition": "type_2_diabetes",
         "publication_date": "2020",
+        "date_type": "publication",
         "version": None,
         "jurisdiction": "International",
         "source_url": "https://www.who.int/publications/i/item/WHO-UCN-NCD-20.1",
@@ -156,6 +160,7 @@ DOCUMENT_CATALOG = [
         "issuing_organization": "Indian Council of Medical Research (ICMR) / DHR",
         "condition": "hypertension",
         "publication_date": "May/2026",
+        "date_type": "unspecified",
         "version": None,
         "jurisdiction": "India",
         "source_url": (
@@ -166,9 +171,9 @@ DOCUMENT_CATALOG = [
         "rel_path": "icmr_stw/icmr_htn_hypertension_in_adults.pdf",
         "relevant_page_ranges": "1",
         "notes": (
-            "Status: current (May/2026 printed review horizon date on sheet, "
-            "active on stw.icmr.org.in). Evidence-based clinical decision workflow "
-            "for all levels of Indian healthcare system."
+            "Status: current. Printed date: May/2026 (date_type: unspecified; printed date of "
+            "unspecified type, exact meaning unstated in document). Active on stw.icmr.org.in. "
+            "Evidence-based clinical decision workflow for all levels of Indian healthcare system."
         ),
     },
     {
@@ -179,6 +184,7 @@ DOCUMENT_CATALOG = [
         "issuing_organization": "Indian Council of Medical Research (ICMR) / DHR",
         "condition": "type_2_diabetes",
         "publication_date": "July/ 2022",
+        "date_type": "unspecified",
         "version": None,
         "jurisdiction": "India",
         "source_url": (
@@ -189,7 +195,8 @@ DOCUMENT_CATALOG = [
         "rel_path": "icmr_stw/icmr_t2dm_diabetes_type2.pdf",
         "relevant_page_ranges": "1",
         "notes": (
-            "Status: current (July/ 2022 STW release, active on stw.icmr.org.in). "
+            "Status: current. Printed date: July/ 2022 (date_type: unspecified; printed date of "
+            "unspecified type, exact meaning unstated in document). Active on stw.icmr.org.in. "
             "Stepwise algorithmic management of Type 2 Diabetes Mellitus in primary/secondary care."
         ),
     },
@@ -199,6 +206,7 @@ DOCUMENT_CATALOG = [
         "issuing_organization": "National Institute for Health and Care Excellence (NICE)",
         "condition": "hypertension",
         "publication_date": "2019-08-28",
+        "date_type": "publication",
         "version": None,
         "jurisdiction": "United Kingdom",
         "source_url": "https://www.nice.org.uk/guidance/ng136",
@@ -217,6 +225,7 @@ DOCUMENT_CATALOG = [
         "issuing_organization": "National Institute for Health and Care Excellence (NICE)",
         "condition": "type_2_diabetes",
         "publication_date": "2015-12-02",
+        "date_type": "publication",
         "version": None,
         "jurisdiction": "United Kingdom",
         "source_url": "https://www.nice.org.uk/guidance/ng28",
@@ -236,6 +245,7 @@ DOCUMENT_CATALOG = [
         "issuing_organization": "Ministry of Health and Family Welfare, Government of India",
         "condition": "hypertension",
         "publication_date": "March 2016",
+        "date_type": "unspecified",
         "version": None,
         "jurisdiction": "India",
         "source_url": (
@@ -247,9 +257,10 @@ DOCUMENT_CATALOG = [
         "rel_path": "mohfw_stg/mohfw_stg_hypertension_full.pdf",
         "relevant_page_ranges": "1-144",
         "notes": (
-            "Status: current (March 2016). Tagged as background document. "
-            "Contains comprehensive epidemiology, pathophysiology, screening, and diagnostic "
-            "rationale for primary hypertension in adults in India."
+            "Status: current. Printed date: March 2016 (date_type: unspecified; printed on cover, "
+            "meaning unstated). Tagged as background document. Contains comprehensive "
+            "epidemiology, pathophysiology, screening, and diagnostic rationale for primary "
+            "hypertension in adults in India."
         ),
     },
     {
@@ -260,6 +271,7 @@ DOCUMENT_CATALOG = [
         "issuing_organization": "Ministry of Health and Family Welfare, Government of India",
         "condition": "hypertension",
         "publication_date": "May 2016",
+        "date_type": "unspecified",
         "version": None,
         "jurisdiction": "India",
         "source_url": (
@@ -271,8 +283,8 @@ DOCUMENT_CATALOG = [
         "rel_path": "mohfw_stg/mohfw_stg_hypertension_quickref.pdf",
         "relevant_page_ranges": "1-54",
         "notes": (
-            "Status: current (May 2016). Clinical practice guidelines with "
-            "quick reference flowcharts and dosage tables."
+            "Status: current. Printed date: May 2016 (date_type: unspecified; printed on cover, "
+            "meaning unstated). Clinical practice guidelines with quick reference flowcharts."
         ),
     },
     {
@@ -281,6 +293,7 @@ DOCUMENT_CATALOG = [
         "issuing_organization": "Ministry of Health and Family Welfare, Government of India",
         "condition": "type_2_diabetes",
         "publication_date": None,
+        "date_type": None,
         "version": None,
         "jurisdiction": "India",
         "source_url": (
@@ -328,6 +341,7 @@ def build_inventory(data_dir: Path) -> list[InventoryRecord]:
             issuing_organization=str(item.get("issuing_organization") or ""),
             condition=str(item.get("condition") or ""),
             publication_date=item.get("publication_date"),
+            date_type=item.get("date_type"),
             version=item.get("version"),
             jurisdiction=str(item.get("jurisdiction") or "unknown"),
             source_url=str(item.get("source_url") or ""),

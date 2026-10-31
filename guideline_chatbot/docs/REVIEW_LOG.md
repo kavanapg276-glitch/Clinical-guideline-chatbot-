@@ -51,10 +51,32 @@ Each entry records: bugs found, hard-coded clinical claims (strictly forbidden),
 
 ### 5. Test Suite & Static Analysis
 - **Ruff Check:** Passed (0 errors).
-- **Ruff Format Check:** Passed (19 files formatted).
-- **Mypy Check:** Passed (0 errors across 12 files).
-- **Pytest:** 58 passed in 55.84s.
+- **Ruff Format Check:** Passed (21 files formatted).
+- **Mypy Check:** Passed (0 errors across 12 source files).
+- **Pytest:** 58 passed in 14.57s.
 
 ### 6. Security & Privacy Audit
 - Zero credentials or API keys committed.
 - `.env` and `guideline_chatbot/data/raw/` strictly ignored in Git.
+
+---
+
+## Step B — Pre-Build Checklist & Cross-Guideline Analysis
+
+**Review Date:** 2026-11-01  
+**Reviewer:** Self-Review Pass  
+**Status:** COMPLETED — Awaiting User Approval to Begin Phase 1  
+
+### 1. Gate 0 Adjustments & Step B Deliverables
+1. **Unspecified Date Types:**
+   - Added `date_type: str | None` to `InventoryRecord`, `INVENTORY_FIELDS`, and tests.
+   - Set to `"unspecified"` for ICMR HTN ("May/2026"), ICMR T2DM ("July/ 2022"), MoHFW HTN Background ("March 2016"), and MoHFW HTN QRG ("May 2016").
+   - Explicit publication notices (WHO, NICE) marked `"publication"`.
+2. **Flowcharts Option A:**
+   - Rendered 4 high-res page images (1700 × 2200 px) in `guideline_chatbot/data/reports/flowcharts/`.
+   - Transcribed structured decision-tree nodes to JSON and Markdown with `needs_review: true` and `indexed_for_retrieval: false`.
+3. **Cross-Guideline Disagreements Documented:**
+   - Produced `docs/PRE_BUILD_CHECKLIST.md` with evidentiary disagreement matrix comparing MoHFW (2016), ICMR (2022/2026), WHO (2020/2021), and NICE (NG136/NG28).
+   - Covered diagnostic strategy, blood pressure targets (general vs diabetic), monotherapy vs dual therapy, first-line drug selection, and T2DM SGLT2-i adoption.
+4. **LLM Provider Configuration:**
+   - Verified deterministic Mock LLM is active and default for testing and pipeline development. Real provider selection deferred to Phase 3.

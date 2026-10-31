@@ -1,0 +1,259 @@
+[
+  {
+    "flowchart_id": "fc_mohfw_qr_p40",
+    "document_id": "mohfw_htn_002",
+    "document_name": "MoHFW Standard Treatment Guidelines - Hypertension (Quick Reference Guide)",
+    "page": 40,
+    "image_filename": "mohfw_quickref_p40_adult_htn_algorithm.png",
+    "image_path": "guideline_chatbot\\data\\reports\\flowcharts\\mohfw_quickref_p40_adult_htn_algorithm.png",
+    "title": "Physical Activity and Exercise Prescription Algorithm in Hypertension",
+    "source_reference": "Ref: (85) - Metkus TS, Baughman KL, Thompson PD. Circulation 2010; MoHFW STG Annexure 2",
+    "needs_review": true,
+    "indexed_for_retrieval": false,
+    "verification_status": "draft_pending_human_verification",
+    "human_review_directive": "Do not index for retrieval until human verification against page image is complete.",
+    "nodes": [
+      {
+        "node_id": "N1",
+        "node_type": "entry",
+        "label": "Adult with diagnosed Hypertension or high cardiovascular risk",
+        "criteria": "SBP >= 140 and/or DBP >= 90 mmHg or high-normal BP",
+        "next_nodes": [
+          "N2"
+        ]
+      },
+      {
+        "node_id": "N2",
+        "node_type": "decision",
+        "label": "Pre-exercise medical screening & symptom check",
+        "check": "Presence of chest discomfort, jaw pain, palpitations, syncope, dyspnea, decompensated heart failure, or ACS",
+        "branches": {
+          "yes": "N3_contraindication",
+          "no": "N4_activity_assessment"
+        }
+      },
+      {
+        "node_id": "N3_contraindication",
+        "node_type": "action_referral",
+        "label": "Exercise Contraindicated / Urgent Medical Evaluation",
+        "action": "Do not start exercise program; evaluate and manage cardiac condition before initiating exercise."
+      },
+      {
+        "node_id": "N4_activity_assessment",
+        "node_type": "decision",
+        "label": "Baseline physical activity level",
+        "check": "Is the patient chronically sedentary?",
+        "branches": {
+          "yes": "N5_sedentary_start",
+          "no": "N6_standard_aerobic"
+        }
+      },
+      {
+        "node_id": "N5_sedentary_start",
+        "node_type": "action",
+        "label": "Gradual Initiation for Sedentary Patients",
+        "prescription": "Start with 10 minutes of moderate activity per session; gradually increase duration and intensity to minimize musculoskeletal and cardiac risk.",
+        "next_nodes": [
+          "N6_standard_aerobic"
+        ]
+      },
+      {
+        "node_id": "N6_standard_aerobic",
+        "node_type": "action",
+        "label": "Standard Aerobic Exercise Prescription",
+        "prescription": "Moderate-intensity physical activity 30 minutes/day or >= 150 minutes/week in sessions of >= 10 mins, 4-7 days/week (brisk walking at 3-4 mph, cycling, light swimming). Expect average BP reduction of 4 mmHg SBP / 2.5 mmHg DBP.",
+        "next_nodes": [
+          "N7_resistance"
+        ]
+      },
+      {
+        "node_id": "N7_resistance",
+        "node_type": "action",
+        "label": "Muscle Strengthening / Resistance Training",
+        "prescription": "Include resistance/muscle-strengthening exercises on at least 2 days per week."
+      }
+    ]
+  },
+  {
+    "flowchart_id": "fc_mohfw_qr_p44_bg_p127",
+    "document_id": "mohfw_htn_002",
+    "document_name": "MoHFW Standard Treatment Guidelines - Hypertension (Quick Reference Guide p.44 & Background Document p.127)",
+    "page": 44,
+    "image_filename": "mohfw_quickref_p44_diabetic_htn_algorithm.png",
+    "image_path": "guideline_chatbot\\data\\reports\\flowcharts\\mohfw_quickref_p44_diabetic_htn_algorithm.png",
+    "title": "Overall Adult Hypertension Screening, Risk Stratification & Stepwise Treatment Algorithm",
+    "source_reference": "Ref: (23) - European Guidelines on CVD Prevention / MoHFW Section 7 Management Pathway",
+    "needs_review": true,
+    "indexed_for_retrieval": false,
+    "verification_status": "draft_pending_human_verification",
+    "human_review_directive": "Do not index for retrieval until human verification against page image is complete.",
+    "nodes": [
+      {
+        "node_id": "M1",
+        "node_type": "entry",
+        "label": "Confirmed Hypertension Diagnosis",
+        "criteria": "SBP >= 140 and/or DBP >= 90 mmHg on >= 2 clinic visits using standardized procedure",
+        "next_nodes": [
+          "M2_lifestyle_all"
+        ]
+      },
+      {
+        "node_id": "M2_lifestyle_all",
+        "node_type": "action",
+        "label": "Universal Lifestyle Modification",
+        "action": "Salt intake < 5 g/day, low fat diet, weight control (target BMI 18.5-22.9 kg/m2), regular exercise, stop tobacco.",
+        "next_nodes": [
+          "M3_stratification"
+        ]
+      },
+      {
+        "node_id": "M3_stratification",
+        "node_type": "decision",
+        "label": "Risk & Severity Stratification",
+        "check": "Is HTN Grade 1 without TOD/comorbidities (<3 risk factors) vs Grade 2/3 or with Diabetes/CKD/CAD/TOD?",
+        "branches": {
+          "grade_1_low_risk": "M4_grade1_trial",
+          "grade_2_3_or_high_risk": "M5_drug_step1"
+        }
+      },
+      {
+        "node_id": "M4_grade1_trial",
+        "node_type": "decision",
+        "label": "Grade 1 Lifestyle Trial (3 Months)",
+        "check": "Is BP controlled to < 140/90 mmHg after 3 months?",
+        "branches": {
+          "controlled": "M4_continue_lifestyle",
+          "uncontrolled": "M5_drug_step1"
+        }
+      },
+      {
+        "node_id": "M4_continue_lifestyle",
+        "node_type": "action",
+        "label": "Continue Lifestyle Modification & Annual/Periodic Monitoring",
+        "action": "Maintain lifestyle modifications; re-evaluate clinic BP every 3-6 months."
+      },
+      {
+        "node_id": "M5_drug_step1",
+        "node_type": "action_drug",
+        "label": "Step 1: Initial Monotherapy / Low-Dose Dual",
+        "prescription": "Age < 60y: ACE inhibitor (Enalapril 2.5-5 mg) or ARB (Losartan 25-50 mg); Age >= 60y: CCB (Amlodipine 2.5-5 mg) or Thiazide (Hydrochlorothiazide 12.5 mg). Target: < 140/90 mmHg (< 150/90 in >=80y; < 130/80 in Diabetes/CKD).",
+        "next_nodes": [
+          "M6_step1_check"
+        ]
+      },
+      {
+        "node_id": "M6_step1_check",
+        "node_type": "decision",
+        "label": "Evaluate Step 1 BP Target at 4-6 Weeks",
+        "check": "Is BP at target?",
+        "branches": {
+          "yes": "M6_maintain",
+          "no": "M7_drug_step2"
+        }
+      },
+      {
+        "node_id": "M6_maintain",
+        "node_type": "action",
+        "label": "Maintain Current Regimen & Follow-up",
+        "action": "Monitor adherence, creatinine and electrolytes every 6 months."
+      },
+      {
+        "node_id": "M7_drug_step2",
+        "node_type": "action_drug",
+        "label": "Step 2: Dual Combination Therapy",
+        "prescription": "Combine two agents from different classes: ACEi/ARB + CCB (A + C) OR ACEi/ARB + Thiazide (A + D). DO NOT combine ACEi + ARB.",
+        "next_nodes": [
+          "M8_step2_check"
+        ]
+      },
+      {
+        "node_id": "M8_step2_check",
+        "node_type": "decision",
+        "label": "Evaluate Step 2 BP Target at 4 Weeks",
+        "check": "Is BP at target?",
+        "branches": {
+          "yes": "M6_maintain",
+          "no": "M9_drug_step3"
+        }
+      },
+      {
+        "node_id": "M9_drug_step3",
+        "node_type": "action_drug",
+        "label": "Step 3: Triple Combination Therapy",
+        "prescription": "Combine three classes: ACEi/ARB + CCB + Thiazide diuretic (A + C + D). Check adherence and lifestyle.",
+        "next_nodes": [
+          "M10_step3_check"
+        ]
+      },
+      {
+        "node_id": "M10_step3_check",
+        "node_type": "decision",
+        "label": "Evaluate Step 3 BP Target at 4 Weeks",
+        "check": "Is BP at target?",
+        "branches": {
+          "yes": "M6_maintain",
+          "no": "M11_step4_resistant"
+        }
+      },
+      {
+        "node_id": "M11_step4_resistant",
+        "node_type": "action_referral",
+        "label": "Step 4: Resistant Hypertension & Specialist Referral",
+        "action": "Add Spironolactone (MRA 25 mg) or Beta-blocker; refer to District Hospital / Specialist for secondary HTN evaluation."
+      }
+    ]
+  },
+  {
+    "flowchart_id": "fc_mohfw_qr_p52",
+    "document_id": "mohfw_htn_002",
+    "document_name": "MoHFW Standard Treatment Guidelines - Hypertension (Quick Reference Guide)",
+    "page": 52,
+    "image_filename": "mohfw_quickref_p52_pregnancy_htn_algorithm.png",
+    "image_path": "guideline_chatbot\\data\\reports\\flowcharts\\mohfw_quickref_p52_pregnancy_htn_algorithm.png",
+    "title": "Formulary Drug Titration & Renal Impairment Safeguards Flowchart",
+    "source_reference": "MoHFW STG Quick Reference Guide Annexure 3 Formulary Summary & Page 52 Footnote",
+    "needs_review": true,
+    "indexed_for_retrieval": false,
+    "verification_status": "draft_pending_human_verification",
+    "human_review_directive": "Do not index for retrieval until human verification against page image is complete.",
+    "nodes": [
+      {
+        "node_id": "F1",
+        "node_type": "entry",
+        "label": "Antihypertensive Drug Selection & Dosage Guidance",
+        "classes": [
+          "CCB (Amlodipine)",
+          "ACEi (Enalapril)",
+          "ARB (Losartan)",
+          "Thiazide (Hydrochlorothiazide)"
+        ],
+        "next_nodes": [
+          "F2_renal_check"
+        ]
+      },
+      {
+        "node_id": "F2_renal_check",
+        "node_type": "decision",
+        "label": "Renal Function Threshold Check",
+        "check": "Is Creatinine Clearance < 30 ml/min (approx serum creatinine >= 3.0 mg/dl)?",
+        "branches": {
+          "yes": "F3_renal_impairment_action",
+          "no": "F4_standard_formulary"
+        }
+      },
+      {
+        "node_id": "F3_renal_impairment_action",
+        "node_type": "warning_action",
+        "label": "Thiazide Contraindication / Inefficacy Rule",
+        "rule": "Avoid thiazide diuretics if creatinine clearance is < 30 ml/min, as they are ineffective. Switch to loop diuretics (Furosemide). Monitor potassium and creatinine closely when using ACEi/ARBs.",
+        "footnote_text": "Renal impairment: Avoid if creatinine clearance is less than <30 ml/min (approximate serum creatinine 3 mg/dl), when they may be ineffective."
+      },
+      {
+        "node_id": "F4_standard_formulary",
+        "node_type": "action",
+        "label": "Standard Low-Dose Thiazide & Essential Drug Formulary",
+        "guidance": "Hydrochlorothiazide 12.5 mg once daily produces near-maximal BP reduction with minimal metabolic disturbance. Amlodipine 2.5-5 mg once daily. Enalapril 2.5-5 mg once daily."
+      }
+    ]
+  }
+]

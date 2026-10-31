@@ -17,17 +17,17 @@ A complete development environment was provisioned from scratch with Python 3.11
 
 ## 2. Acquired Documents Inventory & Title Page Verification
 
-| Doc ID | Organization | Document Title | Condition | Pages | Size (bytes) | SHA-256 (prefix) | Publication Date | Version | Title Page Verification |
-|---|---|---|---|---|---|---|---|---|---|
-| `who_htn_001` | WHO | Guideline for the Pharmacological Treatment of Hypertension in Adults (2021) | HTN | 61 | 843,539 | `57f6376d5c9b...` | 2021 | null | "Guideline for the pharmacological treatment of hypertension in adults // World Health Organization" |
-| `who_t2dm_001` | WHO | HEARTS-D: Diagnosis and Management of Type 2 Diabetes (2020) | T2DM | 35 | 1,248,098 | `71b216b19a22...` | 2020 | null | "Diagnosis and Management of Type 2 Diabetes // WHO/UCN/NCD/20.1" |
-| `icmr_htn_001` | ICMR / DHR | STW - Hypertension in Adults (ICD-11 BA00) | HTN | 1 | 3,297,566 | `bffc8acfa65c...` | May/2026 | null | "Standard Treatment Workflow (STW) // HYPERTENSION IN ADULTS // ICD-11 BA00" |
-| `icmr_t2dm_001` | ICMR / DHR | STW - Diabetes Mellitus Type 2 (ICD-10-E11) | T2DM | 1 | 332,368 | `bcad0bfca7c2...` | July/ 2022 | null | "Standard Treatment Workflow (STW) // DIABETES MELLITUS TYPE 2 // ICD-10-E11" |
-| `nice_htn_001` | NICE (UK) | NG136: Hypertension in Adults: Diagnosis and Management | HTN | 52 | 296,345 | `3f8255bf9c16...` | 2019-08-28 | null | "Hypertension in adults: diagnosis and management // NICE guideline NG136" |
-| `nice_t2dm_001` | NICE (UK) | NG28: Type 2 Diabetes in Adults: Management | T2DM | 131 | 569,249 | `249e1f3ad3d1...` | 2015-12-02 | null | "Type 2 diabetes in adults: management // NICE guideline NG28" |
-| `mohfw_htn_001` | MoHFW (India) | STG - Hypertension (Background Document) | HTN | 144 | 1,438,955 | `8388906c4f3c...` | March 2016 | null | "Background Document // Hypertension // Screening, Diagnosis, Assessment, and Management of Primary Hypertension in Adults in India // March 2016" |
-| `mohfw_htn_002` | MoHFW (India) | STG - Hypertension (Quick Reference Guide) | HTN | 54 | 1,748,005 | `62de7ccc3b98...` | May 2016 | null | "Standard Treatment Guidelines - Hypertension // Quick Reference Guide // May 2016" |
-| `mohfw_t2dm_001` | MoHFW (India) | STG - Endocrinology (Diabetes Mellitus) | T2DM | 49 | 725,300 | `7f681425fa91...` | null | null | "STANDARD TREATMENT GUIDELINES // ENDOCRINOLOGY // Ministry of Health & Family Welfare" |
+| Doc ID | Organization | Document Title | Condition | Pages | Size (bytes) | SHA-256 (prefix) | Printed Date | Date Type | Version | Title Page Verification |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `who_htn_001` | WHO | Guideline for the Pharmacological Treatment of Hypertension in Adults (2021) | HTN | 61 | 843,539 | `57f6376d5c9b...` | 2021 | publication | null | "Guideline for the pharmacological treatment of hypertension in adults // World Health Organization" |
+| `who_t2dm_001` | WHO | HEARTS-D: Diagnosis and Management of Type 2 Diabetes (2020) | T2DM | 35 | 1,248,098 | `71b216b19a22...` | 2020 | publication | null | "Diagnosis and Management of Type 2 Diabetes // WHO/UCN/NCD/20.1" |
+| `icmr_htn_001` | ICMR / DHR | STW - Hypertension in Adults (ICD-11 BA00) | HTN | 1 | 3,297,566 | `bffc8acfa65c...` | May/2026 | unspecified | null | "Standard Treatment Workflow (STW) // HYPERTENSION IN ADULTS // ICD-11 BA00" |
+| `icmr_t2dm_001` | ICMR / DHR | STW - Diabetes Mellitus Type 2 (ICD-10-E11) | T2DM | 1 | 332,368 | `bcad0bfca7c2...` | July/ 2022 | unspecified | null | "Standard Treatment Workflow (STW) // DIABETES MELLITUS TYPE 2 // ICD-10-E11" |
+| `nice_htn_001` | NICE (UK) | NG136: Hypertension in Adults: Diagnosis and Management | HTN | 52 | 296,345 | `3f8255bf9c16...` | 2019-08-28 | publication | null | "Hypertension in adults: diagnosis and management // NICE guideline NG136" |
+| `nice_t2dm_001` | NICE (UK) | NG28: Type 2 Diabetes in Adults: Management | T2DM | 131 | 569,249 | `249e1f3ad3d1...` | 2015-12-02 | publication | null | "Type 2 diabetes in adults: management // NICE guideline NG28" |
+| `mohfw_htn_001` | MoHFW (India) | STG - Hypertension (Background Document) | HTN | 144 | 1,438,955 | `8388906c4f3c...` | March 2016 | unspecified | null | "Background Document // Hypertension // Screening, Diagnosis, Assessment, and Management of Primary Hypertension in Adults in India // March 2016" |
+| `mohfw_htn_002` | MoHFW (India) | STG - Hypertension (Quick Reference Guide) | HTN | 54 | 1,748,005 | `62de7ccc3b98...` | May 2016 | unspecified | null | "Standard Treatment Guidelines - Hypertension // Quick Reference Guide // May 2016" |
+| `mohfw_t2dm_001` | MoHFW (India) | STG - Endocrinology (Diabetes Mellitus) | T2DM | 49 | 725,300 | `7f681425fa91...` | null | null | null | "STANDARD TREATMENT GUIDELINES // ENDOCRINOLOGY // Ministry of Health & Family Welfare" |
 
 **Totals:** 9 documents, 528 total pages, 10,499,425 bytes (~10.5 MB). 100% verified authentic.
 
@@ -36,9 +36,10 @@ A complete development environment was provisioned from scratch with Python 3.11
 ## 3. Scope Boundaries & Investigative Audit Findings
 
 ### 3.1 ICMR STW Documents Audit
-1. **Publication Dates:**
-   - `icmr_htn_001` explicitly prints `May/2026` on page 1 (advisory review horizon printed by ICMR). Recorded verbatim as `"May/2026"` without inference.
-   - `icmr_t2dm_001` explicitly prints `July/ 2022` on page 1. Recorded verbatim as `"July/ 2022"`.
+1. **Printed Dates & Date Types:**
+   - `icmr_htn_001` explicitly prints `May/2026` on page 1. Recorded as a printed date of unspecified type (`date_type: "unspecified"`) without editorial characterization as a publication or review date.
+   - `icmr_t2dm_001` explicitly prints `July/ 2022` on page 1. Recorded as a printed date of unspecified type (`date_type: "unspecified"`).
+   - `mohfw_htn_001` ("March 2016") and `mohfw_htn_002` ("May 2016") also carry `date_type: "unspecified"` as their exact legal/administrative meaning is not stated. Documents with explicit publication notices (WHO, NICE) carry `date_type: "publication"`. MoHFW Endocrinology carries `publication_date: null` and `date_type: null`.
 2. **ICD Code Correction:**
    - The T2DM STW sheet explicitly prints `ICD-10-E11` beneath the title "DIABETES MELLITUS TYPE 2". The document title and catalog were corrected from the initial placeholder `ICD-11 5A11` to `ICD-10-E11`.
 3. **Scope Restriction:**
