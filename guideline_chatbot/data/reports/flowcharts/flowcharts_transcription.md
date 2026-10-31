@@ -2,83 +2,73 @@
 
 > [!CAUTION]
 > **VERIFICATION STATUS: `needs_review: true` | `indexed_for_retrieval: false`**  
-> These structured decision nodes were transcribed from the embedded flowchart drawings of the MoHFW Standard Treatment Guidelines. Per Gate 0 approval directives, **these nodes MUST NOT be indexed for RAG retrieval** until each has been explicitly verified by the human reviewer against the rendered high-resolution page images.
+> These structured decision nodes were transcribed directly from the rendered high-resolution page images of the MoHFW Standard Treatment Guidelines. Per Gate 0 approval directives, **these nodes MUST NOT be indexed for RAG retrieval** until each has been explicitly verified by the human reviewer against the page images.
 
 ---
 
 ## 1. Flowchart Overview & Image Mapping
 
-| Flowchart ID | Source Document | Page | Rendered High-Res Image | Verification Status | RAG Indexing Allowed? |
-|---|---|---|---|---|---|
-| `fc_mohfw_qr_p40` | MoHFW STG Quick Reference Guide (`6591.pdf`) | p. 40 | [`mohfw_quickref_p40_adult_htn_algorithm.png`](file:///c:/Users/kavan/OneDrive/Desktop/capstone/guideline_chatbot/data/reports/flowcharts/mohfw_quickref_p40_adult_htn_algorithm.png) | `needs_review` | **NO** (Hold until human review) |
-| `fc_mohfw_qr_p44` | MoHFW STG Quick Reference Guide (`6591.pdf`) | p. 44 | [`mohfw_quickref_p44_diabetic_htn_algorithm.png`](file:///c:/Users/kavan/OneDrive/Desktop/capstone/guideline_chatbot/data/reports/flowcharts/mohfw_quickref_p44_diabetic_htn_algorithm.png) | `needs_review` | **NO** (Hold until human review) |
-| `fc_mohfw_bg_p127` | MoHFW STG Background Document (`5191.pdf`) | p. 127 | [`mohfw_background_p127_screening_diagnosis_flowchart.png`](file:///c:/Users/kavan/OneDrive/Desktop/capstone/guideline_chatbot/data/reports/flowcharts/mohfw_background_p127_screening_diagnosis_flowchart.png) | `needs_review` | **NO** (Hold until human review) |
-| `fc_mohfw_qr_p52` | MoHFW STG Quick Reference Guide (`6591.pdf`) | p. 52 | [`mohfw_quickref_p52_pregnancy_htn_algorithm.png`](file:///c:/Users/kavan/OneDrive/Desktop/capstone/guideline_chatbot/data/reports/flowcharts/mohfw_quickref_p52_pregnancy_htn_algorithm.png) | `needs_review` | **NO** (Hold until human review) |
+| Flowchart ID | Source Document | Page | Verified Document Figure Title | Rendered High-Res Image | Verification Status | RAG Indexing Allowed? |
+|---|---|---|---|---|---|---|
+| `fc_mohfw_qr_p40` | MoHFW STG Quick Reference Guide (`6591.pdf`) | p. 40 | **Figure. An approach to staged exercise prescriptions** | [`mohfw_quickref_p40_staged_exercise_prescription.png`](file:///c:/Users/kavan/OneDrive/Desktop/capstone/guideline_chatbot/data/reports/flowcharts/mohfw_quickref_p40_staged_exercise_prescription.png) | `needs_review` | **NO** (Hold until human review) |
+| `fc_mohfw_qr_p44` | MoHFW STG Quick Reference Guide (`6591.pdf`) | p. 44 | **Figure 7. Modified World Health Organization (WHO) smoking cessation algorithm** | [`mohfw_quickref_p44_who_smoking_cessation_algorithm.png`](file:///c:/Users/kavan/OneDrive/Desktop/capstone/guideline_chatbot/data/reports/flowcharts/mohfw_quickref_p44_who_smoking_cessation_algorithm.png) | `needs_review` | **NO** (Hold until human review) |
+| `fc_mohfw_bg_p127` | MoHFW STG Background Document (`5191.pdf`) | p. 127 | **Figure 7. Modified World Health Organization (WHO) smoking cessation algorithm** (Identical to QRG p. 44) | [`mohfw_background_p127_who_smoking_cessation_algorithm.png`](file:///c:/Users/kavan/OneDrive/Desktop/capstone/guideline_chatbot/data/reports/flowcharts/mohfw_background_p127_who_smoking_cessation_algorithm.png) | `needs_review` | **NO** (Hold until human review) |
+| `fc_mohfw_qr_p52` | MoHFW STG Quick Reference Guide (`6591.pdf`) | p. 52 | **Formulary Renal Impairment Advisory Note (Not a Flowchart Diagram)** | [`mohfw_quickref_p52_renal_impairment_caution.png`](file:///c:/Users/kavan/OneDrive/Desktop/capstone/guideline_chatbot/data/reports/flowcharts/mohfw_quickref_p52_renal_impairment_caution.png) | `needs_review` | **NO** (Hold until human review) |
 
 ---
 
-## 2. Transcribed Flowchart 1: Physical Activity & Exercise Prescription
+## 2. Transcribed Flowchart 1: Staged Exercise Prescription
 - **Source:** MoHFW STG Quick Reference Guide, Page 40 (Ref: 85 - Metkus et al., Circulation 2010; MoHFW STG Annexure 2).
-- **Target Condition:** Adult Hypertension (Lifestyle & Non-Pharmacological Management).
+- **Exact Title on Image:** *"Figure. An approach to staged exercise prescriptions: Any enjoyable, moderate-intensity activity such as those listed in Table 2 may be substituted for walking. Specific strength training exercises are also listed in Table 2. Rx indicates prescription. Source: Ref: (85)"*
 
 ```mermaid
 flowchart TD
-    N1["Adult with diagnosed HTN or high CV risk (BP >= 140/90)"] --> N2{"Pre-exercise symptom & safety check: Chest pain, dyspnea, syncope, heart failure, ACS?"}
-    N2 -- Yes --> N3["CONTRAINDICATION: Do not start exercise. Urgent cardiac evaluation & stabilization."]
-    N2 -- No --> N4{"Is the patient chronically sedentary?"}
-    N4 -- Yes --> N5["Gradual start: 10 min/session moderate activity; build gradually."]
-    N4 -- No --> N6["Standard aerobic prescription: >= 30 min/day or >= 150 min/week in >= 10 min bouts (brisk walk 3-4 mph). Avg reduction: -4 SBP / -2.5 DBP."]
-    N5 --> N6
-    N6 --> N7["Resistance training: Muscle strengthening exercises >= 2 days/week."]
+    N1["Adult patient initiating exercise prescription for CV risk / BP reduction"] --> N2["Stage 1: Walking at conversational pace, 5 days/week, 10 min/session"]
+    N2 --> N3{"Concerning symptoms or repeated exercise intolerance?"}
+    N3 -- Yes --> N4["Perform cardiac evaluation before continuing"]
+    N3 -- No --> N5["Stage 2: Walking at conversational pace, 5 days/week, 15 min/session"]
+    N5 --> N6["Stage 3 (Maintenance): Walking at conversational pace, 5 days/week, 30 min/session"]
+    N6 --> N7["Strength Training Adjunct: Major muscle groups, 1-3 sets, 8-12 reps/set, 2-3 days/week"]
 ```
 
 ### Node Dictionary
-- **Node `N1` (Entry):** Adult presenting with diagnosed hypertension or high CVD risk.
-- **Node `N2` (Decision/Check):** Clinical safety screen for chest discomfort, jaw pain, palpitations, syncope, dyspnea, decompensated heart failure, or acute coronary syndrome.
-- **Node `N3` (Action/Contraindication):** Exercise contraindicated. Urgent referral/workup required before any exercise program.
-- **Node `N4` (Decision/Check):** Activity history assessment: chronically sedentary vs active.
-- **Node `N5` (Action):** Start with 10 minutes moderate activity per session; gradually titrate upward to prevent acute cardiac events and musculoskeletal trauma.
-- **Node `N6` (Action/Prescription):** Moderate-intensity physical activity of 30 mins/day or >= 150 mins/week, 4–7 days/week (brisk walking, cycling).
-- **Node `N7` (Action/Prescription):** Resistance muscle-strengthening exercises on at least 2 days per week.
+- **Node `P40_N1_entry`:** Entry for hypertensive patient initiating physical activity.
+- **Node `P40_N2_stage1`:** Stage 1: Walking at conversational pace, 5 days/week, 10 minutes per session.
+- **Node `P40_N3_check`:** Symptom check for chest pain, dyspnea, syncope, or exercise intolerance.
+- **Node `P40_N4_eval`:** Action: Cardiac evaluation required before proceeding.
+- **Node `P40_N5_stage2`:** Stage 2: Walking at conversational pace, 5 days/week, 15 minutes per session.
+- **Node `P40_N6_stage3`:** Stage 3: Walking at conversational pace, 5 days/week, 30 minutes per session (target 150 mins/week).
+- **Node `P40_N7_strength`:** Strength training adjunct: Major muscle groups (bicep curls, military press, shrugs, squats, leg curls), 1–3 sets, 8–12 reps/set, 2–3 days/week.
 
 ---
 
-## 3. Transcribed Flowchart 2: Adult Hypertension Diagnosis, Stratification & Treatment Pathway
-- **Source:** MoHFW STG Quick Reference Guide, Page 44 & Background Document, Page 127 (Ref: 23 - European Guidelines on CVD Prevention / MoHFW Section 7 Management Pathway).
-- **Target Condition:** Primary Hypertension in Adults.
+## 3. Transcribed Flowchart 2: Modified WHO Smoking Cessation Algorithm (5 As)
+- **Source:** MoHFW STG Quick Reference Guide, Page 44 & Background Document, Page 127.
+- **Exact Title on Image:** *"Figure 7 Modified World Health Organization (WHO) smoking cessation algorithm. Ref: (23)"* (Taken with permission from WHO CVD risk management package).
 
 ```mermaid
 flowchart TD
-    M1["Confirmed HTN: SBP >= 140 and/or DBP >= 90 mmHg on >= 2 clinic visits"] --> M2["Universal lifestyle modification: Salt < 5 g/day, BMI 18.5-22.9, exercise, stop tobacco"]
-    M2 --> M3{"Severity & Risk Stratification: Grade 1 Uncomplicated vs Grade 2/3, TOD, Diabetes, CKD, CAD?"}
-    M3 -- Grade 1 Low Risk --> M4{"3-Month Lifestyle Trial: Is BP controlled to < 140/90?"}
-    M4 -- Controlled --> M4_OK["Maintain lifestyle & review clinic BP every 3-6 months"]
-    M4 -- Uncontrolled --> M5["Step 1 Monotherapy: Age < 60y: ACEi (Enalapril 2.5-5 mg) or ARB (Losartan 25-50 mg) or CCB. Age >= 60y: CCB (Amlodipine 2.5-5 mg) or Thiazide (HCTZ 12.5 mg)."]
-    M3 -- Grade 2/3 or High Risk --> M5
-    M5 --> M6{"Step 1 Target Check at 4-6 Weeks: BP < 140/90 (<150/90 if >=80y; <130/80 if DM/CKD)?"}
-    M6 -- Yes --> M6_OK["Maintain dose & monitor creatinine/electrolytes at 6 months"]
-    M6 -- No --> M7["Step 2 Dual Combination: Combine 2 classes: ACEi/ARB + CCB (A + C) OR ACEi/ARB + Thiazide (A + D). NEVER ACEi + ARB."]
-    M7 --> M8{"Step 2 Target Check at 4 Weeks: BP at target?"}
-    M8 -- Yes --> M6_OK
-    M8 -- No --> M9["Step 3 Triple Combination: ACEi/ARB + CCB + Thiazide (A + C + D). Verify adherence."]
-    M9 --> M10{"Step 3 Target Check at 4 Weeks: BP at target?"}
-    M10 -- Yes --> M6_OK
-    M10 -- No --> M11["Step 4 Resistant HTN: Add Spironolactone (MRA 25 mg) or Beta-blocker; refer to District/Specialist."]
+    A1{"A1: ASK — Do you use tobacco?"}
+    A1 -- No --> A1_No["Reinforce message that tobacco increases heart disease risk; congratulate non-use."]
+    A1 -- Yes --> A2["A2: ADVISE — Clear, strong, personalised advice: 'Quitting tobacco use is the one most important thing you can do to protect your heart and health, you have to quit now.'"]
+    A2 --> A3{"A3: ASSESS — Are you willing to make a quit attempt now?"}
+    A3 -- No --> A3_No["Provide information on health hazards of tobacco and give educational leaflet to patient. Re-assess at follow-up."]
+    A3 -- Yes --> A4["A4: ASSIST — Prepare quitting plan: Set quit date; Inform family/friends & ask support; Remove cigarettes/tobacco; Remove objects prompting smoking; Arrange follow-up."]
+    A4 --> A5["A5: ARRANGE — Schedule follow-up: within same month, monthly for 4 months, evaluate at 1 year. At visit: Congratulate success, reinforce; if relapsed, intensive support."]
 ```
+
+### Node Dictionary
+- **Step `A1: ASK`:** Inquire about tobacco use at every patient contact.
+- **Step `A2: ADVISE`:** Provide strong, unambiguous, personalized medical advice on quitting.
+- **Step `A3: ASSESS`:** Evaluate readiness to make a quit attempt immediately.
+- **Step `A4: ASSIST`:** Deliver structured cessation counseling (quit date, social support, stimulus control).
+- **Step `A5: ARRANGE`:** Establish concrete longitudinal follow-up schedule aligned with BP monitoring visits.
 
 ---
 
-## 4. Transcribed Flowchart 3: Essential Formulary & Renal Safeguards
-- **Source:** MoHFW STG Quick Reference Guide, Page 52 (Formulary Summary & Renal Footnote).
-- **Target Condition:** Drug safety and dosing boundaries in renal impairment.
-
-```mermaid
-flowchart TD
-    F1["Antihypertensive Drug Selection: CCB (Amlodipine), ACEi (Enalapril), ARB (Losartan), Thiazide (HCTZ)"] --> F2{"Renal Function Check: Creatinine Clearance < 30 ml/min (approx Serum Cr >= 3.0 mg/dl)?"}
-    F2 -- CrCl < 30 ml/min --> F3["CRITICAL WARNING: Avoid Thiazide Diuretics (ineffective at CrCl < 30). Switch to Loop Diuretics (Furosemide). Monitor K+ and Cr closely with ACEi/ARBs."]
-    F2 -- CrCl >= 30 ml/min --> F4["Standard Essential Formulary Dosing: HCTZ 12.5 mg once daily (near-maximal BP reduction with minimal metabolic impact); Amlodipine 2.5-5 mg once daily; Enalapril 2.5-5 mg once daily."]
-```
-
-### Footnote Citation from Page 52:
-> *"Renal impairment: Avoid if creatinine clearance is less than <30 ml/min (approximate serum creatinine 3 mg/dl), when they may be ineffective."*
-
+## 4. Visual Inspection of QuickRef Page 52: Renal Impairment Advisory
+- **Source:** MoHFW STG Quick Reference Guide, Page 52.
+- **Image Inspection Finding:** **This page does NOT contain a flowchart or diagram.** The page contains standard running headers/footers with a single isolated clinical advisory sentence:
+  > *"Renal impairment: Avoid if creatinine clearance is less than <30 ml/min (approximate serum creatinine 3 mg/dl), when they may be ineffective."*
+- **Reason for Prior Flag:** Generated as a sparse page in PDF rendering with 234 null background vector tiles, leaving the middle 80% as blank white space.
+- **Transcribed Element:** Documented strictly as a cautionary text block regarding thiazide inefficacy in severe renal impairment (CrCl $< 30\text{ ml/min}$).
