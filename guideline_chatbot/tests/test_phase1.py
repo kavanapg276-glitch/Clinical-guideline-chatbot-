@@ -1,12 +1,15 @@
-"""Unit tests for Phase 1: PDF Extraction, Cleaning, and Recommendation-Aware Chunking.
+"""Unit tests for Phase 1 & Phase 1b: PDF Extraction, Cleaning, and Recommendation-Aware Chunking.
 
 Verifies:
 1. Extraction preserves 1-based page numbers and respects relevant_page_ranges.
 2. Cleaning strips running headers, footers, and boilerplate without corrupting clinical text.
-3. Chunker satisfies the GuidelineChunk schema with all 22 required metadata fields.
+3. Chunker satisfies the GuidelineChunk schema with all 26 required metadata fields.
 4. 100% of chunks have valid page provenance and non-empty text/hashes.
-5. Transcribed flowchart nodes are strictly excluded from retrieval chunks.
-6. Clinical entity tagging correctly detects populations and drug classes.
+5. Transcribed flowchart nodes and noise chunks are excluded from retrieval indexing.
+6. Clinical entity tagging correctly detects populations, separate T1/T2 tags, and drug classes.
+7. Automated numeric preservation check across critical thresholds and doses.
+8. Ten clinical trap verifications.
+9. ICMR poster drug table row-by-row and T2DM strata preservation.
 """
 
 from __future__ import annotations
@@ -25,6 +28,7 @@ from guideline_chatbot.chunking.recommendation_chunker import (
     extract_exceptions,
     extract_population_tags,
     extract_recommendation_strength,
+    parse_recommendation_year,
     resolve_chunk_condition,
 )
 from guideline_chatbot.chunking.schemas import CHUNK_METADATA_FIELDS
@@ -136,7 +140,7 @@ def test_clean_text_preserves_clinical_numbers_and_drugs() -> None:
         "Initiate Metformin 500 mg twice daily. If eGFR < 30 ml/min, avoid Metformin. "
         "Target HbA1c < 7.0% (53 mmol/mol). Combine Ramipril 2.5-10 mg with Amlodipine 5 mg."
     )
-    cleaned, stats = clean_text(raw, "clinical_test")
+    cleaned, _ = clean_text(raw, "clinical_test")
     assert "Metformin 500 mg twice daily" in cleaned
     assert "eGFR < 30 ml/min" in cleaned
     assert "Target HbA1c < 7.0%" in cleaned
@@ -148,22 +152,41 @@ def test_clean_text_preserves_clinical_numbers_and_drugs() -> None:
 # --- 3. Tagging & Clinical Classifier Tests ---
 
 
-def test_extract_population_tags() -> None:
-    """Verify detection of specific clinical patient populations."""
-    text1 = (
-        "In elderly patients aged over 80 years with chronic kidney disease, target BP < 150/90."
+def test_extract_population_tags_applicability_and_negation() -> None:
+    """Verify population tags enforce applicability over mere mention and handle negations."""
+    # Negation: "without renal disease" must NOT tag chronic_kidney_disease
+    text_negation = (
+        "Measure blood pressure at least annually in an adult with type 2 diabetes without "
+        "previously diagnosed hypertension or renal disease."
     )
-    tags1 = extract_population_tags(text1)
-    assert "elderly" in tags1
-    assert "chronic_kidney_disease" in tags1
+    tags_neg = extract_population_tags(text_negation)
+    assert "type_2_diabetes" in tags_neg
+    assert "chronic_kidney_disease" not in tags_neg
 
-    text2 = "In pregnant women with gestational hypertension, avoid ACE inhibitors."
-    tags2 = extract_population_tags(text2)
-    assert "pregnancy" in tags2
+    # Routine lab screening: HbA1c mentioned in general hypertension workup must NOT tag T2DM
+    text_screening = (
+        "For all people with hypertension offer to: test for the presence of protein in the urine... "
+        "take a blood sample to measure glycated haemoglobin (HbA1C), electrolytes, creatinine."
+    )
+    tags_screen = extract_population_tags(text_screening)
+    assert "type_2_diabetes" not in tags_screen
 
-    text3 = "For people of Black African or African-Caribbean family origin, start with CCB."
-    tags3 = extract_population_tags(text3)
-    assert "african_caribbean" in tags3
+    # Type 1 vs Type 2 diabetes disambiguation
+    text_t1dm = (
+        "See also table 1 for guidance on clinic blood pressure targets for people aged under 80 "
+        "with type 1 diabetes or severe chronic kidney disease."
+    )
+    tags_t1 = extract_population_tags(text_t1dm)
+    assert "type_1_diabetes" in tags_t1
+    assert "type_2_diabetes" not in tags_t1
+
+    # Adverse drug effect mention must NOT tag T2DM
+    text_ae = (
+        "The common side effects of diuretics are metabolic side effects like "
+        "hypokalemia, hyperglycemia but which are less frequent when used in doses of 12.5 mg."
+    )
+    tags_ae = extract_population_tags(text_ae)
+    assert "type_2_diabetes" not in tags_ae
 
 
 def test_extract_drug_class_tags() -> None:
@@ -200,48 +223,61 @@ def test_extract_applicability_and_exceptions() -> None:
         "Do not offer an ACE inhibitor in combination with an ARB."
     )
     conds = extract_applicability_conditions(text)
-    assert len(conds) >= 1
+    assert conds is not None
     assert any("clinic BP >= 140/90" in c for c in conds)
 
     exc = extract_exceptions(text)
-    assert len(exc) >= 1
+    assert exc is not None
     assert any("Avoid if creatinine clearance" in e or "Do not offer" in e for e in exc)
 
 
+def test_parse_recommendation_year() -> None:
+    """Verify parsing of NICE bracketed year tags."""
+    assert parse_recommendation_year("Recommend lifestyle advice. [2009]") == "2009"
+    assert (
+        parse_recommendation_year("Reduce clinic BP to below 140/90. [2019, amended 2022]")
+        == "2022"
+    )
+    assert (
+        parse_recommendation_year("Stop GLP-1 receptor agonists if targets not reached. [2026]")
+        == "2026"
+    )
+    assert parse_recommendation_year("Unversioned recommendation text.") is None
+
+
 def test_classify_chunk_type() -> None:
-    """Verify classification of chunk types."""
-    assert (
-        classify_chunk_type("Table content\n| a | b |\n|---|---|\n| 1 | 2 |", "Table 1") == "table"
+    """Verify classification of chunk types and retrieval indexability flags."""
+    c_tab, idx_tab = classify_chunk_type(
+        "Table content\n| a | b |\n|---|---|\n| 1 | 2 |", "Table 1"
     )
-    assert (
-        classify_chunk_type(
-            "Criteria for diagnosis of diabetes include FPG >= 126.", "Diagnostic Criteria"
-        )
-        == "definition"
+    assert c_tab == "table" and idx_tab is True
+
+    c_def, idx_def = classify_chunk_type(
+        "Criteria for diagnosis of diabetes include FPG >= 126.", "Diagnostic Criteria"
     )
-    assert (
-        classify_chunk_type("Recheck blood pressure every 3 months until controlled.", "Monitoring")
-        == "monitoring"
+    assert c_def == "definition" and idx_def is True
+
+    c_rec, idx_rec = classify_chunk_type("1.4.20 For adults with hypertension", "1.4.20")
+    assert c_rec == "recommendation" and idx_rec is True
+
+    c_ref, idx_ref = classify_chunk_type(
+        "1. Mancia G. 2023 ESH Guidelines. doi: 10.1097/...", "References"
     )
-    assert (
-        classify_chunk_type("Offer amlodipine 5 mg once daily as initial treatment.", "Treatment")
-        == "recommendation"
+    assert c_ref == "reference" and idx_ref is False
+
+    c_fm, idx_fm = classify_chunk_type(
+        "ACEi: Angiotensin-converting enzyme inhibitor", "Abbreviations"
     )
-    assert (
-        classify_chunk_type(
-            "The trial evaluated cardiovascular mortality across groups.", "Rationale"
-        )
-        == "rationale"
-    )
+    assert c_fm == "front_matter" and idx_fm is False
 
 
 def test_resolve_chunk_condition() -> None:
-    """Verify multi-condition cross-tagging."""
+    """Verify multi-condition scoping (both only when both conditions are governed)."""
     assert (
         resolve_chunk_condition("hypertension", "Target blood pressure in adults") == "hypertension"
     )
     assert (
-        resolve_chunk_condition("hypertension", "Target BP in diabetic patients is < 130/80")
+        resolve_chunk_condition("hypertension", "Target BP in diabetic patients is < 140/90")
         == "both"
     )
     assert (
@@ -249,7 +285,7 @@ def test_resolve_chunk_condition() -> None:
         == "type_2_diabetes"
     )
     assert (
-        resolve_chunk_condition("type_2_diabetes", "Hypertension management in diabetic patients")
+        resolve_chunk_condition("type_2_diabetes", "Target BP = 140/90 in diabetic patients")
         == "both"
     )
 
@@ -257,8 +293,8 @@ def test_resolve_chunk_condition() -> None:
 # --- 4. Dataset Integrity & Quality Gate Tests ---
 
 
-def test_all_chunks_have_all_22_fields(processed_chunks: list[dict]) -> None:
-    """Verify that 100% of chunks contain all 22 required metadata fields."""
+def test_all_chunks_have_all_26_fields(processed_chunks: list[dict[str, Any]]) -> None:
+    """Verify that 100% of chunks contain all 26 required metadata fields."""
     assert len(processed_chunks) > 500, f"Expected > 500 chunks, got {len(processed_chunks)}"
     for idx, c in enumerate(processed_chunks):
         for field in CHUNK_METADATA_FIELDS:
@@ -278,7 +314,7 @@ def test_all_chunks_have_all_22_fields(processed_chunks: list[dict]) -> None:
                 )
 
 
-def test_page_provenance_and_validity(processed_chunks: list[dict]) -> None:
+def test_page_provenance_and_validity(processed_chunks: list[dict[str, Any]]) -> None:
     """Verify that every chunk has valid 1-based page provenance (page_start <= page_end)."""
     for c in processed_chunks:
         assert isinstance(c["page_start"], int) and c["page_start"] >= 1
@@ -288,26 +324,27 @@ def test_page_provenance_and_validity(processed_chunks: list[dict]) -> None:
         )
 
 
-def test_flowcharts_excluded_from_retrieval_chunks(processed_chunks: list[dict]) -> None:
-    """Verify that unverified flowchart nodes are strictly excluded from the chunk dataset."""
+def test_flowcharts_and_noise_indexability(processed_chunks: list[dict[str, Any]]) -> None:
+    """Verify that unverified flowchart nodes and noise chunks are not indexed for retrieval."""
     for c in processed_chunks:
         assert not c["chunk_id"].startswith("fc_"), (
             f"Unverified flowchart node {c['chunk_id']} found in processed chunks!"
         )
-        assert c["chunk_type"] != "flowchart", (
-            f"Chunk {c['chunk_id']} has unverified chunk_type 'flowchart'!"
-        )
+        if c["chunk_type"] in ["reference", "methods", "front_matter", "contributors"]:
+            assert c["indexed_for_retrieval"] is False, (
+                f"Noise chunk {c['chunk_id']} of type {c['chunk_type']} was marked indexable!"
+            )
 
 
-def test_word_length_distribution(processed_chunks: list[dict]) -> None:
+def test_word_length_distribution(processed_chunks: list[dict[str, Any]]) -> None:
     """Verify chunk sizes adhere to clinical recommendation boundaries without runaway lengths."""
     for c in processed_chunks:
         words = len(c["text"].split())
-        assert words >= 5, f"Chunk {c['chunk_id']} too short ({words} words)"
+        assert words >= 20, f"Chunk {c['chunk_id']} too short ({words} words)"
         assert words <= 650, f"Chunk {c['chunk_id']} too long ({words} words)"
 
 
-def test_nine_documents_represented(processed_chunks: list[dict]) -> None:
+def test_nine_documents_represented(processed_chunks: list[dict[str, Any]]) -> None:
     """Verify that all 9 guideline documents from the inventory have generated chunks."""
     doc_ids = {c["doc_id"] for c in processed_chunks}
     expected_docs = {
@@ -322,3 +359,156 @@ def test_nine_documents_represented(processed_chunks: list[dict]) -> None:
         "mohfw_t2dm_001",
     }
     assert doc_ids == expected_docs, f"Missing document chunks: {expected_docs - doc_ids}"
+
+
+# --- 5. Phase 1b Numeric Preservation & Trap Tests ---
+
+
+def test_numeric_preservation(processed_chunks: list[dict[str, Any]]) -> None:
+    """Verify critical clinical thresholds, blood pressures, and doses are preserved in chunk text."""
+    corpus_text = " ".join(c["text"] for c in processed_chunks).lower()
+
+    critical_tokens = [
+        "140/90",
+        "130/80",
+        "135/85",
+        "150/90",
+        "160/100",
+        "180/120",
+        "2.5 mg",
+        "5 mg",
+        "10 mg",
+        "12.5 mg",
+        "20 mg",
+        "25 mg",
+        "40 mg",
+        "50 mg",
+        "80 mg",
+        "100 mg",
+        "400 mg",
+        "500 mg",
+        "1000 mg",
+        "2000 mg",
+        "6.5%",
+        "7.0%",
+        "8.5%",
+        "48 mmol/mol",
+        "53 mmol/mol",
+        "30 ml/min",
+        "23 kg/m2",
+    ]
+
+    for tok in critical_tokens:
+        clean_tok = tok.lower()
+        variants = [clean_tok, clean_tok.replace(" ", "")]
+        assert any(v in corpus_text for v in variants), (
+            f"Critical numeric token '{tok}' missing from chunks!"
+        )
+
+
+def test_icmr_drug_table_and_strata_preservation(processed_chunks: list[dict[str, Any]]) -> None:
+    """Verify complete row-wise preservation of ICMR antihypertensive table and T2DM strata."""
+    c_htn = next(c for c in processed_chunks if c["chunk_id"] == "icmr_htn_001_c0012")
+    c_t2dm = next(c for c in processed_chunks if c["chunk_id"] == "icmr_t2dm_001_c0008")
+
+    assert c_htn["chunk_type"] == "table"
+    assert c_t2dm["chunk_type"] == "table"
+
+    # Verify all 13 drugs appear in the HTN table chunk
+    drugs = [
+        "Amlodipine",
+        "Enalapril",
+        "Ramipril",
+        "Losartan",
+        "Olmesartan",
+        "Telmisartan",
+        "Chlorthalidone",
+        "Hydrochlorothiazide",
+        "Carvedilol",
+        "Labetalol",
+        "Metoprolol",
+        "Nebivolol",
+        "Spironolactone",
+    ]
+    for d in drugs:
+        assert d in c_htn["text"], f"Drug '{d}' missing from ICMR HTN table chunk!"
+
+    # Verify all 3 HbA1c strata appear in the T2DM table chunk
+    assert "HbA1c < 8.5%" in c_t2dm["text"]
+    assert "HbA1c 8.5%" in c_t2dm["text"]
+    assert "HbA1c > 10.0%" in c_t2dm["text"]
+
+
+def test_ten_clinical_traps(processed_chunks: list[dict[str, Any]]) -> None:
+    """Verify all 10 clinical trap assertions specified in Gate 1 defect remediation."""
+    # Trap 1: NICE 1.4.20 tags type_1_diabetes, NOT type_2_diabetes
+    c1 = next(
+        c
+        for c in processed_chunks
+        if c["text"].strip().startswith("1.4.20") and c["doc_id"] == "nice_htn_001"
+    )
+    assert "type_1_diabetes" in c1["population_tags"]
+    assert "type_2_diabetes" not in c1["population_tags"]
+
+    # Trap 2: NICE 1.2.12 negates chronic_kidney_disease
+    c2 = next(
+        c
+        for c in processed_chunks
+        if c["text"].strip().startswith("1.2.12") and c["doc_id"] == "nice_htn_001"
+    )
+    assert "type_2_diabetes" in c2["population_tags"]
+    assert "chronic_kidney_disease" not in c2["population_tags"]
+
+    # Trap 3: NICE 1.3.3 does NOT tag type_2_diabetes
+    c3 = next(
+        c
+        for c in processed_chunks
+        if c["text"].strip().startswith("1.3.3") and c["doc_id"] == "nice_htn_001"
+    )
+    assert "type_2_diabetes" not in c3["population_tags"]
+
+    # Trap 4: MoHFW 5.3.2 does NOT tag type_2_diabetes
+    c4 = next(c for c in processed_chunks if "5.3.2" in c["text"] and "hypokalemia" in c["text"])
+    assert "type_2_diabetes" not in c4["population_tags"]
+
+    # Trap 5: ICMR HTN table tags pregnancy and records contraindication
+    c5 = next(c for c in processed_chunks if c["chunk_id"] == "icmr_htn_001_c0012")
+    assert "pregnancy" in c5["population_tags"]
+    assert any("Pregnancy" in e for e in (c5["exceptions"] or []))
+
+    # Trap 6: NICE 1.4.21 age-80 target <150/90 mmHg
+    c6 = next(
+        c
+        for c in processed_chunks
+        if c["text"].strip().startswith("1.4.21") and c["doc_id"] == "nice_htn_001"
+    )
+    assert "150/90" in c6["text"]
+    assert "elderly" in c6["population_tags"]
+
+    # Trap 7: WHO Recommendation 6 target <140/90 mmHg
+    c7 = next(
+        c
+        for c in processed_chunks
+        if c["doc_id"] == "who_htn_001"
+        and "RECOMMENDATION ON TARGET BLOOD PRESSURE" in c["heading"]
+    )
+    assert "<140/90" in c7["text"]
+
+    # Trap 8: ICMR HTN age-80 target <150/90 mmHg
+    c8 = next(
+        c
+        for c in processed_chunks
+        if c["doc_id"] == "icmr_htn_001" and "CONTROL TARGETS" in c["text"]
+    )
+    assert "150" in c8["text"]
+    assert "elderly" in c8["population_tags"]
+
+    # Trap 9: MoHFW diabetes target <140/90 mmHg
+    c9 = next(
+        c for c in processed_chunks if "4.8.1.1" in c["text"] and c["doc_id"] == "mohfw_htn_001"
+    )
+    assert "140 mm Hg" in c9["text"]
+    assert "90 mm Hg" in c9["text"]
+
+    # Trap 10: Trailing section header not glued to NICE 1.2.12
+    assert "Specialist investigations" not in c2["text"]

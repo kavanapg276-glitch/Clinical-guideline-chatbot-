@@ -54,6 +54,20 @@ COMPILED_BOILERPLATE = [
 LINE_DROP_PATTERNS = [
     # NICE header lines
     re.compile(
+        r"^Screening,\s*Diagnosis,\s*Assessment,\s*and\s*Management\s+of\s+Primary\s+Hypertension.*$",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        r"^GUIDELINE\s+FOR\s+THE\s+PHARMACOLOGICAL\s+TREATMENT\s+OF\s+HYPERTENSION\s+IN\s+ADULTS\s*$",
+        re.IGNORECASE,
+    ),
+    re.compile(r"^\s*Department\s+of\s+Health\s+Research\s*$", re.IGNORECASE),
+    re.compile(
+        r"^\s*Ministry\s+of\s+Health\s+and\s+Family\s+Welfare,\s*Government\s+of\s+India\s*$",
+        re.IGNORECASE,
+    ),
+    re.compile(r"^\s*Standard\s+Treatment\s+Workflow\s*\(STW\)\s*$", re.IGNORECASE),
+    re.compile(
         r"^(?:Hypertension in adults: diagnosis and management|"
         r"Type 2 diabetes in adults: management)"
         r"(?:\s*\([A-Z0-9]+\))?\s*$",

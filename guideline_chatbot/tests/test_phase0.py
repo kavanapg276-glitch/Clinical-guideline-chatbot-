@@ -213,6 +213,8 @@ class TestInventorySchema:
         "condition",
         "publication_date",
         "date_type",
+        "last_updated",
+        "last_updated_source",
         "version",
         "jurisdiction",
         "source_url",

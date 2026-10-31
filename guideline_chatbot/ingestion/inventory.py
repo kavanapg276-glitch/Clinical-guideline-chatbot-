@@ -32,6 +32,8 @@ class InventoryRecord(BaseModel):
     condition: str
     publication_date: str | None = None
     date_type: str | None = None  # publication | copyright | unspecified | None
+    last_updated: str | None = None
+    last_updated_source: str | None = None
     version: str | None = None
     jurisdiction: str = "unknown"
     source_url: str = ""
@@ -55,6 +57,8 @@ INVENTORY_FIELDS = [
     "condition",
     "publication_date",
     "date_type",
+    "last_updated",
+    "last_updated_source",
     "version",
     "jurisdiction",
     "source_url",
@@ -207,6 +211,8 @@ DOCUMENT_CATALOG = [
         "condition": "hypertension",
         "publication_date": "2019-08-28",
         "date_type": "publication",
+        "last_updated": "2026-02-26",
+        "last_updated_source": "Printed on title page / NICE website metadata: last updated 26 February 2026",
         "version": None,
         "jurisdiction": "United Kingdom",
         "source_url": "https://www.nice.org.uk/guidance/ng136",
@@ -226,6 +232,8 @@ DOCUMENT_CATALOG = [
         "condition": "type_2_diabetes",
         "publication_date": "2015-12-02",
         "date_type": "publication",
+        "last_updated": "2026-02-18",
+        "last_updated_source": "Printed on title page / NICE website metadata: last updated 18 February 2026",
         "version": None,
         "jurisdiction": "United Kingdom",
         "source_url": "https://www.nice.org.uk/guidance/ng28",
@@ -342,6 +350,8 @@ def build_inventory(data_dir: Path) -> list[InventoryRecord]:
             condition=str(item.get("condition") or ""),
             publication_date=item.get("publication_date"),
             date_type=item.get("date_type"),
+            last_updated=item.get("last_updated"),
+            last_updated_source=item.get("last_updated_source"),
             version=item.get("version"),
             jurisdiction=str(item.get("jurisdiction") or "unknown"),
             source_url=str(item.get("source_url") or ""),

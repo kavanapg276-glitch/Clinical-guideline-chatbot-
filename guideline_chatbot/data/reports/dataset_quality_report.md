@@ -201,3 +201,4 @@ All chunks were extracted from official open-access publications under documente
 1. **Condition Scope:** Chunks strictly cover Hypertension and Type 2 Diabetes. Out-of-scope conditions (e.g. secondary endocrine disorders on MoHFW Endocrinology pp. 22–49) have been excluded at extraction time.
 2. **Flowchart Holdout:** Visual algorithms remain held out of the retrieval index until the human reviewer verifies each node against the high-resolution images.
 3. **Next Steps:** Proceed to Phase 2 (Vector Embeddings, ChromaDB, BM25 Keyword Search, and Reciprocal Rank Fusion) upon Gate 1 approval.
+

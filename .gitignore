@@ -28,6 +28,9 @@ build/
 .DS_Store
 Thumbs.db
 
+# Scratch and temporary scripts
+guideline_chatbot/scratch/
+
 # Caches
 .mypy_cache/
 .pytest_cache/

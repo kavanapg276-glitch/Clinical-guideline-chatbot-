@@ -1,7 +1,7 @@
 """Schema definitions for guideline chunking.
 
-Defines the GuidelineChunk model with all 22 required metadata fields
-specified in the project specification (§6).
+Defines the GuidelineChunk model with clinical provenance, versioning,
+applicability logic, and indexability flags.
 """
 
 from __future__ import annotations
@@ -18,6 +18,10 @@ ChunkType = Literal[
     "flowchart",
     "definition",
     "monitoring",
+    "reference",
+    "methods",
+    "front_matter",
+    "contributors",
     "other",
 ]
 
@@ -36,15 +40,19 @@ class GuidelineChunk(BaseModel):
     page_end: int
     version: str | None = None
     publication_date: str | None = None
+    last_updated: str | None = None
+    last_updated_source: str | None = None
+    recommendation_year: str | None = None
     jurisdiction: str = "unknown"
     document_status: str = "current"
     chunk_type: ChunkType = "other"
+    indexed_for_retrieval: bool = True
     evidence_strength: str | None = None
     recommendation_strength: str | None = None
     population_tags: list[str] = Field(default_factory=list)
     drug_class_tags: list[str] = Field(default_factory=list)
-    applicability_conditions: list[str] = Field(default_factory=list)
-    exceptions: list[str] = Field(default_factory=list)
+    applicability_conditions: list[str] | None = None
+    exceptions: list[str] | None = None
     text: str
     text_hash: str = ""
 
@@ -76,9 +84,13 @@ CHUNK_METADATA_FIELDS = [
     "page_end",
     "version",
     "publication_date",
+    "last_updated",
+    "last_updated_source",
+    "recommendation_year",
     "jurisdiction",
     "document_status",
     "chunk_type",
+    "indexed_for_retrieval",
     "evidence_strength",
     "recommendation_strength",
     "population_tags",

@@ -289,8 +289,72 @@ def extract_pdf_pages(
                     )
                 )
 
-        # Tables
+        # Tables: detect structured tables if page text or structure indicates a table
         extracted_tables: list[ExtractedTable] = []
+        has_table_indicator = bool(
+            re.search(
+                r"\b(?:Table\s+\d+|TABLE\s+\d+|Table\s*#|guidelines?\s+comparison)\b",
+                raw_text,
+                re.I,
+            )
+        ) or (file_path.name.startswith("mohfw_stg_hypertension_full") and 30 <= page_num <= 46)
+        if has_table_indicator:
+            try:
+                drawings = page.get_drawings()
+                if drawings:
+                    tabs = page.find_tables()
+                    for t in tabs.tables:
+                        rows = t.extract()
+                        if rows and len(rows) >= 2 and max(len(r) for r in rows) >= 2:
+                            t_bbox = _to_bbox(t.bbox)
+                            md = format_table_as_markdown(rows)
+                            if md.strip():
+                                extracted_tables.append(
+                                    ExtractedTable(
+                                        bbox=t_bbox,
+                                        rows=rows,
+                                        markdown=md,
+                                    )
+                                )
+            except Exception as e:
+                logger.warning("Error detecting tables on page %d: %s", page_num, e)
+
+        # If tables were detected, replace text blocks inside table regions with markdown table
+        if extracted_tables:
+            filtered_blocks: list[ExtractedBlock] = []
+            table_inserted: set[int] = set()
+
+            for b in extracted_blocks:
+                # Check if block falls inside any detected table
+                inside_idx = -1
+                for idx, t_obj in enumerate(extracted_tables):
+                    tb = t_obj.bbox
+                    bb = b.bbox
+                    if (
+                        bb[0] >= tb[0] - 5
+                        and bb[1] >= tb[1] - 5
+                        and bb[2] <= tb[2] + 5
+                        and bb[3] <= tb[3] + 5
+                    ):
+                        inside_idx = idx
+                        break
+
+                if inside_idx >= 0:
+                    if inside_idx not in table_inserted:
+                        table_inserted.add(inside_idx)
+                        filtered_blocks.append(
+                            ExtractedBlock(
+                                bbox=extracted_tables[inside_idx].bbox,
+                                text=extracted_tables[inside_idx].markdown,
+                                lines=[],
+                                block_type=0,
+                            )
+                        )
+                else:
+                    filtered_blocks.append(b)
+
+            extracted_blocks = filtered_blocks
+            raw_text = "\n\n".join(b.text for b in extracted_blocks if b.text.strip())
 
         # Images
         image_list = page.get_images()

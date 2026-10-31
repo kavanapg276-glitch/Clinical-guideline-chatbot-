@@ -8,13 +8,16 @@ readme = "README.md"
 [tool.ruff]
 line-length = 100
 target-version = "py310"
+extend-exclude = ["guideline_chatbot/scratch", ".venv"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "N", "UP", "B", "A", "SIM"]
+ignore = ["E501"]
 
 [tool.mypy]
 python_version = "3.10"
 warn_return_any = true
 warn_unused_configs = true
 ignore_missing_imports = true
+exclude = ["guideline_chatbot/scratch", ".venv"]
 
