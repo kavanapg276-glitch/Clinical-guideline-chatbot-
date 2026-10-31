@@ -13,3 +13,4 @@ Decision gate outcomes: `Pass` / `Clarify` / `Warn` / `Refuse + explain`
 ## Detailed Design
 
 *(To be documented as components are built)*
+

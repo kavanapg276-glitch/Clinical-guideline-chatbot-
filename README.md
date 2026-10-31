@@ -67,3 +67,4 @@ See `docs/LICENSING.md` for source document licensing information.
 ## Disclaimer
 
 This is a research prototype built for academic evaluation. It is **not** validated for clinical use. All recommendations are grounded in retrieved guideline text and carry no clinical authority beyond the source documents themselves.
+

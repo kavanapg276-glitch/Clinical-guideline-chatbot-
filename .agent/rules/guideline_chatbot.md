@@ -14,3 +14,4 @@ These rules are **non-negotiable** and apply to all phases of development.
 10. **Network failures:** if a download is blocked, times out, needs login/captcha, or a link is not found, **do not guess URLs or fabricate files**. Log it in `docs/OPEN_QUESTIONS.md`, list the exact document and the official page where it can be downloaded manually into `data/raw/<source>/`, and wait. Continue only with documents actually obtained.
 11. When requirements are ambiguous, choose the safest documented default and log it; do not silently guess.
 12. Clinical-safety posture: answers are grounded only in retrieved guideline text, always cited, state missing patient information, and abstain when evidence is inadequate. No doses, diagnoses or recommendations that are not in retrieved text.
+
