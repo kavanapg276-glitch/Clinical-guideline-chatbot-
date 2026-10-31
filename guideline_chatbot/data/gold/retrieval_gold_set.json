@@ -1,0 +1,644 @@
+[
+  {
+    "query_id": "gold_01",
+    "category": "bp_thresholds",
+    "query": "What is the recommended clinic blood pressure target for adults under 80 without major comorbidities?",
+    "expected_chunk_ids": [
+      "nice_htn_001_c0048",
+      "who_htn_001_c0052",
+      "who_htn_001_c0019",
+      "icmr_htn_001_c0006",
+      "mohfw_htn_002_c0048",
+      "mohfw_htn_001_c0038",
+      "nice_htn_001_c0087",
+      "nice_htn_001_c0049"
+    ],
+    "is_out_of_scope": false,
+    "patient_context": {
+      "age": 55,
+      "conditions": [
+        "hypertension"
+      ]
+    }
+  },
+  {
+    "query_id": "gold_02",
+    "category": "bp_thresholds",
+    "query": "What is the target blood pressure for elderly patients aged 80 years and over?",
+    "expected_chunk_ids": [
+      "nice_htn_001_c0049",
+      "nice_htn_001_c0087",
+      "mohfw_htn_001_c0231",
+      "mohfw_htn_002_c0086",
+      "mohfw_htn_001_c0080",
+      "icmr_htn_001_c0006",
+      "mohfw_htn_001_c0230"
+    ],
+    "is_out_of_scope": false,
+    "patient_context": {
+      "age": 82,
+      "conditions": [
+        "hypertension"
+      ]
+    }
+  },
+  {
+    "query_id": "gold_03",
+    "category": "bp_thresholds",
+    "query": "What is the blood pressure target for patients with diabetes in the Indian MoHFW guideline?",
+    "expected_chunk_ids": [
+      "mohfw_htn_001_c0062",
+      "mohfw_htn_001_c0209",
+      "mohfw_htn_002_c0065"
+    ],
+    "is_out_of_scope": false,
+    "patient_context": {
+      "conditions": [
+        "hypertension",
+        "type_2_diabetes"
+      ]
+    }
+  },
+  {
+    "query_id": "gold_04",
+    "category": "bp_thresholds",
+    "query": "What is the blood pressure control target in diabetes mellitus and chronic kidney disease in ICMR STW?",
+    "expected_chunk_ids": [
+      "icmr_htn_001_c0006",
+      "icmr_t2dm_001_c0007"
+    ],
+    "is_out_of_scope": false,
+    "patient_context": {
+      "conditions": [
+        "hypertension",
+        "type_2_diabetes",
+        "ckd"
+      ]
+    }
+  },
+  {
+    "query_id": "gold_05",
+    "category": "bp_thresholds",
+    "query": "According to NICE NG136, what is the clinic blood pressure target for people with type 2 diabetes?",
+    "expected_chunk_ids": [
+      "nice_htn_001_c0048",
+      "nice_htn_001_c0099"
+    ],
+    "is_out_of_scope": false,
+    "patient_context": {
+      "conditions": [
+        "hypertension",
+        "type_2_diabetes"
+      ]
+    }
+  },
+  {
+    "query_id": "gold_06",
+    "category": "bp_thresholds",
+    "query": "What daytime ABPM threshold defines Stage 1 hypertension in NICE guidelines?",
+    "expected_chunk_ids": [
+      "nice_htn_001_c0019",
+      "nice_htn_001_c0046"
+    ],
+    "is_out_of_scope": false,
+    "patient_context": null
+  },
+  {
+    "query_id": "gold_07",
+    "category": "first_line_drugs",
+    "query": "What is the first-line antihypertensive drug for an adult under 55 who is not of Black African origin in NICE?",
+    "expected_chunk_ids": [
+      "nice_htn_001_c0058",
+      "nice_htn_001_c0061",
+      "nice_htn_001_c0071",
+      "nice_htn_001_c0037"
+    ],
+    "is_out_of_scope": false,
+    "patient_context": {
+      "age": 45,
+      "conditions": [
+        "hypertension"
+      ]
+    }
+  },
+  {
+    "query_id": "gold_08",
+    "category": "first_line_drugs",
+    "query": "What is the initial antihypertensive drug recommended for an adult aged 55 or over, or of Black African origin in NICE?",
+    "expected_chunk_ids": [
+      "nice_htn_001_c0058",
+      "nice_htn_001_c0061",
+      "nice_htn_001_c0040",
+      "nice_htn_001_c0037"
+    ],
+    "is_out_of_scope": false,
+    "patient_context": {
+      "age": 60,
+      "conditions": [
+        "hypertension"
+      ]
+    }
+  },
+  {
+    "query_id": "gold_09",
+    "category": "first_line_drugs",
+    "query": "Which three drug classes does the WHO recommend as initial pharmacological treatment for hypertension?",
+    "expected_chunk_ids": [
+      "who_htn_001_c0017",
+      "who_htn_001_c0044",
+      "who_htn_001_c0045",
+      "who_htn_001_c0018"
+    ],
+    "is_out_of_scope": false,
+    "patient_context": {
+      "conditions": [
+        "hypertension"
+      ]
+    }
+  },
+  {
+    "query_id": "gold_10",
+    "category": "first_line_drugs",
+    "query": "What is the preferred initial drug class for hypertension in patients with diabetes mellitus in MoHFW STG?",
+    "expected_chunk_ids": [
+      "mohfw_htn_001_c0062",
+      "mohfw_htn_001_c0209",
+      "mohfw_htn_002_c0039",
+      "mohfw_htn_002_c0065",
+      "mohfw_htn_002_c0044"
+    ],
+    "is_out_of_scope": false,
+    "patient_context": {
+      "conditions": [
+        "hypertension",
+        "type_2_diabetes"
+      ]
+    }
+  },
+  {
+    "query_id": "gold_11",
+    "category": "first_line_drugs",
+    "query": "What pharmacological classes are used as initial dual therapy in ICMR hypertension STW?",
+    "expected_chunk_ids": [
+      "icmr_htn_001_c0010",
+      "icmr_htn_001_c0011",
+      "icmr_htn_001_c0012",
+      "icmr_htn_001_c0005"
+    ],
+    "is_out_of_scope": false,
+    "patient_context": {
+      "conditions": [
+        "hypertension"
+      ]
+    }
+  },
+  {
+    "query_id": "gold_12",
+    "category": "first_line_drugs",
+    "query": "In which clinical conditions are beta-blockers recommended as appropriate initial therapy in ICMR guidelines?",
+    "expected_chunk_ids": [
+      "icmr_htn_001_c0010",
+      "icmr_htn_001_c0012"
+    ],
+    "is_out_of_scope": false,
+    "patient_context": {
+      "conditions": [
+        "hypertension",
+        "angina",
+        "heart_failure"
+      ]
+    }
+  },
+  {
+    "query_id": "gold_13",
+    "category": "combination_therapy",
+    "query": "When is initial monotherapy still appropriate instead of combination therapy in ICMR STW?",
+    "expected_chunk_ids": [
+      "icmr_htn_001_c0010",
+      "icmr_htn_001_c0011",
+      "who_htn_001_c0049",
+      "who_htn_001_c0050"
+    ],
+    "is_out_of_scope": false,
+    "patient_context": {
+      "age": 83,
+      "conditions": [
+        "hypertension"
+      ]
+    }
+  },
+  {
+    "query_id": "gold_14",
+    "category": "combination_therapy",
+    "query": "Why should clinicians not combine an ACE inhibitor with an ARB in hypertension management?",
+    "expected_chunk_ids": [
+      "nice_htn_001_c0063",
+      "icmr_htn_001_c0010",
+      "mohfw_htn_002_c0056",
+      "mohfw_htn_001_c0058",
+      "nice_htn_001_c0069"
+    ],
+    "is_out_of_scope": false,
+    "patient_context": null
+  },
+  {
+    "query_id": "gold_15",
+    "category": "combination_therapy",
+    "query": "What is the WHO recommendation regarding single-pill fixed-dose combinations for hypertension?",
+    "expected_chunk_ids": [
+      "who_htn_001_c0018",
+      "who_htn_001_c0048",
+      "who_htn_001_c0049",
+      "who_htn_001_c0050"
+    ],
+    "is_out_of_scope": false,
+    "patient_context": null
+  },
+  {
+    "query_id": "gold_16",
+    "category": "combination_therapy",
+    "query": "What are the stepwise drug titration steps in the ICMR ATTACC treatment protocol?",
+    "expected_chunk_ids": [
+      "icmr_htn_001_c0011",
+      "icmr_htn_001_c0010",
+      "icmr_htn_001_c0012"
+    ],
+    "is_out_of_scope": false,
+    "patient_context": {
+      "conditions": [
+        "hypertension"
+      ]
+    }
+  },
+  {
+    "query_id": "gold_17",
+    "category": "target_organ_damage",
+    "query": "What diagnostic investigations are recommended by NICE for all people with hypertension to assess target organ damage?",
+    "expected_chunk_ids": [
+      "nice_htn_001_c0020",
+      "nice_htn_001_c0028",
+      "nice_htn_001_c0016"
+    ],
+    "is_out_of_scope": false,
+    "patient_context": {
+      "conditions": [
+        "hypertension"
+      ]
+    }
+  },
+  {
+    "query_id": "gold_18",
+    "category": "target_organ_damage",
+    "query": "What annual monitoring investigations are specified for hypertension in the ICMR STW?",
+    "expected_chunk_ids": [
+      "icmr_htn_001_c0008"
+    ],
+    "is_out_of_scope": false,
+    "patient_context": {
+      "conditions": [
+        "hypertension"
+      ]
+    }
+  },
+  {
+    "query_id": "gold_19",
+    "category": "target_organ_damage",
+    "query": "What are the red flag symptoms of acute target organ damage in hypertensive emergencies in ICMR?",
+    "expected_chunk_ids": [
+      "icmr_htn_001_c0009"
+    ],
+    "is_out_of_scope": false,
+    "patient_context": {
+      "vitals": {
+        "sbp": 190,
+        "dbp": 125
+      }
+    }
+  },
+  {
+    "query_id": "gold_20",
+    "category": "target_organ_damage",
+    "query": "How should asymptomatic hypertensive urgency with BP over 180/120 without organ damage be treated?",
+    "expected_chunk_ids": [
+      "icmr_htn_001_c0009",
+      "mohfw_htn_001_c0245",
+      "mohfw_htn_001_c0241",
+      "mohfw_htn_001_c0090"
+    ],
+    "is_out_of_scope": false,
+    "patient_context": {
+      "vitals": {
+        "sbp": 185,
+        "dbp": 115
+      }
+    }
+  },
+  {
+    "query_id": "gold_21",
+    "category": "glycemic_targets",
+    "query": "What is the general HbA1c target for adults with type 2 diabetes in the ICMR STW?",
+    "expected_chunk_ids": [
+      "icmr_t2dm_001_c0007",
+      "icmr_t2dm_001_c0008",
+      "icmr_t2dm_001_c0004",
+      "icmr_t2dm_001_c0005"
+    ],
+    "is_out_of_scope": false,
+    "patient_context": {
+      "conditions": [
+        "type_2_diabetes"
+      ]
+    }
+  },
+  {
+    "query_id": "gold_22",
+    "category": "glycemic_targets",
+    "query": "What is the general HbA1c target recommended by WHO HEARTS-D for type 2 diabetes?",
+    "expected_chunk_ids": [
+      "who_t2dm_001_c0016",
+      "who_t2dm_001_c0012",
+      "who_t2dm_001_c0019",
+      "nice_t2dm_001_c0029",
+      "nice_t2dm_001_c0032"
+    ],
+    "is_out_of_scope": false,
+    "patient_context": {
+      "conditions": [
+        "type_2_diabetes"
+      ]
+    }
+  },
+  {
+    "query_id": "gold_23",
+    "category": "glycemic_targets",
+    "query": "What are the renal contraindications and serum creatinine cutoffs for Metformin in MoHFW Endocrinology STG?",
+    "expected_chunk_ids": [
+      "mohfw_t2dm_001_c0015",
+      "mohfw_t2dm_001_c0020",
+      "mohfw_htn_002_c0133",
+      "mohfw_t2dm_001_c0010"
+    ],
+    "is_out_of_scope": false,
+    "patient_context": {
+      "conditions": [
+        "type_2_diabetes",
+        "ckd"
+      ]
+    }
+  },
+  {
+    "query_id": "gold_24",
+    "category": "glycemic_targets",
+    "query": "What is the recommended pharmacotherapy for HbA1c under 8.5% in the ICMR diabetes STW?",
+    "expected_chunk_ids": [
+      "icmr_t2dm_001_c0008"
+    ],
+    "is_out_of_scope": false,
+    "patient_context": {
+      "conditions": [
+        "type_2_diabetes"
+      ]
+    }
+  },
+  {
+    "query_id": "gold_25",
+    "category": "glycemic_targets",
+    "query": "When is basal insulin recommended as part of initial therapy in the ICMR diabetes workflow?",
+    "expected_chunk_ids": [
+      "icmr_t2dm_001_c0008",
+      "icmr_t2dm_001_c0009",
+      "icmr_t2dm_001_c0010"
+    ],
+    "is_out_of_scope": false,
+    "patient_context": {
+      "conditions": [
+        "type_2_diabetes"
+      ]
+    }
+  },
+  {
+    "query_id": "gold_26",
+    "category": "glycemic_targets",
+    "query": "According to NICE NG28, which patients with type 2 diabetes should receive an SGLT2 inhibitor first-line with Metformin?",
+    "expected_chunk_ids": [
+      "nice_t2dm_001_c0072",
+      "nice_t2dm_001_c0068",
+      "nice_t2dm_001_c0099"
+    ],
+    "is_out_of_scope": false,
+    "patient_context": {
+      "conditions": [
+        "type_2_diabetes",
+        "heart_failure"
+      ]
+    }
+  },
+  {
+    "query_id": "gold_27",
+    "category": "pregnancy",
+    "query": "Why are ACE inhibitors and ARBs contraindicated during pregnancy and in women planning pregnancy?",
+    "expected_chunk_ids": [
+      "icmr_htn_001_c0012",
+      "nice_htn_001_c0057",
+      "nice_htn_001_c0058",
+      "who_htn_001_c0066",
+      "who_htn_001_c0075",
+      "nice_htn_001_c0054"
+    ],
+    "is_out_of_scope": false,
+    "patient_context": {
+      "is_pregnant": true,
+      "conditions": [
+        "hypertension"
+      ]
+    }
+  },
+  {
+    "query_id": "gold_28",
+    "category": "pregnancy",
+    "query": "What is the screening protocol for diabetes in pregnancy according to the ICMR STW?",
+    "expected_chunk_ids": [
+      "icmr_t2dm_001_c0006"
+    ],
+    "is_out_of_scope": false,
+    "patient_context": {
+      "is_pregnant": true
+    }
+  },
+  {
+    "query_id": "gold_29",
+    "category": "pregnancy",
+    "query": "What fasting plasma glucose value defines Gestational Diabetes Mellitus (GDM) during first trimester screening in ICMR?",
+    "expected_chunk_ids": [
+      "icmr_t2dm_001_c0006"
+    ],
+    "is_out_of_scope": false,
+    "patient_context": {
+      "is_pregnant": true
+    }
+  },
+  {
+    "query_id": "gold_30",
+    "category": "pregnancy",
+    "query": "What is the guidance on antihypertensive drug safety for breastfeeding women in NICE NG136?",
+    "expected_chunk_ids": [
+      "nice_htn_001_c0057",
+      "nice_htn_001_c0058",
+      "nice_htn_001_c0054"
+    ],
+    "is_out_of_scope": false,
+    "patient_context": {
+      "is_pregnant": false,
+      "conditions": [
+        "hypertension"
+      ]
+    }
+  },
+  {
+    "query_id": "gold_31",
+    "category": "pregnancy",
+    "query": "Which antihypertensive drug classes have strict contraindications in pregnancy in the ICMR drug table?",
+    "expected_chunk_ids": [
+      "icmr_htn_001_c0012",
+      "who_htn_001_c0066"
+    ],
+    "is_out_of_scope": false,
+    "patient_context": {
+      "is_pregnant": true
+    }
+  },
+  {
+    "query_id": "gold_32",
+    "category": "resistant_htn",
+    "query": "What is the Step 4 medical treatment recommendation for resistant hypertension in NICE NG136?",
+    "expected_chunk_ids": [
+      "nice_htn_001_c0074",
+      "nice_htn_001_c0076",
+      "nice_htn_001_c0077",
+      "nice_htn_001_c0078",
+      "nice_htn_001_c0080",
+      "nice_htn_001_c0105",
+      "nice_htn_001_c0079",
+      "nice_htn_001_c0072"
+    ],
+    "is_out_of_scope": false,
+    "patient_context": {
+      "conditions": [
+        "hypertension"
+      ]
+    }
+  },
+  {
+    "query_id": "gold_33",
+    "category": "resistant_htn",
+    "query": "What electrolyte and renal monitoring is required after starting diuretic therapy for Step 4 resistant hypertension?",
+    "expected_chunk_ids": [
+      "nice_htn_001_c0078",
+      "nice_htn_001_c0077"
+    ],
+    "is_out_of_scope": false,
+    "patient_context": {
+      "conditions": [
+        "hypertension"
+      ]
+    }
+  },
+  {
+    "query_id": "gold_34",
+    "category": "resistant_htn",
+    "query": "When is Spironolactone considered for resistant hypertension in ICMR treatment protocols?",
+    "expected_chunk_ids": [
+      "icmr_htn_001_c0011",
+      "icmr_htn_001_c0012",
+      "nice_htn_001_c0077",
+      "icmr_htn_001_c0010"
+    ],
+    "is_out_of_scope": false,
+    "patient_context": {
+      "conditions": [
+        "hypertension"
+      ]
+    }
+  },
+  {
+    "query_id": "gold_35",
+    "category": "resistant_htn",
+    "query": "How is resistant hypertension defined in the MoHFW Standard Treatment Guidelines?",
+    "expected_chunk_ids": [
+      "mohfw_htn_001_c0060",
+      "mohfw_htn_001_c0201",
+      "mohfw_htn_002_c0058",
+      "mohfw_htn_002_c0121",
+      "mohfw_htn_001_c0266"
+    ],
+    "is_out_of_scope": false,
+    "patient_context": {
+      "conditions": [
+        "hypertension"
+      ]
+    }
+  },
+  {
+    "query_id": "gold_36",
+    "category": "resistant_htn",
+    "query": "What is the recommended dose and major side effect of Spironolactone in the ICMR drug table?",
+    "expected_chunk_ids": [
+      "icmr_htn_001_c0012",
+      "icmr_htn_001_c0011"
+    ],
+    "is_out_of_scope": false,
+    "patient_context": {
+      "conditions": [
+        "hypertension"
+      ]
+    }
+  },
+  {
+    "query_id": "gold_37",
+    "category": "out_of_scope",
+    "query": "What is the recommended inhaled corticosteroid dose for acute pediatric asthma exacerbation?",
+    "expected_chunk_ids": [],
+    "is_out_of_scope": true,
+    "patient_context": null
+  },
+  {
+    "query_id": "gold_38",
+    "category": "out_of_scope",
+    "query": "Surgical indications and antibiotic prophylaxis for acute uncomplicated appendicitis in adolescents.",
+    "expected_chunk_ids": [],
+    "is_out_of_scope": true,
+    "patient_context": null
+  },
+  {
+    "query_id": "gold_39",
+    "category": "out_of_scope",
+    "query": "First-line platinum-based chemotherapy regimen for metastatic non-small cell lung cancer.",
+    "expected_chunk_ids": [],
+    "is_out_of_scope": true,
+    "patient_context": null
+  },
+  {
+    "query_id": "gold_40",
+    "category": "out_of_scope",
+    "query": "Weekly methotrexate dosing schedule and folic acid supplementation in rheumatoid arthritis.",
+    "expected_chunk_ids": [],
+    "is_out_of_scope": true,
+    "patient_context": null
+  },
+  {
+    "query_id": "gold_41",
+    "category": "out_of_scope",
+    "query": "Universal childhood immunization schedule for MMR and varicella vaccines.",
+    "expected_chunk_ids": [],
+    "is_out_of_scope": true,
+    "patient_context": null
+  },
+  {
+    "query_id": "gold_42",
+    "category": "out_of_scope",
+    "query": "Postoperative physical therapy and rehabilitation protocol following total hip arthroplasty.",
+    "expected_chunk_ids": [],
+    "is_out_of_scope": true,
+    "patient_context": null
+  }
+]

@@ -32,6 +32,7 @@ Thumbs.db
 guideline_chatbot/scratch/
 
 # Caches
+guideline_chatbot/data/cache/
 .mypy_cache/
 .pytest_cache/
 .ruff_cache/
