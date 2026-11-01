@@ -11,15 +11,25 @@ from __future__ import annotations
 import json
 import logging
 import os
+import sys
 import time
 import uuid
 from pathlib import Path
 
-import streamlit as st
+# Ensure repository root is on sys.path when invoked via `streamlit run frontend/app.py`
+_REPO_ROOT = Path(__file__).resolve().parent.parent
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
 
-from frontend.theme import apply_theme, render_gate_badge
-from guideline_chatbot.chatbot.orchestrator import ChatbotOrchestrator, TurnResult
-from guideline_chatbot.coherence.pipeline import ArmMode
+import streamlit as st  # noqa: E402
+
+try:
+    from frontend.theme import apply_theme, render_gate_badge  # noqa: E402
+except ModuleNotFoundError:
+    from theme import apply_theme, render_gate_badge  # type: ignore[no-redef]  # noqa: E402
+
+from guideline_chatbot.chatbot.orchestrator import ChatbotOrchestrator, TurnResult  # noqa: E402
+from guideline_chatbot.coherence.pipeline import ArmMode  # noqa: E402
 
 logger = logging.getLogger("frontend")
 
