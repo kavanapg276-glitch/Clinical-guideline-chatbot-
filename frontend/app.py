@@ -17,7 +17,7 @@ import time
 import uuid
 from pathlib import Path
 
-# Ensure repository root and frontend folder are on sys.path when invoked via `streamlit run frontend/app.py`
+# Ensure repository root and frontend folder are on sys.path immediately
 _REPO_ROOT = Path(__file__).resolve().parent.parent
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
@@ -30,7 +30,7 @@ import streamlit as st  # noqa: E402
 
 try:
     from frontend.theme import apply_theme, render_gate_badge  # noqa: E402
-except ModuleNotFoundError:
+except (ImportError, ModuleNotFoundError):
     from theme import apply_theme, render_gate_badge  # type: ignore[no-redef]  # noqa: E402
 
 from guideline_chatbot.chatbot.orchestrator import ChatbotOrchestrator, TurnResult  # noqa: E402
@@ -38,15 +38,6 @@ from guideline_chatbot.chatbot.patient_state import PatientState  # noqa: E402
 from guideline_chatbot.coherence.pipeline import ArmMode  # noqa: E402
 
 logger = logging.getLogger("frontend")
-
-# Configure Streamlit page
-st.set_page_config(
-    page_title="ClinCoherence Decision Support",
-    layout="wide",
-    initial_sidebar_state="expanded",
-)
-
-apply_theme()
 
 
 @st.cache_resource(show_spinner="Loading clinical knowledge base and hybrid index...")
@@ -593,6 +584,12 @@ def render_demo_tab(orchestrator: ChatbotOrchestrator) -> None:
 
 def main() -> None:
     """Main application entry point."""
+    st.set_page_config(
+        page_title="ClinCoherence Decision Support",
+        layout="wide",
+        initial_sidebar_state="expanded",
+    )
+    apply_theme()
     init_session()
     try:
         orchestrator = get_orchestrator()

@@ -64,18 +64,33 @@ html, body, [class*="css"] {
 
 /* Subtle flat borders, clean clinical styling */
 div[data-testid="stExpander"],
-div[data-testid="stExpander"] details,
-div[data-testid="stExpander"] details > div,
-div[data-testid="stExpanderDetails"] {
-    background-color: #ffffff !important;
+div[data-testid="stExpander"] * {
+    box-sizing: border-box;
 }
 
 div[data-testid="stExpander"] {
     border: 1px solid #cbd5e1 !important;
     border-radius: 6px !important;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+    background-color: #ffffff !important;
+    background: #ffffff !important;
     margin-bottom: 0.75rem !important;
     overflow: hidden !important;
+}
+
+/* Ensure all details containers and nested Streamlit wrapper blocks are crisp white */
+div[data-testid="stExpander"] details,
+div[data-testid="stExpander"] details > div,
+div[data-testid="stExpander"] [data-testid="stExpanderDetails"],
+div[data-testid="stExpanderDetails"],
+div[data-testid="stExpander"] [data-testid="stVerticalBlock"],
+div[data-testid="stExpander"] [data-testid="stVerticalBlockBorderWrapper"],
+div[data-testid="stExpander"] div[role="region"],
+div[data-testid="stExpander"] .stMarkdown,
+div[data-testid="stExpander"] .stMarkdown > div {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
 }
 
 div[data-testid="stExpander"] details summary {
@@ -83,6 +98,7 @@ div[data-testid="stExpander"] details summary {
     font-weight: 600 !important;
     color: #0f172a !important;
     background-color: #f8fafc !important;
+    background: #f8fafc !important;
     border-bottom: 1px solid #e2e8f0 !important;
     padding: 0.6rem 0.85rem !important;
 }
@@ -102,33 +118,28 @@ div[data-testid="stExpander"] details:not([open]) summary {
     border-bottom: none !important;
 }
 
-/* Expander details body - MUST BE WHITE AND CRISP */
-div[data-testid="stExpanderDetails"] {
-    background-color: #ffffff !important;
-    color: #0f172a !important;
-    padding: 0.85rem 1rem !important;
-}
-
 /* Force all text elements inside expander to be crystal clear dark readable text */
+div[data-testid="stExpander"] p,
+div[data-testid="stExpander"] span,
+div[data-testid="stExpander"] li,
+div[data-testid="stExpander"] div,
+div[data-testid="stExpander"] label,
 div[data-testid="stExpanderDetails"] p,
 div[data-testid="stExpanderDetails"] span,
 div[data-testid="stExpanderDetails"] li,
 div[data-testid="stExpanderDetails"] div,
-div[data-testid="stExpanderDetails"] label,
-div[data-testid="stExpander"] details p,
-div[data-testid="stExpander"] details span,
-div[data-testid="stExpander"] details li {
+div[data-testid="stExpanderDetails"] label {
     color: #0f172a !important;
 }
 
-div[data-testid="stExpanderDetails"] strong,
-div[data-testid="stExpander"] details strong {
+div[data-testid="stExpander"] strong,
+div[data-testid="stExpanderDetails"] strong {
     color: #0f172a !important;
     font-weight: 600 !important;
 }
 
-div[data-testid="stExpanderDetails"] code,
-div[data-testid="stExpander"] details code {
+div[data-testid="stExpander"] code,
+div[data-testid="stExpanderDetails"] code {
     background-color: #f1f5f9 !important;
     color: #0f172a !important;
     border: 1px solid #cbd5e1 !important;
