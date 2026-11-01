@@ -86,8 +86,9 @@ def main() -> None:
             "--headless=new",
             "--disable-gpu",
             "--remote-debugging-port=9222",
+            "--user-data-dir=C:\\Users\\kavan\\AppData\\Local\\Temp\\chrome_test_profile",
             "--window-size=1280,950",
-            url,
+            "about:blank",
         ],
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
@@ -120,6 +121,9 @@ def main() -> None:
 
     call_cdp(ws, "Page.enable")
     call_cdp(ws, "Runtime.enable")
+
+    print(f"[5] Navigating to {url}...")
+    call_cdp(ws, "Page.navigate", {"url": url})
 
     # Poll DOM until .patient-card is rendered (orchestrator index load takes ~15-20s)
     print("[6] Waiting for .patient-card and Streamlit components to mount...")
@@ -160,8 +164,39 @@ def main() -> None:
     has_code = res_code.get("result", {}).get("result", {}).get("value")
     print(f"Raw code/pre tags inside patient card: {has_code}")
 
-    # Wait an extra 2 seconds for CSS animations and fonts to settle
+    # Switch to "Replay & Scenarios" tab to verify open expander styling and colors
+    print("[6b] Switching to Replay & Scenarios tab to check expander styling...")
+    call_cdp(
+        ws,
+        "Runtime.evaluate",
+        {
+            "expression": "document.querySelectorAll('button[data-baseweb=\"tab\"]')[2].click()",
+            "returnByValue": True,
+        },
+    )
     time.sleep(2)
+
+    expander_style = call_cdp(
+        ws,
+        "Runtime.evaluate",
+        {
+            "expression": """(() => {
+                const exp = document.querySelector('div[data-testid="stExpander"]');
+                const det = document.querySelector('div[data-testid="stExpanderDetails"]');
+                return {
+                    has_expander: Boolean(exp),
+                    exp_bg: exp ? window.getComputedStyle(exp).backgroundColor : 'N/A',
+                    det_bg: det ? window.getComputedStyle(det).backgroundColor : 'N/A',
+                    det_color: det ? window.getComputedStyle(det).color : 'N/A',
+                };
+            })()""",
+            "returnByValue": True,
+        },
+    )
+    print("Expander styling:", expander_style.get("result", {}).get("result", {}).get("value"))
+
+    # Wait an extra 1 second for CSS animations and fonts to settle
+    time.sleep(1)
 
     # Capture Screenshot
     print("[7] Capturing screenshot via CDP Page.captureScreenshot...")

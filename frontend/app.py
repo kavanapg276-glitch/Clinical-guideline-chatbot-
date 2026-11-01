@@ -274,14 +274,14 @@ def render_turn_result(tr: TurnResult) -> None:
                 chunk_text = h.get("text", "")
                 preview, has_more = format_chunk_snippet(chunk_text, max_sentences=2)
                 st.markdown(
-                    f"<div style='font-size: 0.82rem; color: #475569; background: #f8fafc; padding: 8px; border-left: 3px solid #006666; line-height: 1.45;'>{preview}</div>",
+                    f"<div style='font-size: 0.82rem; color: #0f172a; background: #f8fafc; padding: 10px; border-radius: 4px; border: 1px solid #e2e8f0; border-left: 4px solid #006666; line-height: 1.5;'>{preview}</div>",
                     unsafe_allow_html=True,
                 )
                 if has_more:
                     with st.expander(f"Full text for {cid}", expanded=False):
                         escaped_full = chunk_text.replace("#", r"\#")
                         st.markdown(
-                            f"<div style='font-size: 0.82rem; color: #334155; line-height: 1.5; white-space: pre-wrap;'>{escaped_full}</div>",
+                            f"<div style='font-size: 0.82rem; color: #0f172a; line-height: 1.5; white-space: pre-wrap;'>{escaped_full}</div>",
                             unsafe_allow_html=True,
                         )
                 st.markdown("---")
@@ -299,7 +299,7 @@ def render_turn_result(tr: TurnResult) -> None:
             if cv.unverified_citations:
                 unv_list = ", ".join(c.raw_text for c in cv.unverified_citations)
                 st.markdown(
-                    f"<div style='color: #c62828; font-size: 0.85rem;'>Unverified Citations: {unv_list}</div>",
+                    f"<div style='color: #b71c1c; font-weight: 600; font-size: 0.85rem;'>Unverified Citations: {unv_list}</div>",
                     unsafe_allow_html=True,
                 )
             if cv.validated_citations:

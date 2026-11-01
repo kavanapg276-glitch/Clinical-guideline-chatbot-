@@ -62,19 +62,80 @@ html, body, [class*="css"] {
     font-variant-numeric: tabular-nums;
 }
 
-/* Subtle flat borders, no heavy shadows */
+/* Subtle flat borders, clean clinical styling */
+div[data-testid="stExpander"],
+div[data-testid="stExpander"] details,
+div[data-testid="stExpander"] details > div,
+div[data-testid="stExpanderDetails"] {
+    background-color: #ffffff !important;
+}
+
 div[data-testid="stExpander"] {
-    border: 1px solid #e2e8f0 !important;
-    border-radius: 4px !important;
-    box-shadow: none !important;
-    background-color: #ffffff;
-    margin-bottom: 0.5rem;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 6px !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+    margin-bottom: 0.75rem !important;
+    overflow: hidden !important;
 }
 
 div[data-testid="stExpander"] details summary {
     font-size: 0.88rem !important;
-    font-weight: 500 !important;
-    color: #475569 !important;
+    font-weight: 600 !important;
+    color: #0f172a !important;
+    background-color: #f8fafc !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    padding: 0.6rem 0.85rem !important;
+}
+
+div[data-testid="stExpander"] details summary:hover {
+    color: #006666 !important;
+    background-color: #f1f5f9 !important;
+}
+
+div[data-testid="stExpander"] details summary p,
+div[data-testid="stExpander"] details summary span {
+    color: #0f172a !important;
+    font-weight: 600 !important;
+}
+
+div[data-testid="stExpander"] details:not([open]) summary {
+    border-bottom: none !important;
+}
+
+/* Expander details body - MUST BE WHITE AND CRISP */
+div[data-testid="stExpanderDetails"] {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    padding: 0.85rem 1rem !important;
+}
+
+/* Force all text elements inside expander to be crystal clear dark readable text */
+div[data-testid="stExpanderDetails"] p,
+div[data-testid="stExpanderDetails"] span,
+div[data-testid="stExpanderDetails"] li,
+div[data-testid="stExpanderDetails"] div,
+div[data-testid="stExpanderDetails"] label,
+div[data-testid="stExpander"] details p,
+div[data-testid="stExpander"] details span,
+div[data-testid="stExpander"] details li {
+    color: #0f172a !important;
+}
+
+div[data-testid="stExpanderDetails"] strong,
+div[data-testid="stExpander"] details strong {
+    color: #0f172a !important;
+    font-weight: 600 !important;
+}
+
+div[data-testid="stExpanderDetails"] code,
+div[data-testid="stExpander"] details code {
+    background-color: #f1f5f9 !important;
+    color: #0f172a !important;
+    border: 1px solid #cbd5e1 !important;
+    padding: 2px 6px !important;
+    border-radius: 4px !important;
+    font-size: 0.85em !important;
+    font-weight: 600 !important;
 }
 
 /* Clinical chat bubble styling */
@@ -89,7 +150,7 @@ div[data-testid="stChatMessage"] {
     display: inline-block;
     padding: 2px 8px;
     font-size: 0.75rem;
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: 0.04em;
     text-transform: uppercase;
     border-radius: 4px;
@@ -100,33 +161,33 @@ div[data-testid="stChatMessage"] {
 }
 
 .gate-pill-pass {
-    color: #1b5e20;
-    background-color: #edf7ed;
-    border-color: #c8e6c9;
+    color: #1b5e20 !important;
+    background-color: #edf7ed !important;
+    border-color: #c8e6c9 !important;
 }
 
 .gate-pill-warn {
-    color: #b25e00;
-    background-color: #fff8e1;
-    border-color: #ffe082;
+    color: #b25e00 !important;
+    background-color: #fff8e1 !important;
+    border-color: #ffe082 !important;
 }
 
 .gate-pill-clarify {
-    color: #026aa7;
-    background-color: #e1f5fe;
-    border-color: #b3e5fc;
+    color: #026aa7 !important;
+    background-color: #e1f5fe !important;
+    border-color: #b3e5fc !important;
 }
 
 .gate-pill-refuse {
-    color: #c62828;
-    background-color: #ffebee;
-    border-color: #ffcdd2;
+    color: #c62828 !important;
+    background-color: #ffebee !important;
+    border-color: #ffcdd2 !important;
 }
 
 /* Gate explanation notice */
 .gate-notice {
     font-size: 0.85rem;
-    color: #475569;
+    color: #334155;
     margin-top: 2px;
     margin-bottom: 8px;
     line-height: 1.4;
@@ -134,34 +195,36 @@ div[data-testid="stChatMessage"] {
 
 .gate-notice-warn {
     color: #9a5300;
+    font-weight: 500;
 }
 
 .gate-notice-refuse {
     color: #b71c1c;
-    font-weight: 500;
+    font-weight: 600;
 }
 
 /* Patient state sidebar card */
 .patient-card {
-    border: 1px solid #e2e8f0;
-    border-radius: 4px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
     padding: 12px;
     background-color: #ffffff;
     margin-bottom: 12px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .patient-label {
     font-size: 0.75rem;
-    font-weight: 600;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: #64748b;
+    color: #475569;
     margin-bottom: 2px;
 }
 
 .patient-value {
     font-size: 0.95rem;
-    font-weight: 500;
+    font-weight: 600;
     color: #0f172a;
     margin-bottom: 8px;
     font-variant-numeric: tabular-nums;
@@ -217,56 +280,6 @@ div[data-testid="stChatMessage"] {
     margin-top: 16px;
     padding-top: 8px;
     border-top: 1px solid #e2e8f0;
-}
-
-/* Dark mode adjustments */
-@media (prefers-color-scheme: dark) {
-    html, body, [class*="css"] {
-        color: #e2e8f0;
-    }
-    div[data-testid="stExpander"] {
-        border-color: #334155 !important;
-        background-color: #1e293b;
-    }
-    .gate-pill-pass {
-        color: #81c784;
-        background-color: #1e3820;
-        border-color: #2e5b32;
-    }
-    .gate-pill-warn {
-        color: #ffb74d;
-        background-color: #3e2710;
-        border-color: #664319;
-    }
-    .gate-pill-clarify {
-        color: #4fc3f7;
-        background-color: #0c2836;
-        border-color: #134b66;
-    }
-    .gate-pill-refuse {
-        color: #e57373;
-        background-color: #3c181a;
-        border-color: #5c2427;
-    }
-    .patient-card {
-        border-color: #334155;
-        background-color: #1e293b;
-    }
-    .patient-label {
-        color: #94a3b8;
-    }
-    .patient-value {
-        color: #f1f5f9;
-    }
-    .llm-mode-banner {
-        border-color: #334155;
-        background-color: #1e293b;
-        color: #94a3b8;
-    }
-    .legal-notice {
-        border-top-color: #334155;
-        color: #94a3b8;
-    }
 }
 </style>
 """
