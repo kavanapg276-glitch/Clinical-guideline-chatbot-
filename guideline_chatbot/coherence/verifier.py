@@ -114,9 +114,10 @@ class RuleBasedCoherenceVerifier(CoherenceVerifier):
                 and "### Clarification Required" not in draft_response
             ):
                 modified_response = self._build_clarify_response(case_state)
+                explanation = "Clarification required: active disputed facts in patient state."
             else:
                 modified_response = draft_response
-            explanation = "Clarification required: active disputed facts in patient state."
+                explanation = "Clarification required: incomplete clinical measurement or contradictory statement."
         elif has_warning:
             gate_decision = GateDecision.WARN
             modified_response = self._build_warning_response(violations, draft_response)

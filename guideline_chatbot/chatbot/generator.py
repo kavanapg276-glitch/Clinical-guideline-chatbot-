@@ -188,7 +188,26 @@ class ClinicalResponseGenerator:
                     "is_abstention": False,
                 }
 
-        # 3. Patient pushback check
+        # 3. Check for isolated single blood pressure reading without systolic/diastolic pair
+        single_bp_match = re.search(
+            r"^\s*(?:(?:my|clinic|today(?:'s)?|patient(?:'s)?)\s+)?(?:bp|blood\s+pressure)\s*(?:is|came\s+back\s+at|measures?|[:=])?\s*(\d{2,3})\s*(?:mm\s*hg)?\s*$",
+            query.strip().lower(),
+        )
+        if single_bp_match and "/" not in query:
+            val = single_bp_match.group(1)
+            return {
+                "text": (
+                    "### Clarification Required: Incomplete Blood Pressure Reading\n\n"
+                    f"A single blood pressure reading of **{val} mmHg** was provided without distinguishing systolic and diastolic values.\n\n"
+                    "Clinical guidelines (NICE NG136, WHO 2021, ICMR STW) require both **systolic** and **diastolic** measurements "
+                    "(e.g., **140/90 mmHg**) to assess hypertension stages, cardiovascular risk, and target thresholds.\n\n"
+                    "Please provide the complete systolic/diastolic clinic reading."
+                ),
+                "action_type": "clarify",
+                "is_abstention": False,
+            }
+
+        # 4. Patient pushback check
         is_pushback = self._detect_pushback(query)
 
         # 4. Generate structured recommendation

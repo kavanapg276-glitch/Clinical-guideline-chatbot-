@@ -184,6 +184,8 @@ class ChatbotOrchestrator:
                 if not ver_result.explanation or "passed" in ver_result.explanation.lower():
                     ver_result.explanation = (
                         "Clarification required: active clinical contradiction in patient state."
+                        if current_state.has_conflicts
+                        else "Clarification required: incomplete clinical measurement."
                     )
         elif ver_result.gate_decision == GateDecision.CLARIFY:
             action_type = "clarify"
