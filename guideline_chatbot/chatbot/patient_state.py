@@ -44,6 +44,7 @@ class PatientState:
     sex: str | None = None  # "male" | "female"
     ethnicity: str | None = None  # "black_african_or_caribbean", "south_asian", "white", etc.
     is_pregnant: bool = False
+    pregnancy_weeks: int | None = None
     is_breastfeeding: bool = False
 
     # Vitals
@@ -90,6 +91,7 @@ class PatientState:
             "medications": sorted(self.medications),
             "allergies": sorted(self.allergies),
             "is_pregnant": self.is_pregnant,
+            "pregnancy_weeks": self.pregnancy_weeks,
             "is_breastfeeding": self.is_breastfeeding,
         }
         if self.age is not None:
@@ -109,7 +111,10 @@ class PatientState:
         if self.sex:
             parts.append(f"Sex: {self.sex}")
         if self.is_pregnant:
-            parts.append("Status: Pregnant")
+            if self.pregnancy_weeks is not None:
+                parts.append(f"Status: Pregnant ({self.pregnancy_weeks} weeks)")
+            else:
+                parts.append("Status: Pregnant")
         elif self.is_breastfeeding:
             parts.append("Status: Breastfeeding")
 
@@ -171,7 +176,7 @@ class PatientStateManager:
         )
         claims_normotension = bool(
             re.search(
-                r"\b(?:normal\s+bp|normal\s+blood\s+pressure|no\s+high\s+bp|not\s+hypertensive|bp\s+is\s+fine|bp\s+is\s+normal)\b",
+                r"\b(?:normal\s+bp|normal\s+blood\s+pressure|no\s+high\s+bp|not\s+hypertensive|bp\s+is\s+fine|bp\s+is\s+normal|blood\s+pressure\s+(?:is\s+)?(?:completely\s+|entirely\s+)?normal)\b",
                 lower,
             )
         )
@@ -257,11 +262,26 @@ class PatientStateManager:
             self.state.sex = "male"
 
         # 3. Pregnancy & Lactation Status
-        if re.search(r"\b(?:pregnant|pregnancy|expecting|gestation|first\s+trimester)\b", lower):
+        preg_match = re.search(
+            r"\b(?:(\d{1,2})\s*weeks?\s+(?:pregnant|gestation|pregnancy)|"
+            r"(?:i\s+am|she\s+is|patient\s+is|currently)?\s*pregnant|pregnancy|expecting|gestation|"
+            r"first\s+trimester|second\s+trimester|third\s+trimester)\b",
+            lower,
+        )
+        if preg_match:
             self.state.is_pregnant = True
             self.state.conditions.add("pregnancy")
+            self.state.sex = "female"
+            if preg_match.group(1):
+                self.state.pregnancy_weeks = int(preg_match.group(1))
+            else:
+                weeks_match = re.search(r"\b(\d{1,2})\s*weeks?\b", lower)
+                if weeks_match:
+                    self.state.pregnancy_weeks = int(weeks_match.group(1))
+
         if re.search(r"\b(?:breastfeeding|nursing|lactating|lactation)\b", lower):
             self.state.is_breastfeeding = True
+            self.state.sex = "female"
 
         # 4. HbA1c Lab Extraction
         hba1c_match = re.search(

@@ -11,7 +11,9 @@ from __future__ import annotations
 import json
 import logging
 import os
+import re
 import sys
+import textwrap
 import time
 import uuid
 from pathlib import Path
@@ -142,25 +144,23 @@ def render_sidebar(orchestrator: ChatbotOrchestrator) -> None:
     med_str = ", ".join(m.title() for m in sorted(state.medications)) or "None"
     all_str = ", ".join(a.replace("_", " ").title() for a in sorted(state.allergies)) or "None"
 
-    patient_html = f"""
-    <div class="patient-card">
-        <div class="patient-label">Demographics</div>
-        <div class="patient-value">Age: {age_str} | Sex: {sex_str} | Pregnant: {preg_str}</div>
+    patient_html = f"""<div class="patient-card">
+    <div class="patient-label">Demographics</div>
+    <div class="patient-value">Age: {age_str} | Sex: {sex_str} | Pregnant: {preg_str}</div>
 
-        <div class="patient-label">Vitals & Labs</div>
-        <div class="patient-value">BP: {bp_str}<br>HbA1c: {hba1c_str} | eGFR: {egfr_str}<br>ACR: {acr_str}</div>
+    <div class="patient-label">Vitals & Labs</div>
+    <div class="patient-value">BP: {bp_str}<br>HbA1c: {hba1c_str} | eGFR: {egfr_str}<br>ACR: {acr_str}</div>
 
-        <div class="patient-label">Conditions</div>
-        <div class="patient-value">{cond_str}</div>
+    <div class="patient-label">Conditions</div>
+    <div class="patient-value">{cond_str}</div>
 
-        <div class="patient-label">Medications</div>
-        <div class="patient-value">{med_str}</div>
+    <div class="patient-label">Medications</div>
+    <div class="patient-value">{med_str}</div>
 
-        <div class="patient-label">Allergies</div>
-        <div class="patient-value">{all_str}</div>
-    </div>
-    """
-    st.sidebar.markdown(patient_html, unsafe_allow_html=True)
+    <div class="patient-label">Allergies</div>
+    <div class="patient-value">{all_str}</div>
+</div>"""
+    st.sidebar.markdown(textwrap.dedent(patient_html), unsafe_allow_html=True)
 
     # Disputed Facts Highlight
     if state.disputed_facts:
@@ -183,10 +183,32 @@ def render_sidebar(orchestrator: ChatbotOrchestrator) -> None:
     )
 
 
+def format_chunk_snippet(text: str, max_sentences: int = 2) -> tuple[str, bool]:
+    """Truncate chunk text cleanly at a sentence boundary without mid-sentence ellipsis.
+
+    Returns:
+        Tuple of (truncated_preview_text, has_more).
+    """
+    clean_text = text.replace("#", r"\#").strip()
+    sentences = re.split(r"(?<=[.!?])\s+", clean_text)
+    if len(sentences) <= max_sentences:
+        return clean_text, False
+    preview = " ".join(sentences[:max_sentences])
+    return preview, True
+
+
 def render_turn_result(tr: TurnResult) -> None:
     """Render a completed assistant turn with gate pill and collapsed clinical expanders."""
-    # Gate decision badge
-    gate = tr.verification_result.gate_decision.value if tr.verification_result else "pass"
+    from guideline_chatbot.coherence.interfaces import GateDecision
+
+    # Gate decision badge: enforce CLARIFY if action_type is clarify or gate_decision is clarify
+    if tr.action_type == "clarify" or (
+        tr.verification_result and tr.verification_result.gate_decision == GateDecision.CLARIFY
+    ):
+        gate = "clarify"
+    else:
+        gate = tr.verification_result.gate_decision.value if tr.verification_result else "pass"
+
     reason = ""
     if tr.verification_result and tr.verification_result.violations:
         reason = tr.verification_result.violations[0].description
@@ -219,10 +241,18 @@ def render_turn_result(tr: TurnResult) -> None:
                     f"`{cid}` | Applicability: **{flag.upper()}** | Section: *{heading}*"
                 )
                 chunk_text = h.get("text", "")
+                preview, has_more = format_chunk_snippet(chunk_text, max_sentences=2)
                 st.markdown(
-                    f"<div style='font-size: 0.82rem; color: #475569; background: #f8fafc; padding: 6px; border-left: 3px solid #006666;'>{chunk_text}</div>",
+                    f"<div style='font-size: 0.82rem; color: #475569; background: #f8fafc; padding: 8px; border-left: 3px solid #006666; line-height: 1.45;'>{preview}</div>",
                     unsafe_allow_html=True,
                 )
+                if has_more:
+                    with st.expander(f"Full text for {cid}", expanded=False):
+                        escaped_full = chunk_text.replace("#", r"\#")
+                        st.markdown(
+                            f"<div style='font-size: 0.82rem; color: #334155; line-height: 1.5; white-space: pre-wrap;'>{escaped_full}</div>",
+                            unsafe_allow_html=True,
+                        )
                 st.markdown("---")
 
     # 2. Citation Grounding & Verification
@@ -396,11 +426,19 @@ def render_compare_tab(orchestrator: ChatbotOrchestrator) -> None:
                     res = orchestrator.handle_turn(temp_session, test_query.strip())
                     elapsed_ms = (time.perf_counter() - t0) * 1000
 
-                    gate = (
-                        res.verification_result.gate_decision.value
-                        if res.verification_result
-                        else "pass"
-                    )
+                    from guideline_chatbot.coherence.interfaces import GateDecision
+
+                    if res.action_type == "clarify" or (
+                        res.verification_result
+                        and res.verification_result.gate_decision == GateDecision.CLARIFY
+                    ):
+                        gate = "clarify"
+                    else:
+                        gate = (
+                            res.verification_result.gate_decision.value
+                            if res.verification_result
+                            else "pass"
+                        )
                     reason = ""
                     if res.verification_result and res.verification_result.violations:
                         reason = res.verification_result.violations[0].description

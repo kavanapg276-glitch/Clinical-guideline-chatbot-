@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import logging
 import re
+from enum import Enum
 from typing import Any
 
 from guideline_chatbot.retrieval.embeddings import EmbeddingManager
@@ -18,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 # Domain-specific clinical gating keywords for Hypertension and Type 2 Diabetes decision support
 IN_SCOPE_TERMS = re.compile(
-    r"\b(?:hypertension|hypertensive|blood\s+pressure|sbp|dbp|abpm|hbpm|target\s+bp|"
+    r"\b(?:hypertension|hypertensive|blood\s+pressure|bp|sbp|dbp|abpm|hbpm|target\s+bp|"
     r"diabetes|diabetic|t2dm|t1dm|hba1c|glycated|glycaemic|glycemic|blood\s+sugar|fasting\s+glucose|"
     r"postprandial|fpg|ogtt|metformin|insulin|amlodipine|ramipril|losartan|telmisartan|enalapril|"
     r"lisinopril|chlorthalidone|hydrochlorothiazide|indapamide|carvedilol|atenolol|bisoprolol|"
@@ -30,6 +31,68 @@ IN_SCOPE_TERMS = re.compile(
     r"attacc|aattcc|monotherapy|combination\s+therapy)\b",
     re.IGNORECASE,
 )
+
+
+class ClinicalIntent(str, Enum):
+    """Categorized clinical query intent for precision guideline retrieval and ranking."""
+
+    TARGET = "target"
+    FIRST_LINE_DRUG = "first_line_drug"
+    CONTRAINDICATION_SAFETY = "contraindication_safety"
+    THRESHOLD_DIAGNOSIS = "threshold_diagnosis"
+    GENERAL = "general"
+
+
+def detect_clinical_intent(
+    query: str, patient_state: dict[str, Any] | None = None
+) -> ClinicalIntent:
+    """Classify clinical query intent to guide intent-aware retrieval boosting and demotion.
+
+    Args:
+        query: User clinical query.
+        patient_state: Optional structured patient context.
+
+    Returns:
+        ClinicalIntent indicating primary clinical intent.
+    """
+    q_lower = query.lower()
+
+    # 1. Contraindication / Pregnancy Safety Intent
+    is_preg = False
+    if patient_state:
+        is_preg = bool(
+            patient_state.get("is_pregnant") or "pregnancy" in patient_state.get("conditions", [])
+        )
+    if is_preg or re.search(
+        r"\b(?:pregnant|pregnancy|gestation|trimester|can\s+i\s+take|safe\s+(?:to\s+take|in)|"
+        r"contraindicat|avoid|teratogen|breastfeeding|lactat|allergi|adverse)\b",
+        q_lower,
+    ):
+        return ClinicalIntent.CONTRAINDICATION_SAFETY
+
+    # 2. First-line / Initial Pharmacotherapy Intent
+    if re.search(
+        r"\b(?:which\s+drug|what\s+drug|first[- ]line|drug\s+class\s+first|initial\s+(?:drug|therapy|medication)|"
+        r"start\s+with|step\s*1|first\s+choice|choice\s+of\s+drug|prefer(?:red)?\s+(?:drug|agent))\b",
+        q_lower,
+    ):
+        return ClinicalIntent.FIRST_LINE_DRUG
+
+    # 3. Treatment Target Intent
+    if re.search(
+        r"\b(?:target|goal|aim|reduce\s+to|below\s+1[345]0|<1[345]0|bp\s+target|control\s+target)\b",
+        q_lower,
+    ):
+        return ClinicalIntent.TARGET
+
+    # 4. Diagnostic Threshold / Staging Intent
+    if re.search(
+        r"\b(?:threshold|diagnos|stage\s*[12]|grade\s*[123]|cutoff|cut-off)\b",
+        q_lower,
+    ):
+        return ClinicalIntent.THRESHOLD_DIAGNOSIS
+
+    return ClinicalIntent.GENERAL
 
 
 class HybridRetriever:
@@ -357,18 +420,40 @@ class HybridRetriever:
                 search_query = f"{' '.join(context_conds)} {query}"
                 has_clinical_keywords = True
 
+        # Step 1.5: Clinical query intent classification & query augmentation
+        intent = detect_clinical_intent(query, patient_state)
+        dense_query = search_query
+        sparse_query = search_query
+
+        if intent == ClinicalIntent.TARGET:
+            sparse_query = f"{search_query} target clinic blood pressure below 140/90 150/90 130/80 control goal"
+            dense_query = f"{search_query} blood pressure target goal for control"
+        elif intent == ClinicalIntent.FIRST_LINE_DRUG:
+            sparse_query = (
+                f"{search_query} first-line initial drug step 1 preferred drug class therapy"
+            )
+            has_dm = False
+            if patient_state and patient_state.get("conditions"):
+                has_dm = any("diabetes" in c or "t2dm" in c for c in patient_state["conditions"])
+            if "diabetes" in search_query.lower() or has_dm:
+                sparse_query += " ace inhibitor arb type 2 diabetes microalbuminuria offer"
+                dense_query = f"{search_query} first-line drug choice for hypertension in type 2 diabetes ACE inhibitor ARB"
+        elif intent == ClinicalIntent.CONTRAINDICATION_SAFETY:
+            sparse_query = f"{search_query} contraindicated contraindication avoid not for use pregnancy safety teratogenic mhra"
+            dense_query = f"{search_query} pregnancy contraindications antihypertensive safety ACE inhibitor enalapril"
+
         # Retrieve top candidates from each retriever for fusion
-        fetch_k = max(35, top_k * 5)
+        fetch_k = max(80, top_k * 12)
 
         dense_hits = self.vector_store.query_dense(
-            query_text=search_query,
+            query_text=dense_query,
             embedding_manager=self.embedding_manager,
             top_k=fetch_k,
             where_filter=resolved_filter,
         )
 
         sparse_hits = self.keyword_index.query_sparse(
-            query_text=search_query,
+            query_text=sparse_query,
             top_k=fetch_k,
             where_filter=resolved_filter,
         )
@@ -421,15 +506,114 @@ class HybridRetriever:
         elif re.search(r"\bmohfw\b|\bstg\b", query_lower):
             target_org = "MoHFW"
 
-        # Step 3: Patient-Aware Applicability Scoring
+        # Step 3: Patient-Aware & Clinical Intent Applicability Scoring
         scored_candidates: list[dict[str, Any]] = []
+        patient_age = patient_state.get("age") if patient_state else None
+        patient_conds = (
+            [c.lower() for c in patient_state.get("conditions", [])] if patient_state else []
+        )
+
         for cid, rrf_score in rrf_scores.items():
             hit_data = all_items[cid]
             meta = hit_data["metadata"]
+            heading_lower = (meta.get("heading") or "").lower()
+            text_lower = hit_data["text"].lower()
+            chunk_type = meta.get("chunk_type", "")
 
             app_flag, multiplier = self.compute_patient_applicability(meta, patient_state)
             if target_org and target_org.lower() in meta.get("issuing_organization", "").lower():
                 multiplier *= 1.45
+
+            # Step 3.1: Universal Noise Demotion (Screening, Methods, Implementation Tools)
+            if any(
+                h in heading_lower
+                for h in [
+                    "agree ii",
+                    "implementation tools",
+                    "screening pathway",
+                    "rescreening",
+                    "cuff size",
+                    "smoking in previous",
+                    "interval of at least 1 minute",
+                    "prevention",
+                ]
+            ):
+                multiplier *= 0.05
+            if chunk_type in ["methods", "screening"]:
+                multiplier *= 0.1
+
+            # Step 3.2: Clinical Intent Specific Re-ranking Multipliers
+            if intent == ClinicalIntent.TARGET:
+                if (
+                    re.search(
+                        r"\b(?:target|below\s+1[345]0|<1[345]0|reduce\s+clinic\s+blood\s+pressure|target\s+for\s+control)\b",
+                        text_lower,
+                    )
+                    or "target" in heading_lower
+                ):
+                    multiplier *= 1.8
+                if patient_age is not None:
+                    if patient_age >= 80:
+                        if re.search(
+                            r"\b(?:80\s+and\s+over|aged\s+80|above\s+80|150/90)\b", text_lower
+                        ):
+                            multiplier *= 3.0
+                        if re.search(
+                            r"\b(?:under\s+80|less\s+than\s+80|<140/90|aged\s+under\s+\d+)\b",
+                            text_lower,
+                        ) and not re.search(r"80\s+and\s+over", text_lower):
+                            multiplier *= 0.1
+                    elif patient_age < 80:
+                        if re.search(
+                            r"\b(?:under\s+80|less\s+than\s+80|<140/90|below\s+140/90)\b",
+                            text_lower,
+                        ):
+                            multiplier *= 2.0
+                        if re.search(r"\b(?:80\s+and\s+over|aged\s+80)\b", text_lower):
+                            multiplier *= 0.1
+
+            elif intent == ClinicalIntent.FIRST_LINE_DRUG:
+                is_dm = "diabetes" in query_lower or any(
+                    "diabetes" in c or "t2dm" in c for c in patient_conds
+                )
+                if is_dm:
+                    if re.search(
+                        r"\b(?:step\s*1|first[- ]line|preferred)\b", text_lower
+                    ) and re.search(r"\b(?:ace\s+inhibitor|arb|angiotensin)\b", text_lower):
+                        multiplier *= 3.5
+                    elif (
+                        re.search(r"\b(?:ace\s+inhibitor|arb)\b", text_lower)
+                        and "diabetes" in text_lower
+                    ):
+                        multiplier *= 2.2
+                if re.search(r"initiated in patients with grade 2 hypertension on", heading_lower):
+                    multiplier *= 0.1
+
+            elif intent == ClinicalIntent.CONTRAINDICATION_SAFETY:
+                is_preg_ctx = (
+                    (patient_state and patient_state.get("is_pregnant"))
+                    or "pregnant" in query_lower
+                    or "pregnancy" in query_lower
+                )
+                if is_preg_ctx:
+                    exc_text = (meta.get("exceptions") or "").lower()
+                    has_preg_text = bool(
+                        re.search(r"\b(?:pregnant|pregnancy|teratogenic|mhra)\b", text_lower)
+                        or "pregnancy" in exc_text
+                    )
+                    if not has_preg_text:
+                        multiplier *= 0.05
+                    else:
+                        if (
+                            re.search(
+                                r"\b(?:contraindicated|contraindication|not\s+for\s+use|avoid|teratogenic|harm|safety\s+advice|stop)\b",
+                                text_lower,
+                            )
+                            or "pregnancy" in exc_text
+                        ):
+                            multiplier *= 3.5
+                        else:
+                            multiplier *= 2.0
 
             final_score = rrf_score * multiplier
 

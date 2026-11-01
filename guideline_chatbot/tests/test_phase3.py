@@ -61,6 +61,30 @@ class TestPatientState:
         assert "penicillin" in state.allergies
         assert len(conflicts) == 0
 
+    def test_pregnancy_variants_extraction(self) -> None:
+        """Verify extraction of pregnancy status and gestational age across common conversational variants."""
+        # Variant 1: "26 weeks pregnant"
+        mgr1 = PatientStateManager()
+        state1, _ = mgr1.update_from_text("26 weeks pregnant, can I take enalapril?")
+        assert state1.is_pregnant is True
+        assert state1.pregnancy_weeks == 26
+        assert state1.sex == "female"
+        assert "pregnancy" in state1.conditions
+
+        # Variant 2: "I am pregnant"
+        mgr2 = PatientStateManager()
+        state2, _ = mgr2.update_from_text("I am pregnant with blood pressure of 142/90.")
+        assert state2.is_pregnant is True
+        assert state2.sex == "female"
+        assert "pregnancy" in state2.conditions
+
+        # Variant 3: "currently pregnant at 24 weeks gestation"
+        mgr3 = PatientStateManager()
+        state3, _ = mgr3.update_from_text("Patient is currently pregnant at 24 weeks gestation.")
+        assert state3.is_pregnant is True
+        assert state3.pregnancy_weeks == 24
+        assert state3.sex == "female"
+
     def test_contradiction_bp_normotensive_vs_hypertensive(self) -> None:
         mgr = PatientStateManager()
         # Turn 1: asserts normal blood pressure

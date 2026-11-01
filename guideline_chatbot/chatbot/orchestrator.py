@@ -175,6 +175,19 @@ class ChatbotOrchestrator:
         if ver_result.modified_response is not None:
             response_text = ver_result.modified_response
 
+        # Enforce gate consistency: a clarify action or unresolved state conflicts must reflect CLARIFY gate
+        from guideline_chatbot.coherence.interfaces import GateDecision
+
+        if action_type == "clarify" or current_state.has_conflicts:
+            if ver_result.gate_decision != GateDecision.REFUSE:
+                ver_result.gate_decision = GateDecision.CLARIFY
+                if not ver_result.explanation or "passed" in ver_result.explanation.lower():
+                    ver_result.explanation = (
+                        "Clarification required: active clinical contradiction in patient state."
+                    )
+        elif ver_result.gate_decision == GateDecision.CLARIFY:
+            action_type = "clarify"
+
         # 5. Validate citations against retrieved evidence
         citation_val = self.citation_validator.validate(
             text=response_text,

@@ -103,9 +103,19 @@ class RuleBasedCoherenceVerifier(CoherenceVerifier):
             gate_decision = GateDecision.REFUSE
             modified_response = self._build_refusal_response(violations, draft_response)
             explanation = "Response blocked due to critical safety contraindications."
-        elif case_state.disputed_facts_count > 0:
+        elif (
+            case_state.disputed_facts_count > 0
+            or "### Clarification Required" in draft_response
+            or bool(re.search(r"\bclarification\s+required\b", draft_response.lower()))
+        ):
             gate_decision = GateDecision.CLARIFY
-            modified_response = self._build_clarify_response(case_state)
+            if (
+                case_state.disputed_facts_count > 0
+                and "### Clarification Required" not in draft_response
+            ):
+                modified_response = self._build_clarify_response(case_state)
+            else:
+                modified_response = draft_response
             explanation = "Clarification required: active disputed facts in patient state."
         elif has_warning:
             gate_decision = GateDecision.WARN

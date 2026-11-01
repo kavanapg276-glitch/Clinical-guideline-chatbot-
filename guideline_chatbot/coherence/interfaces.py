@@ -68,6 +68,7 @@ class CaseState(BaseModel):
     age: int | None = None
     sex: str | None = None
     is_pregnant: bool = False
+    pregnancy_weeks: int | None = None
     is_breastfeeding: bool = False
     sbp: float | None = None
     dbp: float | None = None
@@ -91,6 +92,7 @@ class CaseState(BaseModel):
             age=p.age,
             sex=p.sex,
             is_pregnant=p.is_pregnant,
+            pregnancy_weeks=p.pregnancy_weeks,
             is_breastfeeding=p.is_breastfeeding,
             sbp=p.sbp,
             dbp=p.dbp,
