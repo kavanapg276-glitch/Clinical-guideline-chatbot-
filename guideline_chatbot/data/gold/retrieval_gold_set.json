@@ -640,5 +640,147 @@
     "expected_chunk_ids": [],
     "is_out_of_scope": true,
     "patient_context": null
+  },
+  {
+    "query_id": "gold_43",
+    "category": "out_of_scope",
+    "query": "What is the recommended pharmacological treatment for primary hypertension in pediatric patients under 12 years?",
+    "expected_chunk_ids": [],
+    "is_out_of_scope": true,
+    "patient_context": {
+      "age": 10,
+      "conditions": [
+        "hypertension"
+      ]
+    }
+  },
+  {
+    "query_id": "gold_44",
+    "category": "out_of_scope",
+    "query": "What is the target blood pressure and initial intravenous drug protocol for gestational hypertension with severe pre-eclampsia?",
+    "expected_chunk_ids": [],
+    "is_out_of_scope": true,
+    "patient_context": {
+      "is_pregnant": true,
+      "conditions": [
+        "pregnancy",
+        "hypertension"
+      ]
+    }
+  },
+  {
+    "query_id": "gold_45",
+    "category": "out_of_scope",
+    "query": "What preoperative alpha-blockade dosing titration is recommended for pheochromocytoma-induced hypertension?",
+    "expected_chunk_ids": [],
+    "is_out_of_scope": true
+  },
+  {
+    "query_id": "gold_46",
+    "category": "out_of_scope",
+    "query": "What is the basal-bolus insulin titration regimen for a normal-weight young adult with Type 1 Diabetes Mellitus without hypertension?",
+    "expected_chunk_ids": [],
+    "is_out_of_scope": true
+  },
+  {
+    "query_id": "gold_47",
+    "category": "out_of_scope",
+    "query": "What catheter-based renal sympathetic denervation technique is recommended for treatment-resistant hypertension?",
+    "expected_chunk_ids": [],
+    "is_out_of_scope": true
+  },
+  {
+    "query_id": "gold_48",
+    "category": "out_of_scope",
+    "query": "What is the intravenous nitroprusside dosing protocol for hypertensive encephalopathy during acute eclampsia?",
+    "expected_chunk_ids": [],
+    "is_out_of_scope": true
+  },
+  {
+    "query_id": "gold_49",
+    "category": "bp_thresholds",
+    "query": "What is the blood pressure threshold for diagnosing hypertension in a single clinic visit in the ICMR guideline?",
+    "expected_chunk_ids": [
+      "icmr_htn_001_c0005"
+    ],
+    "is_out_of_scope": false,
+    "patient_context": {
+      "conditions": [
+        "hypertension"
+      ]
+    }
+  },
+  {
+    "query_id": "gold_50",
+    "category": "screening",
+    "query": "What blood pressure level is listed as a risk factor for diabetes screening in normal adults in the ICMR workflow?",
+    "expected_chunk_ids": [
+      "icmr_t2dm_001_c0007"
+    ],
+    "is_out_of_scope": false,
+    "patient_context": {
+      "conditions": [
+        "type_2_diabetes"
+      ]
+    }
+  },
+  {
+    "query_id": "gold_51",
+    "category": "drug_selection",
+    "query": "Which guidelines recommend combination therapy or single-pill combinations as default initial treatment for hypertension?",
+    "expected_chunk_ids": [
+      "icmr_htn_001_c0011",
+      "who_htn_001_c0048"
+    ],
+    "is_out_of_scope": false,
+    "patient_context": {
+      "conditions": [
+        "hypertension"
+      ]
+    }
+  },
+  {
+    "query_id": "gold_52",
+    "category": "monitoring",
+    "query": "At what age does the ICMR guideline recommend assessing orthostatic blood pressure at every visit?",
+    "expected_chunk_ids": [
+      "icmr_htn_001_c0007"
+    ],
+    "is_out_of_scope": false,
+    "patient_context": {
+      "age": 70,
+      "conditions": [
+        "hypertension"
+      ]
+    }
+  },
+  {
+    "query_id": "gold_53",
+    "category": "contraindications",
+    "query": "Why is combining two RAAS blockers (ACE inhibitor and ARB) strictly contraindicated in hypertension?",
+    "expected_chunk_ids": [
+      "icmr_htn_001_c0011",
+      "mohfw_htn_001_c0202"
+    ],
+    "is_out_of_scope": false,
+    "patient_context": {
+      "conditions": [
+        "hypertension"
+      ]
+    }
+  },
+  {
+    "query_id": "gold_54",
+    "category": "diagnostic_criteria",
+    "query": "What are the fasting plasma glucose criteria for impaired fasting glucose and prediabetes in the ICMR workflow?",
+    "expected_chunk_ids": [
+      "icmr_t2dm_001_c0006"
+    ],
+    "is_out_of_scope": false,
+    "patient_context": {
+      "conditions": [
+        "type_2_diabetes"
+      ]
+    }
   }
 ]

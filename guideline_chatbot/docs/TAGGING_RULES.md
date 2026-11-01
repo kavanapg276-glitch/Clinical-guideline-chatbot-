@@ -19,9 +19,9 @@
 2. **Negation and Exclusions:**  
    *Negative Example:* NICE NG136 Recommendation 1.2.12 states: *"Measure blood pressure at least annually in an adult with type 2 diabetes without previously diagnosed hypertension or renal disease."*  
    *Rule:* The phrase *"without ... renal disease"* explicitly excludes CKD patients from this specific annual cadence. The pipeline must detect negation patterns (`without`, `excluding`, `in the absence of`, `except`) and **MUST NOT** tag `chronic_kidney_disease`.
-3. **Type 1 vs. Type 2 Diabetes Disambiguation:**  
-   *Negative Example:* NICE NG136 Recommendation 1.4.20 contains a footnote directing readers: *"For people with type 1 diabetes see the NICE guideline on type 1 diabetes."*  
-   *Rule:* The pipeline maintains distinct tags `type_1_diabetes` and `type_2_diabetes`. Footnotes cross-referencing Type 1 Diabetes must not result in tagging `type_2_diabetes`.
+3. **Cross-References vs Target Population Applicability:**  
+   *Negative Example:* NICE NG136 Recommendation 1.4.20 contains a cross-reference statement: *"See also table 1 for guidance on clinic blood pressure targets for people aged under 80 with type 1 diabetes or severe chronic kidney disease."*  
+   *Rule:* Mentioning a population exclusively within an explicit cross-reference ("See also table...", "see the section on...", "see NICE guideline on...") directs clinicians to a separate protocol; it does NOT mean this chunk governs that subpopulation. The pipeline parses all cross-reference clauses into `cross_references: list[str]` and strips them before extracting population tags. Recommendation 1.4.20 therefore carries `population_tags: []` (general adult hypertension under 80), not `type_1_diabetes` or `chronic_kidney_disease`.
 4. **Drug Adverse Effect Mentions:**  
    *Negative Example:* MoHFW STG §5.3.2 notes: *"The common side effects of diuretics are metabolic side effects like hypokalemia, hyperglycemia..."*  
    *Rule:* Listing hyperglycemia as a pharmacological side effect of thiazides is not a recommendation for diabetic patients. It must not be tagged with `type_2_diabetes`.
@@ -48,9 +48,12 @@ The pipeline recognizes the following standardized population tags:
 ## 3. Condition Scoping (`hypertension`, `type_2_diabetes`, `both`)
 
 The field `condition` indicates the therapeutic disease domain to which the chunk applies:
-- `hypertension`: Guidance addressing blood pressure measurement, classification, lifestyle modification, and pharmacological management in non-diabetic adults.
-- `type_2_diabetes`: Guidance addressing glycemic control, HbA1c targets, lifestyle modification, and glucose-lowering agents in normotensive adults.
-- `both`: Applied **ONLY** when the guidance specifically governs patients presenting with **both** conditions simultaneously (e.g. blood pressure thresholds/targets in diabetic patients, ACEi/ARB preferential selection in diabetic hypertension, or screening for diabetes in hypertensive patients).
+- `hypertension`: Guidance addressing blood pressure measurement, classification, lifestyle modification, and pharmacological management of hypertension (applies generally to adults with hypertension unless explicitly restricted).
+- `type_2_diabetes`: Guidance addressing glycemic control, HbA1c targets, lifestyle modification, and glucose-lowering agents in type 2 diabetes (applies generally to adults with diabetes unless explicitly restricted).
+- `both`: Applied when guidance specifically governs patients presenting with **both** conditions simultaneously (e.g. blood pressure thresholds/targets in diabetic patients, ACEi/ARB preferential selection in diabetic hypertension, or screening for diabetes in hypertensive patients).
+
+### Multi-Condition Retrieval Semantics:
+When a patient has **both** hypertension and type 2 diabetes, clinical decision support requires access to general hypertension recommendations, general diabetes recommendations, and combination-specific guidance. Therefore, the retrieval layer dynamically retrieves across `hypertension`, `type_2_diabetes`, and `both` (e.g. `{"condition": {"$in": ["hypertension", "type_2_diabetes", "both"]}}`). Chunks tagged `both` are also indexed for single-condition queries when relevant.
 
 ---
 

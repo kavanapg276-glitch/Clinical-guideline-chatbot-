@@ -172,13 +172,19 @@ def test_extract_population_tags_applicability_and_negation() -> None:
     assert "type_2_diabetes" not in tags_screen
 
     # Type 1 vs Type 2 diabetes disambiguation
-    text_t1dm = (
-        "See also table 1 for guidance on clinic blood pressure targets for people aged under 80 "
-        "with type 1 diabetes or severe chronic kidney disease."
-    )
+    text_t1dm = "Offer continuous glucose monitoring to adults with type 1 diabetes."
     tags_t1 = extract_population_tags(text_t1dm)
     assert "type_1_diabetes" in tags_t1
     assert "type_2_diabetes" not in tags_t1
+
+    # Cross-reference mention must NOT tag population (NICE 1.4.20 per Stage A item 3)
+    text_xref = (
+        "See also table 1 for guidance on clinic blood pressure targets for people aged under 80 "
+        "with type 1 diabetes or severe chronic kidney disease."
+    )
+    tags_xref = extract_population_tags(text_xref)
+    assert "type_1_diabetes" not in tags_xref
+    assert "chronic_kidney_disease" not in tags_xref
 
     # Adverse drug effect mention must NOT tag T2DM
     text_ae = (
@@ -409,7 +415,7 @@ def test_numeric_preservation(processed_chunks: list[dict[str, Any]]) -> None:
 def test_icmr_drug_table_and_strata_preservation(processed_chunks: list[dict[str, Any]]) -> None:
     """Verify complete row-wise preservation of ICMR antihypertensive table and T2DM strata."""
     c_htn = next(c for c in processed_chunks if c["chunk_id"] == "icmr_htn_001_c0012")
-    c_t2dm = next(c for c in processed_chunks if c["chunk_id"] == "icmr_t2dm_001_c0008")
+    c_t2dm = next(c for c in processed_chunks if c["chunk_id"] == "icmr_t2dm_001_c0009")
 
     assert c_htn["chunk_type"] == "table"
     assert c_t2dm["chunk_type"] == "table"
@@ -441,14 +447,16 @@ def test_icmr_drug_table_and_strata_preservation(processed_chunks: list[dict[str
 
 def test_ten_clinical_traps(processed_chunks: list[dict[str, Any]]) -> None:
     """Verify all 10 clinical trap assertions specified in Gate 1 defect remediation."""
-    # Trap 1: NICE 1.4.20 tags type_1_diabetes, NOT type_2_diabetes
+    # Trap 1: NICE 1.4.20 removes type_1_diabetes and chronic_kidney_disease per Stage A item 3
     c1 = next(
         c
         for c in processed_chunks
         if c["text"].strip().startswith("1.4.20") and c["doc_id"] == "nice_htn_001"
     )
-    assert "type_1_diabetes" in c1["population_tags"]
+    assert "type_1_diabetes" not in c1["population_tags"]
+    assert "chronic_kidney_disease" not in c1["population_tags"]
     assert "type_2_diabetes" not in c1["population_tags"]
+    assert len(c1.get("cross_references", [])) > 0
 
     # Trap 2: NICE 1.2.12 negates chronic_kidney_disease
     c2 = next(

@@ -53,7 +53,9 @@ class GuidelineChunk(BaseModel):
     drug_class_tags: list[str] = Field(default_factory=list)
     applicability_conditions: list[str] | None = None
     exceptions: list[str] | None = None
+    cross_references: list[str] = Field(default_factory=list)
     text: str
+    text_verbatim: str | None = None
     text_hash: str = ""
 
     @field_validator("text_hash", mode="before")
@@ -97,6 +99,8 @@ CHUNK_METADATA_FIELDS = [
     "drug_class_tags",
     "applicability_conditions",
     "exceptions",
+    "cross_references",
     "text",
+    "text_verbatim",
     "text_hash",
 ]

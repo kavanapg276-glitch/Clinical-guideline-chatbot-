@@ -93,51 +93,80 @@ class HybridRetriever:
         pop_tags = [
             t.strip().lower() for t in meta.get("population_tags", "").split(",") if t.strip()
         ]
-        drug_tags = [
-            d.strip().lower() for d in meta.get("drug_class_tags", "").split(",") if d.strip()
-        ]
 
         patient_age = patient_state.get("age")
         patient_conditions = [c.lower() for c in patient_state.get("conditions", [])]
         is_pregnant = patient_state.get("is_pregnant", False) or ("pregnancy" in patient_conditions)
 
-        # 1. Pregnancy Contraindication Conflict Check
-        # ACEi, ARB, and thiazides are strictly contraindicated in pregnancy
-        if is_pregnant:
-            if "pregnancy" in pop_tags:
-                return "matches", 1.3
-            if any(d in ["ace_inhibitor", "arb", "thiazide"] for d in drug_tags):
-                # Suggesting ACEi/ARB to a pregnant patient is a direct safety conflict
-                return "conflicts", 0.1
+        # 1. Metadata-Driven Exception & Contraindication Conflict Check
+        # Checks if chunk's explicit exceptions/contraindications mention patient context
+        exceptions_text = str(meta.get("exceptions", "") or "").lower()
+        applicability_text = str(meta.get("applicability_conditions", "") or "").lower()
 
-        # 2. Elderly / Age Check
+        if exceptions_text:
+            if is_pregnant and re.search(r"\bpregnan", exceptions_text):
+                return "conflicts", 0.2
+            if any(
+                "ckd" in c or "renal" in c or "kidney" in c for c in patient_conditions
+            ) and re.search(r"\b(?:renal|kidney|egfr|crcl)\b", exceptions_text):
+                return "conflicts", 0.3
+            if any("asthma" in c for c in patient_conditions) and re.search(
+                r"\basthma\b", exceptions_text
+            ):
+                return "conflicts", 0.3
+            if any("heart failure" in c or "chf" in c for c in patient_conditions) and re.search(
+                r"\bheart\s+failure\b", exceptions_text
+            ):
+                return "conflicts", 0.3
+
+        # 2. Metadata-Driven Population Tag Conflicts
         if patient_age is not None:
-            if patient_age >= 80:
-                if "elderly" in pop_tags:
-                    return "matches", 1.25
-                if "young_adults" in pop_tags:
-                    return "conflicts", 0.3
-            elif patient_age < 40:
-                if "young_adults" in pop_tags:
-                    return "matches", 1.25
-                if "elderly" in pop_tags:
-                    return "conflicts", 0.4
+            if patient_age >= 80 and "young_adults" in pop_tags:
+                return "conflicts", 0.4
+            if patient_age < 45 and "elderly" in pop_tags:
+                return "conflicts", 0.4
 
-        # 3. Comorbidity Matches (CKD, Diabetes, CVD)
-        has_ckd = any("ckd" in c or "renal" in c or "kidney" in c for c in patient_conditions)
-        if has_ckd and "chronic_kidney_disease" in pop_tags:
+        # 3. Metadata-Driven Applicability & Population Tag Matches
+        matches_found = 0
+        if is_pregnant and "pregnancy" in pop_tags:
+            matches_found += 1
+        if (
+            any("ckd" in c or "renal" in c or "kidney" in c for c in patient_conditions)
+            and "chronic_kidney_disease" in pop_tags
+        ):
+            matches_found += 1
+        if (
+            any("diabetes" in c or "t2dm" in c for c in patient_conditions)
+            and "type_2_diabetes" in pop_tags
+        ):
+            matches_found += 1
+        if (
+            any(
+                "cvd" in c or "cad" in c or "heart failure" in c or "stroke" in c
+                for c in patient_conditions
+            )
+            and "cardiovascular_disease" in pop_tags
+        ):
+            matches_found += 1
+        if patient_age is not None and (
+            (patient_age >= 65 and "elderly" in pop_tags)
+            or (patient_age < 55 and "young_adults" in pop_tags)
+        ):
+            matches_found += 1
+
+        if matches_found > 0:
             return "matches", 1.2
 
-        has_t2dm = any("diabetes" in c or "t2dm" in c for c in patient_conditions)
-        if has_t2dm and "type_2_diabetes" in pop_tags:
-            return "matches", 1.2
-
-        has_cvd = any(
-            "cvd" in c or "cad" in c or "heart failure" in c or "stroke" in c
-            for c in patient_conditions
-        )
-        if has_cvd and "cardiovascular_disease" in pop_tags:
-            return "matches", 1.2
+        if applicability_text:
+            if (
+                any("diabetes" in c for c in patient_conditions)
+                and "diabetes" in applicability_text
+            ):
+                return "matches", 1.15
+            if any("ckd" in c for c in patient_conditions) and (
+                "ckd" in applicability_text or "kidney" in applicability_text
+            ):
+                return "matches", 1.15
 
         return "unknown", 1.0
 
@@ -145,7 +174,7 @@ class HybridRetriever:
         self,
         hits: list[dict[str, Any]],
     ) -> list[dict[str, Any]]:
-        """Identify if top retrieved hits from different jurisdictions disagree on targets or protocols.
+        """Identify if top retrieved hits disagree on targets or protocols (cross-jurisdiction or within-source).
 
         Returns:
             List of detected disagreement items with divergent source metadata.
@@ -154,7 +183,51 @@ class HybridRetriever:
         if len(hits) < 2:
             return disagreements
 
-        # Group hits by issuing organization / jurisdiction
+        # 1. Check for within-source ICMR Blood Pressure target disagreement (HTN poster vs T2DM poster)
+        icmr_htn_target = next(
+            (
+                h
+                for h in hits
+                if h["metadata"].get("doc_id") == "icmr_htn_001"
+                and "blood pressure control targets" in h["text"].lower()
+            ),
+            None,
+        )
+        icmr_t2dm_target = next(
+            (
+                h
+                for h in hits
+                if h["metadata"].get("doc_id") == "icmr_t2dm_001"
+                and "metabolic targets" in h["text"].lower()
+            ),
+            None,
+        )
+        if icmr_htn_target and icmr_t2dm_target:
+            disagreements.append(
+                {
+                    "domain": "Blood Pressure Target in Diabetes (Within-Source ICMR Disagreement)",
+                    "description": (
+                        "ICMR Hypertension STW specifies target < 130/80 mmHg in diabetes, "
+                        "whereas ICMR Type 2 Diabetes STW specifies target < 140/90 mmHg (< 130/80 in CKD)."
+                    ),
+                    "divergent_sources": [
+                        {
+                            "issuing_organization": "ICMR",
+                            "document_name": "ICMR STW Hypertension in Adults",
+                            "chunk_id": icmr_htn_target["chunk_id"],
+                            "page_start": 1,
+                        },
+                        {
+                            "issuing_organization": "ICMR",
+                            "document_name": "ICMR STW Diabetes Mellitus Type 2",
+                            "chunk_id": icmr_t2dm_target["chunk_id"],
+                            "page_start": 1,
+                        },
+                    ],
+                }
+            )
+
+        # 2. Group hits by issuing organization / jurisdiction for cross-guideline disagreements
         jurisdictions = {
             h["metadata"].get("jurisdiction") for h in hits if h["metadata"].get("jurisdiction")
         }
@@ -242,6 +315,37 @@ class HybridRetriever:
         has_clinical_keywords = bool(IN_SCOPE_TERMS.search(query))
         search_query = query
 
+        # Resolve condition filter: patients with both conditions retrieve hypertension, type_2_diabetes, and both
+        resolved_filter = where_filter
+        if patient_state and patient_state.get("conditions"):
+            p_conds = [c.lower() for c in patient_state["conditions"]]
+            has_htn = any(
+                "hypertension" in c or "htn" in c or "blood pressure" in c for c in p_conds
+            )
+            has_dm = any("diabetes" in c or "t2dm" in c for c in p_conds)
+            if has_htn and has_dm:
+                if not resolved_filter:
+                    resolved_filter = {
+                        "condition": {"$in": ["hypertension", "type_2_diabetes", "both"]}
+                    }
+                elif "condition" in resolved_filter:
+                    resolved_filter = dict(resolved_filter)
+                    resolved_filter["condition"] = {
+                        "$in": ["hypertension", "type_2_diabetes", "both"]
+                    }
+
+        if resolved_filter and "condition" in resolved_filter:
+            cond_val = resolved_filter["condition"]
+            if cond_val == "both":
+                resolved_filter = dict(resolved_filter)
+                resolved_filter["condition"] = {"$in": ["hypertension", "type_2_diabetes", "both"]}
+            elif cond_val == "hypertension":
+                resolved_filter = dict(resolved_filter)
+                resolved_filter["condition"] = {"$in": ["hypertension", "both"]}
+            elif cond_val == "type_2_diabetes":
+                resolved_filter = dict(resolved_filter)
+                resolved_filter["condition"] = {"$in": ["type_2_diabetes", "both"]}
+
         if not has_clinical_keywords and patient_state and patient_state.get("conditions"):
             # Contextualize follow-up questions using established patient conditions
             context_conds = [
@@ -260,13 +364,13 @@ class HybridRetriever:
             query_text=search_query,
             embedding_manager=self.embedding_manager,
             top_k=fetch_k,
-            where_filter=where_filter,
+            where_filter=resolved_filter,
         )
 
         sparse_hits = self.keyword_index.query_sparse(
             query_text=search_query,
             top_k=fetch_k,
-            where_filter=where_filter,
+            where_filter=resolved_filter,
         )
 
         best_dense = dense_hits[0]["score"] if dense_hits else 0.0

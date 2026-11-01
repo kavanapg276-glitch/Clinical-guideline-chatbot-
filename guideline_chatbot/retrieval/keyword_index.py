@@ -172,10 +172,27 @@ class KeywordIndex:
             # Optional metadata filtering
             if where_filter:
                 match = True
-                for k, v in where_filter.items():
-                    if getattr(chunk, k, None) != v:
-                        match = False
-                        break
+                if "$or" in where_filter:
+                    match = any(
+                        all(
+                            (
+                                getattr(chunk, sub_k, None) in sub_v.get("$in", [])
+                                if isinstance(sub_v, dict) and "$in" in sub_v
+                                else getattr(chunk, sub_k, None) == sub_v
+                            )
+                            for sub_k, sub_v in sub_dict.items()
+                        )
+                        for sub_dict in where_filter["$or"]
+                    )
+                else:
+                    for k, v in where_filter.items():
+                        if isinstance(v, dict) and "$in" in v:
+                            if getattr(chunk, k, None) not in v["$in"]:
+                                match = False
+                                break
+                        elif getattr(chunk, k, None) != v:
+                            match = False
+                            break
                 if not match:
                     continue
 

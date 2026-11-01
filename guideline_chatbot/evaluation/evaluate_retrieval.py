@@ -1,7 +1,9 @@
 """Retrieval evaluation script benchmarking HybridRetriever on the gold benchmark set.
 
-Evaluates Precision@5, Recall@5, MRR, NDCG@5, and Out-of-Scope gating.
-Generates a markdown benchmark report in data/reports/retrieval_evaluation_report.md.
+Evaluates standard Precision@5, bounded Precision@5, Recall@5, MRR, NDCG@5,
+and Out-of-Scope gating across both the original 42-query development set and
+the expanded 54-query set with harder no-evidence queries.
+Generates an honest, unvarnished benchmark report in data/reports/retrieval_evaluation_report.md.
 """
 
 from __future__ import annotations
@@ -27,7 +29,8 @@ class QueryEvalResult:
     retrieved_chunk_ids: list[str]
     retrieved_scores: list[float]
     is_out_of_scope_flagged: bool
-    precision_at_k: float
+    precision_at_k_standard: float  # relevant in top 5 divided by 5
+    precision_at_k_bounded: float  # relevant in top 5 divided by min(5, |expected|)
     recall_at_k: float
     reciprocal_rank: float
     ndcg_at_k: float
@@ -39,9 +42,7 @@ def compute_dcg(relevance: list[int], k: int) -> float:
     dcg = 0.0
     for i in range(min(k, len(relevance))):
         if relevance[i] > 0:
-            dcg += relevance[i] / math.log2(
-                i + 2
-            )  # rank is i+1, discount log2(rank+1) -> log2(i+2)
+            dcg += relevance[i] / math.log2(i + 2)
     return dcg
 
 
@@ -53,7 +54,6 @@ def compute_ndcg(retrieved_ids: list[str], expected_ids: list[str], k: int = 5) 
     rel = [1 if cid in expected_set else 0 for cid in retrieved_ids[:k]]
     actual_dcg = compute_dcg(rel, k)
 
-    # Ideal ranking has all 1s up to min(k, len(expected_ids))
     ideal_rel = [1] * min(k, len(expected_ids))
     ideal_dcg = compute_dcg(ideal_rel, k)
 
@@ -63,7 +63,7 @@ def compute_ndcg(retrieved_ids: list[str], expected_ids: list[str], k: int = 5) 
 
 
 class RetrievalEvaluator:
-    """Evaluates the HybridRetriever against a gold benchmark set."""
+    """Evaluates the HybridRetriever against the gold benchmark development set."""
 
     def __init__(
         self,
@@ -79,8 +79,8 @@ class RetrievalEvaluator:
             data: list[dict[str, Any]] = json.load(f)
             return data
 
-    def evaluate(self) -> tuple[list[QueryEvalResult], dict[str, Any]]:
-        """Run evaluation across all gold queries."""
+    def evaluate(self) -> tuple[list[QueryEvalResult], dict[str, Any], dict[str, Any]]:
+        """Run evaluation across all gold queries and generate 42-query and 54-query summaries."""
         gold_queries = self.load_gold_set()
         results: list[QueryEvalResult] = []
 
@@ -105,7 +105,6 @@ class RetrievalEvaluator:
             disagreements = [d.get("domain", "") for d in res.get("disagreements", [])]
 
             if is_out_of_scope:
-                # Target: flagged as out-of-scope, 0 chunks returned
                 is_correct = is_oos_flagged and len(retrieved_ids) == 0
                 results.append(
                     QueryEvalResult(
@@ -117,7 +116,8 @@ class RetrievalEvaluator:
                         retrieved_chunk_ids=retrieved_ids,
                         retrieved_scores=retrieved_scores,
                         is_out_of_scope_flagged=is_oos_flagged,
-                        precision_at_k=1.0 if is_correct else 0.0,
+                        precision_at_k_standard=1.0 if is_correct else 0.0,
+                        precision_at_k_bounded=1.0 if is_correct else 0.0,
                         recall_at_k=1.0 if is_correct else 0.0,
                         reciprocal_rank=1.0 if is_correct else 0.0,
                         ndcg_at_k=1.0 if is_correct else 0.0,
@@ -129,8 +129,11 @@ class RetrievalEvaluator:
                 relevant_flags = [cid in expected_set for cid in retrieved_ids]
                 num_relevant_retrieved = sum(relevant_flags)
 
-                # Precision@K: relevant retrieved / min(K, total expected)
-                precision = (
+                # Standard Precision@K: relevant retrieved / K (always divided by 5)
+                prec_standard = num_relevant_retrieved / self.top_k
+
+                # Bounded Precision@K: relevant retrieved / min(K, total expected)
+                prec_bounded = (
                     num_relevant_retrieved / min(self.top_k, len(expected_set))
                     if expected_set
                     else 0.0
@@ -139,7 +142,7 @@ class RetrievalEvaluator:
                 # Recall@K: relevant retrieved / total expected
                 recall = num_relevant_retrieved / len(expected_set) if expected_set else 0.0
 
-                # Reciprocal rank: 1 / rank of first relevant item
+                # Reciprocal rank
                 rr = 0.0
                 for rank, is_hit in enumerate(relevant_flags, start=1):
                     if is_hit:
@@ -159,7 +162,8 @@ class RetrievalEvaluator:
                         retrieved_chunk_ids=retrieved_ids,
                         retrieved_scores=retrieved_scores,
                         is_out_of_scope_flagged=is_oos_flagged,
-                        precision_at_k=precision,
+                        precision_at_k_standard=prec_standard,
+                        precision_at_k_bounded=prec_bounded,
                         recall_at_k=recall,
                         reciprocal_rank=rr,
                         ndcg_at_k=ndcg,
@@ -167,16 +171,20 @@ class RetrievalEvaluator:
                     )
                 )
 
-        summary = self._compute_summary(results)
-        return results, summary
+        summary_42 = self._compute_summary(results[:42])
+        summary_54 = self._compute_summary(results)
+        return results, summary_42, summary_54
 
-    def _compute_summary(self, results: list[QueryEvalResult]) -> dict[str, Any]:
-        """Compute aggregate metrics overall and by category."""
-        in_scope = [r for r in results if not r.is_out_of_scope]
-        out_of_scope = [r for r in results if r.is_out_of_scope]
+    def _compute_summary(self, subset_results: list[QueryEvalResult]) -> dict[str, Any]:
+        """Compute aggregate metrics for a given query subset."""
+        in_scope = [r for r in subset_results if not r.is_out_of_scope]
+        out_of_scope = [r for r in subset_results if r.is_out_of_scope]
 
-        mean_precision = (
-            sum(r.precision_at_k for r in in_scope) / len(in_scope) if in_scope else 0.0
+        mean_prec_std = (
+            sum(r.precision_at_k_standard for r in in_scope) / len(in_scope) if in_scope else 0.0
+        )
+        mean_prec_bnd = (
+            sum(r.precision_at_k_bounded for r in in_scope) / len(in_scope) if in_scope else 0.0
         )
         mean_recall = sum(r.recall_at_k for r in in_scope) / len(in_scope) if in_scope else 0.0
         mean_mrr = sum(r.reciprocal_rank for r in in_scope) / len(in_scope) if in_scope else 0.0
@@ -188,26 +196,29 @@ class RetrievalEvaluator:
         oos_rejection_rate = oos_correct / len(out_of_scope) if out_of_scope else 1.0
         oos_false_positives = sum(len(r.retrieved_chunk_ids) for r in out_of_scope)
 
-        # By category metrics
         categories = sorted(set(r.category for r in in_scope))
         cat_metrics: dict[str, dict[str, float]] = {}
         for cat in categories:
             cat_results = [r for r in in_scope if r.category == cat]
             cat_metrics[cat] = {
                 "count": len(cat_results),
-                "precision_at_k": sum(r.precision_at_k for r in cat_results) / len(cat_results),
+                "precision_at_k_standard": sum(r.precision_at_k_standard for r in cat_results)
+                / len(cat_results),
+                "precision_at_k_bounded": sum(r.precision_at_k_bounded for r in cat_results)
+                / len(cat_results),
                 "recall_at_k": sum(r.recall_at_k for r in cat_results) / len(cat_results),
                 "mrr": sum(r.reciprocal_rank for r in cat_results) / len(cat_results),
                 "ndcg_at_k": sum(r.ndcg_at_k for r in cat_results) / len(cat_results),
             }
 
         return {
-            "total_queries": len(results),
+            "total_queries": len(subset_results),
             "in_scope_queries": len(in_scope),
             "out_of_scope_queries": len(out_of_scope),
             "top_k": self.top_k,
             "overall_in_scope": {
-                "precision_at_k": mean_precision,
+                "precision_at_k_standard": mean_prec_std,
+                "precision_at_k_bounded": mean_prec_bnd,
                 "recall_at_k": mean_recall,
                 "mrr": mean_mrr,
                 "ndcg_at_k": mean_ndcg,
@@ -223,64 +234,64 @@ class RetrievalEvaluator:
     def generate_report(
         self,
         results: list[QueryEvalResult],
-        summary: dict[str, Any],
+        summary_42: dict[str, Any],
+        summary_54: dict[str, Any],
         output_path: Path | str = "guideline_chatbot/data/reports/retrieval_evaluation_report.md",
     ) -> str:
-        """Render evaluation report as markdown."""
+        """Render evaluation report as markdown with transparent metric disclosures."""
         out_p = Path(output_path)
         out_p.parent.mkdir(parents=True, exist_ok=True)
 
-        in_scope_summary = summary["overall_in_scope"]
-        oos_summary = summary["out_of_scope_gating"]
-
-        p_k = in_scope_summary["precision_at_k"]
-        r_k = in_scope_summary["recall_at_k"]
-        mrr = in_scope_summary["mrr"]
-        ndcg = in_scope_summary["ndcg_at_k"]
-
-        p_status = "PASS" if p_k >= 0.80 else "FAIL"
-        r_status = "PASS" if r_k >= 0.75 else "FAIL"
-        mrr_status = "PASS" if mrr >= 0.85 else "FAIL"
-        oos_status = "PASS" if oos_summary["false_positives"] == 0 else "FAIL"
+        in_42 = summary_42["overall_in_scope"]
+        oos_42 = summary_42["out_of_scope_gating"]
+        in_54 = summary_54["overall_in_scope"]
+        oos_54 = summary_54["out_of_scope_gating"]
 
         lines: list[str] = [
             "# Retrieval Evaluation Report: Phase 2 Hybrid Retrieval Benchmark",
             "",
+            "> [!IMPORTANT]",
+            "> **Development Set Disclosure:** The gold query benchmark is a developmental set, not independent evidence. "
+            "Ground-truth expected chunks were derived from guideline review and system development queries, and the retriever "
+            "was tuned against this set. For independent evaluation, refer to the un-tuned human test set in "
+            "`retrieval_test_set_human.json` (evaluated via `evaluate_human_test_set.py`).",
+            "",
             f"**Benchmark Dataset:** `{self.gold_set_path}`  ",
-            f"**Total Benchmark Queries:** {summary['total_queries']} ({summary['in_scope_queries']} in-scope, {summary['out_of_scope_queries']} out-of-scope)  ",
+            f"**Total Benchmark Queries:** {summary_54['total_queries']} ({summary_54['in_scope_queries']} in-scope, {summary_54['out_of_scope_queries']} out-of-scope)  ",
             f"**Evaluation Rank Cutoff (Top-K):** {self.top_k}  ",
             "**Dense Retriever:** `sentence-transformers/all-MiniLM-L6-v2` (384-d normalized, ChromaDB)  ",
-            "**Sparse Retriever:** BM25Okapi with clinical synonym expansion tokenization  ",
-            "**Fusion Method:** Reciprocal Rank Fusion (RRF k=60, equal 0.5 weights) with patient applicability weighting  ",
+            "**Sparse Retriever:** BM25Okapi with clinical tokenization  ",
+            "**Fusion Method:** Reciprocal Rank Fusion (RRF k=60, equal 0.5 weights) with metadata-driven patient applicability  ",
             "",
-            "## 1. Overall Performance vs Acceptance Targets",
+            "## 1. Comparative Performance: Original 42-Query Set vs. Expanded 54-Query Set",
             "",
-            "| Metric | Target | Benchmark Score | Status | Evidence |",
-            "| :--- | :--- | :--- | :--- | :--- |",
-            f"| **Precision@{self.top_k}** | $\\ge 0.80$ | **{p_k:.4f}** | **{p_status}** | Mean precision over {summary['in_scope_queries']} clinical queries |",
-            f"| **Recall@{self.top_k}** | $\\ge 0.75$ | **{r_k:.4f}** | **{r_status}** | Mean recall over {summary['in_scope_queries']} clinical queries |",
-            f"| **MRR (Mean Reciprocal Rank)** | $\\ge 0.85$ | **{mrr:.4f}** | **{mrr_status}** | First relevant hit reciprocal rank |",
-            f"| **NDCG@{self.top_k}** | $\\ge 0.80$ | **{ndcg:.4f}** | **PASS** | Normalized discounted cumulative gain |",
-            f"| **Out-of-Scope Rejection Rate** | $100\\%$ | **{oos_summary['rejection_rate'] * 100:.1f}\\%** | **{oos_status}** | {oos_summary['false_positives']} false positive retrievals out of {oos_summary['total_oos']} out-of-scope queries |",
+            "| Metric | Definition | Original 42-Query Set (36 in-scope, 6 OOS) | Expanded 54-Query Set (42 in-scope, 12 OOS) |",
+            "| :--- | :--- | :--- | :--- |",
+            f"| **Standard Precision@{self.top_k}** | Relevant chunks retrieved / {self.top_k} | **{in_42['precision_at_k_standard']:.4f}** | **{in_54['precision_at_k_standard']:.4f}** |",
+            f"| **Bounded Precision@{self.top_k}** | Relevant chunks retrieved / min({self.top_k}, \\|expected\\|) | **{in_42['precision_at_k_bounded']:.4f}** | **{in_54['precision_at_k_bounded']:.4f}** |",
+            f"| **Recall@{self.top_k}** | Relevant chunks retrieved / \\|expected\\| | **{in_42['recall_at_k']:.4f}** | **{in_54['recall_at_k']:.4f}** |",
+            f"| **MRR (Mean Reciprocal Rank)** | Reciprocal rank of 1st relevant chunk | **{in_42['mrr']:.4f}** | **{in_54['mrr']:.4f}** |",
+            f"| **NDCG@{self.top_k}** | Normalized discounted cumulative gain | **{in_42['ndcg_at_k']:.4f}** | **{in_54['ndcg_at_k']:.4f}** |",
+            f"| **Out-of-Scope Rejection Rate** | Correctly rejected / total out-of-scope | **{oos_42['rejection_rate'] * 100:.1f}\\%** ({oos_42['false_positives']} FP / {oos_42['total_oos']} OOS) | **{oos_54['rejection_rate'] * 100:.1f}\\%** ({oos_54['false_positives']} FP / {oos_54['total_oos']} OOS) |",
             "",
-            "## 2. Performance by Clinical Category",
+            "## 2. Performance by Clinical Category (Expanded Set)",
             "",
-            "| Category | Queries | Precision@5 | Recall@5 | MRR | NDCG@5 |",
-            "| :--- | :--- | :--- | :--- | :--- | :--- |",
+            "| Category | Queries | Standard P@5 | Bounded P@5 | Recall@5 | MRR | NDCG@5 |",
+            "| :--- | :--- | :--- | :--- | :--- | :--- | :--- |",
         ]
 
-        for cat, metrics in summary["by_category"].items():
+        for cat, metrics in summary_54["by_category"].items():
             lines.append(
-                f"| `{cat}` | {metrics['count']} | {metrics['precision_at_k']:.4f} | {metrics['recall_at_k']:.4f} | {metrics['mrr']:.4f} | {metrics['ndcg_at_k']:.4f} |"
+                f"| `{cat}` | {metrics['count']} | {metrics['precision_at_k_standard']:.4f} | {metrics['precision_at_k_bounded']:.4f} | {metrics['recall_at_k']:.4f} | {metrics['mrr']:.4f} | {metrics['ndcg_at_k']:.4f} |"
             )
 
         lines.extend(
             [
                 "",
-                "## 3. Detailed Query-by-Query Results",
+                "## 3. Detailed Query-by-Query Results (All 54 Queries)",
                 "",
-                "| ID | Category | P@5 | R@5 | MRR | NDCG@5 | Retrieved Chunks | Expected Chunks | Disagreements Detected |",
-                "| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |",
+                "| ID | Category | Std P@5 | Bnd P@5 | R@5 | MRR | NDCG@5 | Retrieved Chunks | Expected Chunks | Disagreements Detected |",
+                "| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |",
             ]
         )
 
@@ -295,7 +306,7 @@ class RetrievalEvaluator:
                 ", ".join(r.detected_disagreements) if r.detected_disagreements else "None"
             )
             lines.append(
-                f"| `{r.query_id}` | `{r.category}` | {r.precision_at_k:.2f} | {r.recall_at_k:.2f} | {r.reciprocal_rank:.2f} | {r.ndcg_at_k:.2f} | {retrieved_str} | {expected_str} | {disagreements_str} |"
+                f"| `{r.query_id}` | `{r.category}` | {r.precision_at_k_standard:.2f} | {r.precision_at_k_bounded:.2f} | {r.recall_at_k:.2f} | {r.reciprocal_rank:.2f} | {r.ndcg_at_k:.2f} | {retrieved_str} | {expected_str} | {disagreements_str} |"
             )
 
         report_content = "\n".join(lines) + "\n"
@@ -307,11 +318,34 @@ class RetrievalEvaluator:
 
 if __name__ == "__main__":
     evaluator = RetrievalEvaluator()
-    results, summary = evaluator.evaluate()
-    report = evaluator.generate_report(results, summary)
-    print(f"Evaluation complete. Evaluated {summary['total_queries']} queries.")
-    print(f"Precision@5: {summary['overall_in_scope']['precision_at_k']:.4f}")
-    print(f"Recall@5:    {summary['overall_in_scope']['recall_at_k']:.4f}")
-    print(f"MRR:         {summary['overall_in_scope']['mrr']:.4f}")
-    print(f"NDCG@5:      {summary['overall_in_scope']['ndcg_at_k']:.4f}")
-    print(f"OOS Rejection: {summary['out_of_scope_gating']['rejection_rate'] * 100:.1f}%")
+    results, summary_42, summary_54 = evaluator.evaluate()
+    report = evaluator.generate_report(results, summary_42, summary_54)
+
+    print("============================================================")
+    print("RETRIEVAL EVALUATION COMPLETE")
+    print(f"Total Queries Evaluated: {summary_54['total_queries']}")
+    print("------------------------------------------------------------")
+    print("ORIGINAL 42-QUERY SET:")
+    print(
+        f"  Standard Precision@5: {summary_42['overall_in_scope']['precision_at_k_standard']:.4f}"
+    )
+    print(f"  Bounded Precision@5:  {summary_42['overall_in_scope']['precision_at_k_bounded']:.4f}")
+    print(f"  Recall@5:             {summary_42['overall_in_scope']['recall_at_k']:.4f}")
+    print(f"  MRR:                  {summary_42['overall_in_scope']['mrr']:.4f}")
+    print(f"  NDCG@5:               {summary_42['overall_in_scope']['ndcg_at_k']:.4f}")
+    print(
+        f"  OOS Rejection:        {summary_42['out_of_scope_gating']['rejection_rate'] * 100:.1f}%"
+    )
+    print("------------------------------------------------------------")
+    print("EXPANDED 54-QUERY SET:")
+    print(
+        f"  Standard Precision@5: {summary_54['overall_in_scope']['precision_at_k_standard']:.4f}"
+    )
+    print(f"  Bounded Precision@5:  {summary_54['overall_in_scope']['precision_at_k_bounded']:.4f}")
+    print(f"  Recall@5:             {summary_54['overall_in_scope']['recall_at_k']:.4f}")
+    print(f"  MRR:                  {summary_54['overall_in_scope']['mrr']:.4f}")
+    print(f"  NDCG@5:               {summary_54['overall_in_scope']['ndcg_at_k']:.4f}")
+    print(
+        f"  OOS Rejection:        {summary_54['out_of_scope_gating']['rejection_rate'] * 100:.1f}%"
+    )
+    print("============================================================")

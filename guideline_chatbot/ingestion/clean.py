@@ -141,6 +141,40 @@ def repair_hyphenated_linebreaks(text: str) -> str:
     return re.sub(r"([A-Za-z]{3,})-\n([a-z]{3,})", r"\1\2", text)
 
 
+def repair_table_squashed_words(text: str) -> str:
+    """Repair squashed words and corrupted punctuation from PDF table extraction."""
+    # Fix glued words in extracted tables
+    table_repairs = [
+        (r"\bWeareveryconfident\b", "We are very confident"),
+        (r"\bWearemoderatelyconfident\b", "We are moderately confident"),
+        (r"\bInitialdrug\b", "Initial drug"),
+        (r"\bCombinationsforusein\b", "Combinations for use in"),
+        (r"\bACEinhibitors\b", "ACE inhibitors"),
+        (r"\bACEinhibitor\b", "ACE inhibitor"),
+        (r"\bACEInhibitor\b", "ACE Inhibitor"),
+        (r"\bThiazideDiuretic\b", "Thiazide Diuretic"),
+        (r"\bEffectdecreased byNSAIDS\b", "Effect decreased by NSAIDs"),
+        (r"\bEffectdecreased byNSAIDs\b", "Effect decreased by NSAIDs"),
+        (r"\bhigherdoses\b", "higher doses"),
+        (r"\bofeffect\b", "of effect"),
+        (r"\bbeclosetotheestimateofeffect\b", "be close to the estimate of effect"),
+        (
+            r"\bthereisapossibilitythatitissubstantially\b",
+            "there is a possibility that it is substantially",
+        ),
+    ]
+    for pattern, replacement in table_repairs:
+        text = re.sub(pattern, replacement, text, flags=re.IGNORECASE)
+
+    # Clean spaced commas and double commas: e.g. "lipids glucose , , electrolytes"
+    text = re.sub(r"\s*,\s*,\s*", ", ", text)
+    text = re.sub(r"\s*,\s*\.\s*", ". ", text)
+    text = re.sub(r"(\w)\s+,\s+(\w)", r"\1, \2", text)
+    text = re.sub(r"\s+,\s+", ", ", text)
+
+    return text
+
+
 def clean_text(raw_text: str, doc_id: str = "") -> tuple[str, CleaningStats]:
     """Clean raw extracted text by stripping boilerplate and normalizing formatting.
 
@@ -164,8 +198,9 @@ def clean_text(raw_text: str, doc_id: str = "") -> tuple[str, CleaningStats]:
     for pattern in COMPILED_BOILERPLATE:
         text = pattern.sub("", text)
 
-    # Step 3: Repair hyphenated line breaks
+    # Step 3: Repair hyphenated line breaks & squashed table words
     text = repair_hyphenated_linebreaks(text)
+    text = repair_table_squashed_words(text)
 
     # Step 4: Line-level filtering
     filtered_lines: list[str] = []

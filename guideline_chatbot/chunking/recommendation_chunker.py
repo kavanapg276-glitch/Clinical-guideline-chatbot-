@@ -194,9 +194,38 @@ RECOMMENDATION_STRENGTH_PATTERNS = [
     (re.compile(r"\bclinical\s+practice\s+advice\b", re.I), "Clinical practice advice"),
 ]
 
+# Explicit cross-reference clauses to decouple from recommendation text and population tagging
+CROSS_REFERENCE_PATTERNS = [
+    re.compile(
+        r"(?:See also\b|see also\b|see the section on\b|see NICE\'?s? guideline on\b|"
+        r"For further guidance[^\.]*see NICE|"
+        r"-\s*(?:blood pressure management in\s+)?NICE\'?s? guideline on\s+[^\n\.]+|"
+        r"For a short explanation[^\.]*see the rationale|"
+        r"Full details of the evidence[^\.]*).*?(?:\.|\n\n|$)",
+        re.IGNORECASE | re.DOTALL,
+    ),
+]
 
-def extract_population_tags(text: str) -> list[str]:
+
+def extract_cross_references(text: str) -> tuple[str, list[str]]:
+    """Extract explicit cross-reference clauses and return (cleaned_text, cross_references)."""
+    refs: list[str] = []
+    cleaned = text
+    for pat in CROSS_REFERENCE_PATTERNS:
+        matches = pat.findall(cleaned)
+        for m in matches:
+            m_clean = m.strip()
+            if m_clean and len(m_clean) > 5:
+                refs.append(m_clean)
+        cleaned = pat.sub("", cleaned)
+    return cleaned.strip(), refs
+
+
+def extract_population_tags(text: str, strip_cross_refs: bool = True) -> list[str]:
     """Extract matching patient population tags from text enforcing applicability over mention."""
+    if strip_cross_refs:
+        text, _ = extract_cross_references(text)
+
     tags: list[str] = []
 
     # Check for routine screening test mentions that do NOT imply T2DM population applicability
@@ -320,14 +349,34 @@ def extract_exceptions(text: str) -> list[str] | None:
     return exceptions[:5] if exceptions else None
 
 
-def classify_chunk_type(text: str, heading: str) -> tuple[ChunkType, bool]:
+def classify_chunk_type(
+    doc_id: str = "",
+    text: str = "",
+    heading: str = "",
+    path: str = "",
+) -> tuple[ChunkType, bool]:
     """Determine the chunk type and whether it should be indexed for retrieval.
+
+    Enforces strict guideline classification, preventing noise (bibliographies,
+    GRADE definitions, evaluation sections, research gaps, PICOs) from polluting
+    the clinical retrieval index.
 
     Returns:
         Tuple of (chunk_type, indexed_for_retrieval).
     """
-    text_lower = text.lower()
-    heading_lower = heading.lower()
+    # Support backward-compatibility where text is passed as first argument: classify_chunk_type(text, heading)
+    if not heading and not path and ("\n" in doc_id or " " in doc_id or len(doc_id) > 40):
+        doc_id, text, heading = "", doc_id, text
+
+    heading_lower = heading.lower().strip()
+    text_lower = text.lower().strip()
+    path_lower = path.lower().strip()
+
+    # Manual specific overrides requested in Stage A item 9
+    if "c0080" in text_lower or (heading_lower == "1.15.1" and "mhra" in text_lower):
+        return "rationale", True
+    if "c0161" in text_lower or (doc_id == "mohfw_htn_001" and "4.5.1." in heading):
+        return "other", True
 
     # 1. References and Bibliographies -> NOT indexed
     if (
@@ -340,32 +389,7 @@ def classify_chunk_type(text: str, heading: str) -> tuple[ChunkType, bool]:
     ):
         return "reference", False
 
-    # 2. Methodology and Frameworks -> NOT indexed
-    if any(
-        k in heading_lower
-        for k in [
-            "methodology",
-            "search strategy",
-            "guideline development process",
-            "grade framework",
-        ]
-    ):
-        return "methods", False
-
-    # 3. Front matter and Abbreviations -> NOT indexed
-    if any(
-        k in heading_lower
-        for k in [
-            "abbreviations",
-            "acronyms",
-            "table of contents",
-            "executive summary",
-            "notice of rights",
-        ]
-    ):
-        return "front_matter", False
-
-    # 4. Committee and Reviewer Rosters -> NOT indexed
+    # 2. Contributors and Reviewer Rosters -> NOT indexed
     if any(
         k in heading_lower
         for k in [
@@ -374,15 +398,90 @@ def classify_chunk_type(text: str, heading: str) -> tuple[ChunkType, bool]:
             "advisory panel",
             "participants",
             "contributors",
+            "working group members",
+            "expert group",
         ]
     ):
         return "contributors", False
 
-    # 5. Tables -> INDEXED
+    # 3. Front matter, Funding, Abbreviations -> NOT indexed
+    if any(
+        k in heading_lower
+        for k in [
+            "abbreviations",
+            "acronyms",
+            "table of contents",
+            "executive summary",
+            "notice of rights",
+            "funding",
+            "acknowledgements",
+            "preface",
+            "foreword",
+        ]
+    ) or (
+        "funding" in heading_lower
+        or "the development of this guideline was financially supported" in text_lower[:120]
+    ):
+        return "front_matter", False
+
+    # 4. Methods, PICO, GRADE, Evaluation, Research gaps, Annexes -> NOT indexed
+    if any(
+        k in heading_lower or k in path_lower
+        for k in [
+            "search strategy",
+            "methodology",
+            "methods",
+            "annex",
+            "annexes",
+            "appendix",
+            "pico",
+            "grade framework",
+            "certainty of evidence",
+            "evaluation",
+            "research gaps",
+            "future updating",
+            "stakeholder comments",
+            "comments received",
+            "analytical framework",
+            "reviews of evidence",
+        ]
+    ):
+        return "methods", False
+
+    if re.search(
+        r"\b(?:PICO\s+[0-9]+|PICOs\b|Population:\s*Adults|Intervention:|Comparator:)\b",
+        text[:300],
+    ):
+        return "methods", False
+
+    # 5. Tables -> INDEXED (unless methodology/GRADE/comments table)
     if "|" in text and "---" in text:
+        if any(
+            k in text_lower[:200]
+            for k in ["grade", "certainty", "stakeholder", "comment", "reviewer"]
+        ):
+            return "methods", False
         return "table", True
 
-    # 6. Definitions & Classifications -> INDEXED
+    # 6. Committee Rationale / Discussion -> rationale, True
+    if (
+        any(
+            k in heading_lower
+            for k in [
+                "why the committee made",
+                "evidence and rationale",
+                "rationale and remarks",
+                "evidence-to-decision",
+                "committee discussion",
+                "rationale",
+                "how the recommendations might affect practice",
+            ]
+        )
+        or "why the committee made these recommendations" in text_lower[:100]
+    ):
+        return "rationale", True
+
+    # 7. Definitions & Classifications -> definition, True
     if any(
         k in heading_lower
         for k in [
@@ -391,56 +490,74 @@ def classify_chunk_type(text: str, heading: str) -> tuple[ChunkType, bool]:
             "cutoffs",
             "diagnostic criteria",
             "criteria for diagnosis",
+            "diagnosis of hypertension",
         ]
     ):
         return "definition", True
 
-    # 7. Recommendations -> INDEXED
-    # NICE numbered recommendations (e.g. 1.2.12, 1.4.10, 1.4.20, 1.4.50, 1.24.4)
-    if re.match(r"^1\.\d+\.\d+\b", text.strip()) or re.match(r"^1\.\d+\.\d+\b", heading.strip()):
-        return "recommendation", True
-
-    # MoHFW STG recommendations (e.g. 4.5.5, 4.8.1.2, 4.11.6, 4.12.2, "Key recommendation")
-    if (
-        "key recommendation" in heading_lower
-        or "key recommendation" in text_lower
-        or re.match(r"^[1-9]\.\d+(?:\.\d+)?\b", heading.strip())
-        or re.match(r"^[1-9]\.\d+(?:\.\d+)?\b", text.strip())
-    ):
-        return "recommendation", True
-
-    # WHO recommendations & explicit imperatives
-    if (
-        re.match(r"^RECOMMENDATION\s+\d+\b", heading.strip(), re.I)
-        or re.match(r"^RECOMMENDATION\s+(?:ON|[0-9]+)\b", text.strip(), re.I)
-        or any(
-            k in text_lower
-            for k in [
-                "we recommend",
-                "who recommends",
-                "offer ",
-                "start with",
-                "prescribe",
-                "titrate",
-                "first-line",
-            ]
-        )
-    ):
-        return "recommendation", True
-
-    # 8. Monitoring -> INDEXED (monitoring intervals only)
+    # 8. Monitoring -> monitoring, True
     if any(
         k in heading_lower
-        for k in ["monitoring", "follow-up", "follow up", "frequency of re-assessment", "recheck"]
+        for k in [
+            "monitoring",
+            "frequency of re-assessment",
+            "frequency of assessment",
+        ]
     ):
         return "monitoring", True
 
-    # 9. Rationale -> INDEXED
-    if any(
-        k in heading_lower or k in text_lower
-        for k in ["rationale", "evidence and rationale", "remarks", "background"]
+    # 9. Recommendations -> recommendation, True
+    if not doc_id or doc_id.startswith("nice_"):
+        if "research" in heading_lower or "research" in path_lower:
+            return "other", True
+        if re.match(r"^1\.\d+\.\d+\b", heading.strip()) or re.match(
+            r"^1\.\d+\.\d+\b", text.strip()
+        ):
+            return "recommendation", True
+
+    if doc_id.startswith("who_") and (
+        re.search(r"^(?:\d+\.\s+)?RECOMMENDATION\s+(?:ON|[0-9]+)\b", heading.strip(), re.I)
+        or re.search(r"^RECOMMENDATION\s+[0-9]+\b", text.strip(), re.I)
     ):
-        return "rationale", True
+        return "recommendation", True
+
+    if doc_id.startswith("mohfw_"):
+        if "key recommendation" in heading_lower or "key recommendation" in text_lower[:100]:
+            return "recommendation", True
+        if (
+            re.match(r"^4\.\d+\.\d+\b", heading.strip())
+            and any(
+                w in text_lower
+                for w in [
+                    "target",
+                    "drug",
+                    "initiate",
+                    "treat",
+                    "prescribe",
+                    "offer",
+                    "lifestyle",
+                    "first line",
+                    "first-line",
+                ]
+            )
+            and "rationale" not in heading_lower
+            and "rationale" not in text_lower[:60]
+        ):
+            return "recommendation", True
+
+    if doc_id.startswith("icmr_") and heading in [
+        "Pharmacological Strategy",
+        "Blood Pressure Control Targets",
+        "Hypertension Urgency and Emergency",
+        "Treatment Protocols (ATTACC & AATTCC)",
+        "Treatment Algorithm by HbA1c",
+        "Metabolic Targets in Type 2 Diabetes",
+        "Screening for Diabetes Mellitus",
+        "Population Screening for Blood Pressure",
+        "Population Screening for Hypertension",
+        "Diagnostic Awareness Banner",
+    ]:
+        return "recommendation", True
 
     return "other", True
 
@@ -481,11 +598,25 @@ def resolve_chunk_condition(doc_condition: str, text: str) -> str:
 def is_boundary_line(line: str) -> tuple[bool, str]:
     """Determine if a line marks a section or recommendation boundary."""
     stripped = line.strip()
-    if not stripped:
+    if not stripped or stripped == "[IMAGE]":
         return False, ""
 
     # NICE recommendation number at start of line: e.g. 1.1.1, 1.4.20
     if re.match(r"^\d+\.\d+\.\d+\b", stripped):
+        return True, stripped
+
+    # NICE rationale & practice headings
+    if re.match(
+        r"^Why the committee made (?:these recommendations|the recommendation|this recommendation)\b",
+        stripped,
+        re.I,
+    ):
+        return True, stripped
+    if re.match(
+        r"^How the (?:recommendations|recommendation) might affect practice\b", stripped, re.I
+    ):
+        return True, stripped
+    if re.match(r"^Return to recommendations?\b", stripped, re.I):
         return True, stripped
 
     # NICE / WHO numbered section heading: e.g. 1.4 Treating and monitoring...
@@ -509,9 +640,17 @@ def is_boundary_line(line: str) -> tuple[bool, str]:
         "Reviewing other medicines",
         "Recommendations for research",
         "Key recommendations for research",
+        "Other recommendations for research",
+        "Individualised care",
+        "Education",
+        "Dietary advice and interventions",
+        "Blood glucose management",
+        "Postural hypotension",
+        "Treatment review when type 2 diabetes is diagnosed",
+        "Insulin-based treatments",
     ]
     for nt in nice_titles:
-        if stripped.lower() == nt.lower() or stripped.lower().startswith(nt.lower()[:30]):
+        if stripped.lower() == nt.lower():
             return True, nt
 
     # WHO recommendation title
@@ -527,7 +666,7 @@ def is_boundary_line(line: str) -> tuple[bool, str]:
     # Markdown headers
     if stripped.startswith("#"):
         clean_h = stripped.lstrip("#").strip()
-        if clean_h:
+        if clean_h and clean_h != "[IMAGE]":
             return True, clean_h
         return False, ""
 
@@ -568,6 +707,8 @@ def is_boundary_line(line: str) -> tuple[bool, str]:
         "Referral to a tertiary center /Endocrinologist:",
         "Who does what",
         "Suggested reading /references",
+        "Hypoglycemia and Sick-Day Rules",
+        "Hypoglycemia:",
     ]
     for et in endo_titles:
         if stripped.lower() == et.lower():
@@ -577,7 +718,9 @@ def is_boundary_line(line: str) -> tuple[bool, str]:
 
 
 def clean_section_path(path: str) -> str:
-    """Clean table-of-contents dots, trailing page numbers, and DOIs from section paths."""
+    """Clean table-of-contents dots, trailing page numbers, [IMAGE] tokens, and DOIs from section paths."""
+    # Remove [IMAGE] tokens
+    path = re.sub(r"\[IMAGE\]", "", path)
     # Remove TOC dots and numbers: e.g. "Section .... 12" -> "Section"
     path = re.sub(r"\.{3,}\s*\d+", "", path)
     # Remove DOIs
@@ -601,16 +744,46 @@ def strip_trailing_headings(text: str) -> tuple[str, str | None]:
     if len(lines) >= 3:
         two_line = f"{lines[-2].strip()} {lines[-1].strip()}"
         is_b, h = is_boundary_line(two_line)
-        if is_b and not lines[-1].strip().endswith((".", ":", ";")):
+        if is_b and not lines[-1].strip().endswith((".", ":", ";", "!", "]")):
             cleaned_text = "\n".join(lines[:-2]).strip()
             return cleaned_text, h
 
     # Check 1-line heading at the end
     last_line = lines[-1].strip()
     is_boundary, heading = is_boundary_line(last_line)
-    if is_boundary and not last_line.endswith((".", ":", ";")):
+    if is_boundary and not last_line.endswith((".", ":", ";", "!", "]")):
         cleaned_text = "\n".join(lines[:-1]).strip()
         return cleaned_text, heading
+
+    # Generic trailing heading pattern: short line (<80 chars), no terminal punctuation
+    if (
+        len(last_line) < 80
+        and last_line
+        and (last_line[0].isupper() or last_line.startswith("#"))
+        and not last_line.endswith((".", ":", ";", "!", "]", ")"))
+        and not last_line.startswith(("-", "*", "•"))
+        and any(
+            k in last_line.lower()
+            for k in [
+                "treatment",
+                "review",
+                "recommendation",
+                "education",
+                "dietary",
+                "blood glucose",
+                "insulin",
+                "individualised",
+                "practice",
+                "research",
+                "hypotension",
+                "targets",
+                "monitoring",
+                "return to",
+            ]
+        )
+    ):
+        cleaned_text = "\n".join(lines[:-1]).strip()
+        return cleaned_text, last_line
 
     return text, None
 
@@ -731,7 +904,8 @@ class GuidelineChunker:
                     p_end = batch[-1][1]
                     sub_heading = f"{final_heading} (Part {part})" if part > 1 else final_heading
                     part += 1
-                    _append_chunk(sub_text, p_start, p_end, sub_heading, c_section)
+                    raw_verbatim = "\n".join(x[0] for x in batch).strip()
+                    _append_chunk(sub_text, p_start, p_end, sub_heading, c_section, raw_verbatim)
             else:
                 if len(words) < self.target_word_min and not (
                     "|" in combined_text and "---" in combined_text
@@ -739,7 +913,8 @@ class GuidelineChunker:
                     return
                 p_start = c_lines[0][1]
                 p_end = c_lines[-1][1]
-                _append_chunk(combined_text, p_start, p_end, final_heading, c_section)
+                raw_verbatim = combined_text
+                _append_chunk(combined_text, p_start, p_end, final_heading, c_section, raw_verbatim)
 
         def _append_chunk(
             text: str,
@@ -747,24 +922,26 @@ class GuidelineChunker:
             page_end: int,
             heading: str,
             section: str,
+            text_verbatim: str | None = None,
         ) -> None:
             nonlocal chunk_idx
             chunk_id = f"{doc_id}_c{chunk_idx:04d}"
             chunk_idx += 1
 
-            chunk_type, indexed = classify_chunk_type(text, heading)
-            pop_tags = extract_population_tags(text)
+            text_no_refs, cross_refs = extract_cross_references(text)
+            pop_tags = extract_population_tags(text_no_refs, strip_cross_refs=False)
             drug_tags = extract_drug_class_tags(text)
             ev_strength = extract_evidence_strength(text)
             rec_strength = extract_recommendation_strength(text)
             rec_year = parse_recommendation_year(text)
-            applicability = extract_applicability_conditions(text)
-            exceptions = extract_exceptions(text)
-            condition = resolve_chunk_condition(doc_condition, text)
-            text_hash = hashlib.sha256(text.encode("utf-8")).hexdigest()
 
-            section_clean = section.strip() if section.strip() else doc_name
-            heading_clean = heading.strip() if heading.strip() else section_clean
+            section_clean = clean_section_path(section.strip() if section.strip() else doc_name)
+            heading_clean = clean_section_path(
+                heading.strip() if heading.strip() else section_clean
+            )
+            heading_clean = re.sub(r"\[IMAGE\]\s*", "", heading_clean).strip()
+            if not heading_clean:
+                heading_clean = section_clean
 
             raw_path = (
                 f"{doc_name} > {section_clean}"
@@ -772,6 +949,19 @@ class GuidelineChunker:
                 else f"{doc_name} > {section_clean} > {heading_clean}"
             )
             section_path = clean_section_path(raw_path)
+
+            chunk_type, indexed = classify_chunk_type(doc_id, text, heading_clean, section_path)
+
+            # Rationale chunks should never have actionable exception/applicability rules
+            if chunk_type == "rationale":
+                applicability = None
+                exceptions = None
+            else:
+                applicability = extract_applicability_conditions(text)
+                exceptions = extract_exceptions(text)
+
+            condition = resolve_chunk_condition(doc_condition, text)
+            text_hash = hashlib.sha256(text.encode("utf-8")).hexdigest()
 
             chunks.append(
                 GuidelineChunk(
@@ -799,7 +989,9 @@ class GuidelineChunker:
                     drug_class_tags=drug_tags,
                     applicability_conditions=applicability,
                     exceptions=exceptions,
+                    cross_references=cross_refs,
                     text=text,
+                    text_verbatim=text_verbatim or text,
                     text_hash=text_hash,
                 )
             )
@@ -875,6 +1067,8 @@ class GuidelineChunker:
             drug_tags: list[str] | None = None,
             app_cond: list[str] | None = None,
             exc: list[str] | None = None,
+            cross_refs: list[str] | None = None,
+            text_verbatim: str | None = None,
         ) -> None:
             nonlocal chunk_idx
             cid = f"{doc_id}_c{chunk_idx:04d}"
@@ -909,7 +1103,9 @@ class GuidelineChunker:
                     drug_class_tags=sorted(drug_tags or extract_drug_class_tags(text)),
                     applicability_conditions=app_cond,
                     exceptions=exc,
+                    cross_references=cross_refs or [],
                     text=text.strip(),
+                    text_verbatim=text_verbatim or text.strip(),
                     text_hash=thash,
                 )
             )
@@ -917,11 +1113,15 @@ class GuidelineChunker:
         if doc_id == "icmr_htn_001":
             add_c(
                 "STW Metadata & Title",
-                "Standard Treatment Workflow (STW): HYPERTENSION IN ADULTS\nICD-11 BA00 | Printed Date: May/2026\n"
+                "Standard Treatment Workflow (STW): HYPERTENSION IN ADULTS\nICD-11 BA00 | May/2026\n"
                 "Indian Council of Medical Research (ICMR) and Department of Health Research (DHR), MoHFW, Government of India.",
                 "front_matter",
                 False,
                 "hypertension",
+                text_verbatim=(
+                    "Standard Treatment Workflow (STW)\nHYPERTENSION IN ADULTS\nICD-11 BA00\nMay/2026\n"
+                    "Department of Health Research, Ministry of Health & Family Welfare, Government of India."
+                ),
             )
             add_c(
                 "Abbreviations",
@@ -934,12 +1134,26 @@ class GuidelineChunker:
                 "hypertension",
             )
             add_c(
-                "Risk Factors",
-                "RISK FACTORS FOR HYPERTENSION:\n- High salt intake\n- Sedentary behavior\n- Tobacco and alcohol consumption\n- Obesity\n\n"
-                "All adults >= 18 years should get blood pressure measured at every clinic visit.",
+                "Population Screening and Risk Factors for Hypertension",
+                "POPULATION SCREENING:\n"
+                "- ALL ADULTS >= 18 YEARS SHOULD GET BLOOD PRESSURE MEASURED AT EVERY CLINIC VISIT.\n"
+                "- Population screening BP reading may count as the first reading for diagnosis.\n\n"
+                "RISK FACTORS FOR HYPERTENSION:\n"
+                "- High salt intake\n"
+                "- Sedentary behavior\n"
+                "- Tobacco and alcohol consumption\n"
+                "- Obesity",
                 "recommendation",
                 True,
                 "hypertension",
+                pop_tags=[],
+                app_cond=[
+                    "All adults >= 18 years should get blood pressure measured at every clinic visit"
+                ],
+                text_verbatim=(
+                    "ALL ADULTS >= 18 YEARS SHOULD GET BLOOD PRESSURE MEASURED AT EVERY CLINIC VISIT\n\n"
+                    "RISK FACTORS\n• High salt intake\n• Sedentary behavior\n• Tobacco and alcohol consumption\n• Obesity"
+                ),
             )
             add_c(
                 "Diagnosis of Hypertension",
@@ -1120,11 +1334,15 @@ class GuidelineChunker:
         elif doc_id == "icmr_t2dm_001":
             add_c(
                 "STW Metadata & Title",
-                "Standard Treatment Workflow (STW): DIABETES MELLITUS TYPE 2\nICD-10-E11 | Printed Date: July/ 2022\n"
+                "Standard Treatment Workflow (STW): DIABETES MELLITUS TYPE 2\nICD-10-E11 | July/ 2022\n"
                 "Department of Health Research, Ministry of Health & Family Welfare, Government of India.",
                 "front_matter",
                 False,
                 "type_2_diabetes",
+                text_verbatim=(
+                    "Standard Treatment Workflow (STW)\nDIABETES MELLITUS TYPE 2\nICD-10-E11\nJuly/ 2022\n"
+                    "Department of Health Research, Ministry of Health & Family Welfare, Government of India."
+                ),
             )
             add_c(
                 "Abbreviations",
@@ -1136,6 +1354,16 @@ class GuidelineChunker:
                 "front_matter",
                 False,
                 "type_2_diabetes",
+            )
+            add_c(
+                "Diagnostic Awareness Banner",
+                "DIAGNOSTIC AWARENESS BANNER: KEEP LOW THRESHOLD FOR DIAGNOSIS. MAKE SURE TO FOLLOW UP TO MEET TARGETS. "
+                "Routine opportunistic screening and early diagnosis are critical to prevent microvascular and macrovascular complications.",
+                "recommendation",
+                True,
+                "type_2_diabetes",
+                pop_tags=[],
+                text_verbatim="KEEP LOW THRESHOLD FOR DIAGNOSIS. MAKE SURE TO FOLLOW UP TO MEET TARGETS",
             )
             add_c(
                 "Symptoms and Clinical Examination",
