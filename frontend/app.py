@@ -13,15 +13,18 @@ import logging
 import os
 import re
 import sys
-import textwrap
 import time
 import uuid
 from pathlib import Path
 
-# Ensure repository root is on sys.path when invoked via `streamlit run frontend/app.py`
+# Ensure repository root and frontend folder are on sys.path when invoked via `streamlit run frontend/app.py`
 _REPO_ROOT = Path(__file__).resolve().parent.parent
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
+
+_FRONTEND_DIR = Path(__file__).resolve().parent
+if str(_FRONTEND_DIR) not in sys.path:
+    sys.path.insert(0, str(_FRONTEND_DIR))
 
 import streamlit as st  # noqa: E402
 
@@ -31,6 +34,7 @@ except ModuleNotFoundError:
     from theme import apply_theme, render_gate_badge  # type: ignore[no-redef]  # noqa: E402
 
 from guideline_chatbot.chatbot.orchestrator import ChatbotOrchestrator, TurnResult  # noqa: E402
+from guideline_chatbot.chatbot.patient_state import PatientState  # noqa: E402
 from guideline_chatbot.coherence.pipeline import ArmMode  # noqa: E402
 
 logger = logging.getLogger("frontend")
@@ -68,6 +72,8 @@ def init_session() -> None:
         st.session_state.messages = []
     if "active_arm" not in st.session_state:
         st.session_state.active_arm = ArmMode.ARM3_CLINCOHERENCE
+    if "patient_state" not in st.session_state:
+        st.session_state.patient_state = None
 
 
 def reset_session(orchestrator: ChatbotOrchestrator) -> None:
@@ -76,6 +82,59 @@ def reset_session(orchestrator: ChatbotOrchestrator) -> None:
     orchestrator.clear_session(old_id)
     st.session_state.session_id = str(uuid.uuid4())
     st.session_state.messages = []
+    st.session_state.patient_state = orchestrator.get_session_state(st.session_state.session_id)
+
+
+def format_patient_card_html(state: PatientState | None) -> str:
+    """Generate single-line HTML representation of active patient state.
+
+    Constructs a contiguous single-line HTML string with no newlines or blank
+    lines, preventing CommonMark from interpreting indented child tags as
+    code blocks (<pre><code>).
+    """
+    if state is None:
+        age_str = "Unspecified"
+        sex_str = "Unspecified"
+        preg_str = "No"
+        bp_str = "Unrecorded"
+        hba1c_str = "Unrecorded"
+        egfr_str = "Unrecorded"
+        acr_str = "Unrecorded"
+        cond_str = "None"
+        med_str = "None"
+        all_str = "None"
+    else:
+        age_str = f"{state.age} yrs" if state.age else "Unspecified"
+        sex_str = state.sex.title() if state.sex else "Unspecified"
+        preg_str = "Yes" if state.is_pregnant else "No"
+
+        bp_str = (
+            f"{state.sbp:.0f}/{state.dbp:.0f} mmHg" if state.sbp and state.dbp else "Unrecorded"
+        )
+        hba1c_str = f"{state.hba1c:.1f}%" if state.hba1c else "Unrecorded"
+        egfr_str = f"{state.egfr:.0f} mL/min" if state.egfr else "Unrecorded"
+        acr_str = f"{state.urine_acr:.1f} mg/mmol" if state.urine_acr else "Unrecorded"
+
+        cond_str = (
+            ", ".join(c.replace("_", " ").title() for c in sorted(state.conditions)) or "None"
+        )
+        med_str = ", ".join(m.title() for m in sorted(state.medications)) or "None"
+        all_str = ", ".join(a.replace("_", " ").title() for a in sorted(state.allergies)) or "None"
+
+    return (
+        '<div class="patient-card">'
+        '<div class="patient-label">Demographics</div>'
+        f'<div class="patient-value">Age: {age_str} &nbsp;|&nbsp; Sex: {sex_str} &nbsp;|&nbsp; Pregnant: {preg_str}</div>'
+        '<div class="patient-label">Vitals & Labs</div>'
+        f'<div class="patient-value">BP: {bp_str}<br>HbA1c: {hba1c_str} &nbsp;|&nbsp; eGFR: {egfr_str}<br>ACR: {acr_str}</div>'
+        '<div class="patient-label">Conditions</div>'
+        f'<div class="patient-value">{cond_str}</div>'
+        '<div class="patient-label">Medications</div>'
+        f'<div class="patient-value">{med_str}</div>'
+        '<div class="patient-label">Allergies</div>'
+        f'<div class="patient-value">{all_str}</div>'
+        "</div>"
+    )
 
 
 def render_sidebar(orchestrator: ChatbotOrchestrator) -> None:
@@ -125,42 +184,14 @@ def render_sidebar(orchestrator: ChatbotOrchestrator) -> None:
     st.sidebar.markdown("---")
 
     # Patient Clinical State Card
-    state = orchestrator.get_session_state(st.session_state.session_id)
+    state: PatientState = st.session_state.get("patient_state") or orchestrator.get_session_state(
+        st.session_state.session_id
+    )
     st.sidebar.markdown(
         "<div class='clinical-section-label'>Active Patient State</div>",
         unsafe_allow_html=True,
     )
-
-    age_str = f"{state.age} yrs" if state.age else "Unspecified"
-    sex_str = state.sex.title() if state.sex else "Unspecified"
-    preg_str = "Yes" if state.is_pregnant else "No"
-
-    bp_str = f"{state.sbp:.0f}/{state.dbp:.0f} mmHg" if state.sbp and state.dbp else "Unrecorded"
-    hba1c_str = f"{state.hba1c:.1f}%" if state.hba1c else "Unrecorded"
-    egfr_str = f"{state.egfr:.0f} mL/min" if state.egfr else "Unrecorded"
-    acr_str = f"{state.urine_acr:.1f} mg/mmol" if state.urine_acr else "Unrecorded"
-
-    cond_str = ", ".join(c.replace("_", " ").title() for c in sorted(state.conditions)) or "None"
-    med_str = ", ".join(m.title() for m in sorted(state.medications)) or "None"
-    all_str = ", ".join(a.replace("_", " ").title() for a in sorted(state.allergies)) or "None"
-
-    patient_html = f"""<div class="patient-card">
-    <div class="patient-label">Demographics</div>
-    <div class="patient-value">Age: {age_str} | Sex: {sex_str} | Pregnant: {preg_str}</div>
-
-    <div class="patient-label">Vitals & Labs</div>
-    <div class="patient-value">BP: {bp_str}<br>HbA1c: {hba1c_str} | eGFR: {egfr_str}<br>ACR: {acr_str}</div>
-
-    <div class="patient-label">Conditions</div>
-    <div class="patient-value">{cond_str}</div>
-
-    <div class="patient-label">Medications</div>
-    <div class="patient-value">{med_str}</div>
-
-    <div class="patient-label">Allergies</div>
-    <div class="patient-value">{all_str}</div>
-</div>"""
-    st.sidebar.markdown(textwrap.dedent(patient_html), unsafe_allow_html=True)
+    st.sidebar.markdown(format_patient_card_html(state), unsafe_allow_html=True)
 
     # Disputed Facts Highlight
     if state.disputed_facts:
@@ -339,7 +370,10 @@ def render_chat_tab(orchestrator: ChatbotOrchestrator) -> None:
             if msg["role"] == "user":
                 st.markdown(msg["content"])
             else:
-                render_turn_result(msg["turn_result"])
+                if "turn_result" in msg:
+                    render_turn_result(msg["turn_result"])
+                else:
+                    st.markdown(msg.get("content", ""))
 
     # Chat input
     if prompt := st.chat_input("Enter clinical query or patient update..."):
@@ -360,13 +394,17 @@ def render_chat_tab(orchestrator: ChatbotOrchestrator) -> None:
                     session_id=st.session_state.session_id,
                     user_message=clean_prompt,
                 )
-                render_turn_result(turn_result)
+                st.session_state.patient_state = turn_result.patient_state
                 st.session_state.messages.append({"role": "assistant", "turn_result": turn_result})
             except Exception as err:
                 logger.error(f"Turn execution error: {err}", exc_info=True)
-                st.error(
-                    f"Unable to process clinical query at this time. (System notice: {type(err).__name__})"
+                st.session_state.messages.append(
+                    {
+                        "role": "assistant",
+                        "content": f"Unable to process clinical query at this time. (System notice: {type(err).__name__})",
+                    }
                 )
+        st.rerun()
 
 
 def render_compare_tab(orchestrator: ChatbotOrchestrator) -> None:
