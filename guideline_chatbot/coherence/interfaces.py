@@ -149,6 +149,7 @@ class CoherenceVerifier(ABC):
         draft_response: str,
         retrieved_chunks: list[GuidelineChunk] | list[dict[str, Any]],
         conversation_history: list[Turn],
+        current_user_message: str = "",
     ) -> VerificationResult:
         """Verify the draft clinical response against case state, guidelines, and history."""
         pass

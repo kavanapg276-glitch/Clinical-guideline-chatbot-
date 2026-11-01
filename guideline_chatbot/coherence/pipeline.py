@@ -51,6 +51,7 @@ class CoherencePipeline:
         draft_response: str,
         retrieved_chunks: list[GuidelineChunk] | list[dict[str, Any]],
         conversation_history: list[Turn],
+        current_user_message: str = "",
     ) -> VerificationResult:
         """Route verification through the configured experimental arm."""
         if self.mode == ArmMode.ARM1_BASELINE:
@@ -74,6 +75,7 @@ class CoherencePipeline:
                 draft_response=draft_response,
                 retrieved_chunks=retrieved_chunks,
                 conversation_history=conversation_history,
+                current_user_message=current_user_message,
             )
             return res
 

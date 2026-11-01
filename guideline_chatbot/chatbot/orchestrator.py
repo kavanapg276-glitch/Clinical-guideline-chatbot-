@@ -170,6 +170,7 @@ class ChatbotOrchestrator:
             draft_response=response_text,
             retrieved_chunks=retrieval_res.get("hits", []),
             conversation_history=history_turns,
+            current_user_message=user_message,
         )
         if ver_result.modified_response is not None:
             response_text = ver_result.modified_response

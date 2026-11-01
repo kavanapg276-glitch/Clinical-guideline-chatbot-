@@ -57,6 +57,7 @@ class RuleBasedCoherenceVerifier(CoherenceVerifier):
         draft_response: str,
         retrieved_chunks: list[GuidelineChunk] | list[dict[str, Any]],
         conversation_history: list[Turn],
+        current_user_message: str = "",
     ) -> VerificationResult:
         """Verify draft response across the 6 clinical coherence failure modes."""
         violations: list[Violation] = []
@@ -70,7 +71,10 @@ class RuleBasedCoherenceVerifier(CoherenceVerifier):
         # 3. Unjustified Belief Reversal Check
         violations.extend(
             self._check_unjustified_belief_reversal(
-                case_state, draft_response, conversation_history
+                case_state=case_state,
+                draft_response=draft_response,
+                conversation_history=conversation_history,
+                current_user_message=current_user_message,
             )
         )
 
@@ -78,7 +82,13 @@ class RuleBasedCoherenceVerifier(CoherenceVerifier):
         violations.extend(self._check_reasoning_action_inconsistency(case_state, draft_response))
 
         # 5. Evidence Mismatch Check
-        violations.extend(self._check_evidence_mismatch(draft_response, retrieved_chunks))
+        violations.extend(
+            self._check_evidence_mismatch(
+                draft_response=draft_response,
+                retrieved_chunks=retrieved_chunks,
+                case_state=case_state,
+            )
+        )
 
         # 6. Correction Persistence Check
         violations.extend(
@@ -269,41 +279,47 @@ class RuleBasedCoherenceVerifier(CoherenceVerifier):
         return violations
 
     def _check_unjustified_belief_reversal(
-        self, case_state: CaseState, draft_response: str, conversation_history: list[Turn]
+        self,
+        case_state: CaseState,
+        draft_response: str,
+        conversation_history: list[Turn],
+        current_user_message: str = "",
     ) -> list[Violation]:
         """Detect unwarranted retraction of established diagnoses or clinical facts."""
         violations: list[Violation] = []
-        if len(conversation_history) < 1:
+        if len(conversation_history) < 1 and not case_state.conditions:
             return violations
 
         lower_resp = draft_response.lower()
-        last_turn = conversation_history[-1]
-        last_msg = last_turn.user_message.lower()
+        context_text = current_user_message.lower()
+        if conversation_history:
+            context_text += " " + conversation_history[-1].user_message.lower()
 
-        # Check if previous responses established sustained hypertension
-        prior_htn_established = any(
-            "hypertension" in t.patient_state_summary.lower()
-            or "bp:" in t.patient_state_summary.lower()
-            for t in conversation_history
+        # 1. Hypertension retraction check
+        prior_htn_established = (
+            "hypertension" in case_state.conditions
+            or (case_state.sbp is not None and case_state.sbp >= 140)
+            or any(
+                "hypertension" in t.patient_state_summary.lower()
+                or "hypertension" in t.response_text.lower()
+                or "bp:" in t.patient_state_summary.lower()
+                for t in conversation_history
+            )
         )
-
-        # Check if current response asserts patient is normotensive / no treatment needed
         now_claims_normotensive = bool(
             re.search(
-                r"\b(?:patient\s+is\s+normotensive|blood\s+pressure\s+is\s+normal|no\s+hypertension\s+present|treatment\s+is\s+not\s+indicated)\b",
+                r"\b(?:patient\s+is\s+normotensive|blood\s+pressure\s+is\s+normal|normotensive|no\s+hypertension\s+present|treatment\s+is\s+not\s+indicated|do\s+not\s+have\s+hypertension|cancel\s+all\s+antihypertensive)\b",
                 lower_resp,
             )
         )
-
-        # False-positive guard: Did user provide a normal reading or explicit correction?
-        user_disconfirmed = bool(
+        user_disconfirmed_htn = bool(
             re.search(
-                r"\b(?:normal\s+bp|bp\s+is\s+(?:11\d|12\d)/(?:7\d|8\d)|misdiagnosed|false\s+alarm|white\s+coat)\b",
-                last_msg,
+                r"\b(?:normal\s+bp|bp\s+is\s+(?:11\d|12\d)/(?:7\d|8\d)|misdiagnosed|false\s+alarm|white\s+coat|home\s+(?:bp|blood\s+pressure)|hbpm|abpm|average\s+daytime)\b",
+                context_text,
             )
         )
 
-        if prior_htn_established and now_claims_normotensive and not user_disconfirmed:
+        if prior_htn_established and now_claims_normotensive and not user_disconfirmed_htn:
             violations.append(
                 Violation(
                     category=ViolationType.UNJUSTIFIED_BELIEF_REVERSAL,
@@ -314,6 +330,43 @@ class RuleBasedCoherenceVerifier(CoherenceVerifier):
                     ),
                     trigger_text="Unjustified reversal from hypertensive to normotensive",
                     suggested_action="Maintain established diagnosis and recommend appropriate monitoring or therapy.",
+                )
+            )
+
+        # 2. Type 2 Diabetes retraction check
+        prior_t2dm_established = (
+            "type_2_diabetes" in case_state.conditions
+            or "diabetes" in case_state.conditions
+            or (case_state.hba1c is not None and case_state.hba1c >= 6.5)
+            or any(
+                "diabetes" in t.patient_state_summary.lower()
+                or "diabetes" in t.response_text.lower()
+                for t in conversation_history
+            )
+        )
+        now_claims_no_diabetes = bool(
+            re.search(
+                r"\b(?:do\s+not\s+have\s+diabetes|no\s+diabetes|not\s+diabetic|blood\s+sugar\s+is\s+fine|no\s+glycemic\s+abnormalities)\b",
+                lower_resp,
+            )
+        )
+        user_disconfirmed_t2dm = bool(
+            re.search(
+                r"\b(?:normal\s+glucose|fasting\s+(?:is\s+)?(?:7\d|8\d|9\d)|hba1c\s+(?:is\s+)?(?:4\.\d|5\.[0-6])|misdiagnosed|false\s+alarm)\b",
+                context_text,
+            )
+        )
+
+        if prior_t2dm_established and now_claims_no_diabetes and not user_disconfirmed_t2dm:
+            violations.append(
+                Violation(
+                    category=ViolationType.UNJUSTIFIED_BELIEF_REVERSAL,
+                    severity=ViolationSeverity.WARNING,
+                    description=(
+                        "Response unexpectedly retracted established diabetes diagnosis without clinical justification."
+                    ),
+                    trigger_text="Unjustified reversal of established diabetes diagnosis",
+                    suggested_action="Maintain glycemic monitoring and guideline-recommended management.",
                 )
             )
 
@@ -385,6 +438,7 @@ class RuleBasedCoherenceVerifier(CoherenceVerifier):
         self,
         draft_response: str,
         retrieved_chunks: list[GuidelineChunk] | list[dict[str, Any]],
+        case_state: CaseState | None = None,
     ) -> list[Violation]:
         """Verify numerical drug doses and clinical thresholds against retrieved guidelines."""
         violations: list[Violation] = []
@@ -392,7 +446,6 @@ class RuleBasedCoherenceVerifier(CoherenceVerifier):
 
         # Check maximum dosage ceilings
         for drug_name, (max_dose, ceiling_desc) in MAX_GUIDELINE_DOSES.items():
-            # Match patterns like: "ramipril 20 mg", "ramipril 50mg", "ramipril at 20 mg"
             pattern = rf"\b{drug_name}\s+(?:at\s+)?(\d+(?:\.\d+)?)\s*mg\b"
             matches = re.finditer(pattern, lower)
             for m in matches:
@@ -408,6 +461,78 @@ class RuleBasedCoherenceVerifier(CoherenceVerifier):
                             ),
                             trigger_text=f"{drug_name.title()} {prescribed_dose} mg exceeds ceiling {max_dose} mg",
                             suggested_action=f"Reduce {drug_name.title()} dose to maximum therapeutic range (<= {max_dose} mg).",
+                        )
+                    )
+
+        # Check for wrong-target evidence chunks injected or retrieved
+        if case_state:
+            has_t2dm = (
+                "type_2_diabetes" in case_state.conditions or "diabetes" in case_state.conditions
+            )
+            has_t1dm = "type_1_diabetes" in case_state.conditions
+            for chunk in retrieved_chunks:
+                chunk_cond = getattr(chunk, "condition", None) or (
+                    chunk.get("condition") if isinstance(chunk, dict) else None
+                )
+                chunk_id = getattr(chunk, "chunk_id", None) or (
+                    chunk.get("chunk_id") if isinstance(chunk, dict) else ""
+                )
+                chunk_text = getattr(chunk, "text", "") or (
+                    chunk.get("text", "") if isinstance(chunk, dict) else ""
+                )
+
+                # Injected Type 1 Diabetes chunk into Type 2 Diabetes question
+                if (
+                    has_t2dm
+                    and not has_t1dm
+                    and (
+                        chunk_cond == "type_1_diabetes"
+                        or (
+                            "type 1 diabetes" in chunk_text.lower()[:80]
+                            and "type 2" not in chunk_text.lower()[:80]
+                        )
+                    )
+                ):
+                    violations.append(
+                        Violation(
+                            category=ViolationType.EVIDENCE_MISMATCH,
+                            severity=ViolationSeverity.WARNING,
+                            description=(
+                                f"Wrong-target evidence mismatch: Retrieved chunk ({chunk_id}) applies to "
+                                f"Type 1 Diabetes, injected into a Type 2 Diabetes clinical scenario."
+                            ),
+                            trigger_text=f"Chunk {chunk_id} condition is type_1_diabetes",
+                            suggested_action="Filter retrieved evidence to Type 2 Diabetes guidelines (ICMR STW / NICE NG28).",
+                        )
+                    )
+
+                # Injected Hypertension chunk into patient with normal BP and no HTN
+                has_htn = "hypertension" in case_state.conditions
+                if (
+                    not has_htn
+                    and (case_state.sbp is None or case_state.sbp < 130)
+                    and chunk_cond == "hypertension"
+                    and any(
+                        d in lower
+                        for d in [
+                            "amlodipine",
+                            "ramipril",
+                            "telmisartan",
+                            "antihypertensive",
+                            "blood pressure target",
+                        ]
+                    )
+                ):
+                    violations.append(
+                        Violation(
+                            category=ViolationType.EVIDENCE_MISMATCH,
+                            severity=ViolationSeverity.WARNING,
+                            description=(
+                                f"Wrong-target evidence mismatch: Hypertension treatment chunk ({chunk_id}) "
+                                f"applied to a non-hypertensive patient."
+                            ),
+                            trigger_text=f"Hypertension chunk {chunk_id} applied without diagnosed hypertension",
+                            suggested_action="Restrict retrieval to glycemic management guidelines.",
                         )
                     )
 
