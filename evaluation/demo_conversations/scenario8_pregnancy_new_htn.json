@@ -1,0 +1,178 @@
+{
+  "scenario_id": "scenario8_pregnancy_new_htn",
+  "title": "Scenario 8: Pregnancy with New-Onset Hypertension",
+  "category": "Contraindications & Vulnerable Populations",
+  "description": "32-year-old pregnant woman at 28 weeks gestation presenting with clinic BP 155/95 mmHg.",
+  "turns": [
+    {
+      "turn_index": 1,
+      "user_message": "A 32-year-old female patient who is currently pregnant at 28 weeks gestation has a new clinic BP of 155/95 mmHg.",
+      "action_type": "recommendation",
+      "is_abstention": false,
+      "patient_state_delta": {
+        "conditions": {
+          "previous": null,
+          "current": [
+            "hypertension",
+            "pregnancy"
+          ]
+        },
+        "is_pregnant": {
+          "previous": null,
+          "current": true
+        },
+        "age": {
+          "previous": null,
+          "current": 32
+        },
+        "vitals": {
+          "previous": null,
+          "current": {
+            "sbp": 155.0,
+            "dbp": 95.0
+          }
+        }
+      },
+      "patient_state_summary": "Age: 32; Sex: female; Status: Pregnant; BP: 155/95 mmHg; Conditions: hypertension, pregnancy",
+      "retrieved_chunks": [
+        {
+          "chunk_id": "who_htn_001_c0065",
+          "score": 0.0164,
+          "document_name": "WHO Guideline for the Pharmacological Treatment of Hypertension in Adults",
+          "heading": "4.3\t Pregnancy and hypertension",
+          "page": 34
+        },
+        {
+          "chunk_id": "nice_htn_001_c0013",
+          "score": 0.014,
+          "document_name": "NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management",
+          "heading": "1.2.3",
+          "page": 7
+        },
+        {
+          "chunk_id": "nice_htn_001_c0018",
+          "score": 0.0136,
+          "document_name": "NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management",
+          "heading": "1.2.8",
+          "page": 8
+        },
+        {
+          "chunk_id": "nice_htn_001_c0080",
+          "score": 0.0136,
+          "document_name": "NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management",
+          "heading": "1.5.2",
+          "page": 24
+        },
+        {
+          "chunk_id": "mohfw_htn_001_c0117",
+          "score": 0.013,
+          "document_name": "MoHFW STG - Hypertension (Background Document)",
+          "heading": "5 AGREE II Instrument http://www.agreetrust.org/ (Part 2)",
+          "page": 35
+        }
+      ],
+      "disputed_facts_count": 0,
+      "citations_verified": 4,
+      "citations_total": 4,
+      "response_text": "### Guideline Recommendation(s)\n\n1. **4.3\t Pregnancy and hypertension** [WHO Guideline for the Pharmacological Treatment of Hypertension in Adults, p. 34, \u00a74.3\t Pregnancy and hypertension, 2021]:\n   4.3\t Pregnancy and hypertension Hypertension, including chronic HTN, gestational HTN, pre-eclampsia, and eclampsia, is a very common medical condition in pregnancy (99). Due to the adverse consequences of increased morbidity and mortality to both the women and fetus, HTN in pregnancy must be diag... [^1]\n\n2. **1.2.3** [NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management, p. 7, \u00a71.2.3, 2019/2022]:\n   1.2.3 If clinic blood pressure is between 140/90 mmHg and 180/120 mmHg, offer ambulatory blood pressure monitoring (ABPM) to confirm the diagnosis of hypertension. See the section on identifying who to refer for people with a clinic blood pressure 180/120 mmHg or higher. [2019] [^2]\n\n3. **1.2.8** [NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management, p. 8, \u00a71.2.8, 2019/2022]:\n   1.2.8 Confirm diagnosis of hypertension in people with a: -  clinic blood pressure of 140/90 mmHg or higher and -  ABPM daytime average or HBPM average of 135/85 mmHg or higher. [2019] [^3]\n\n4. **1.5.2** [NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management, p. 24, \u00a71.5.2, 2019/2022]:\n   1.5.2 Refer people for specialist assessment, carried out on the same day, if they have a clinic blood pressure of 180/120 mmHg and higher with: -  signs of retinal haemorrhage or papilloedema (accelerated hypertension) or -  life-threatening symptoms such as new onset confusion, chest pain, sign... [^4]\n\n\n### Patient Applicability & Context Analysis\n\n- **Recorded Clinic BP (155/95 mmHg)**: Evaluated against threshold criteria in retrieved guideline recommendations [^1].\n- **Patient Age (32 years)**: Evaluated against age-stratified criteria in retrieved recommendations [^1].\n- **Pregnancy Status**: Evaluated against guideline contraindications and pregnancy-specific management [^1].\n\n### Missing Patient Information & Recommended Workup\n\n- **Out-of-office BP Confirmation (ABPM/HBPM)**: Referenced in retrieved applicability criteria to confirm sustained hypertension.\n- **Renal Function (eGFR / Serum Creatinine)**: Referenced in retrieved dosing criteria and contraindication exceptions.\n- **Glycemic Status (HbA1c / Fasting Glucose)**: Referenced in retrieved criteria to assess diabetic comorbidity and glycemic control.\n\n### General Clinical Rationale\n\n*General Clinical Rationale \u2014 Not a Formal Guideline Recommendation*:\nStepwise blood pressure and glycemic management provides synergistic protection against microvascular and macrovascular events. Treatment decisions should be individualized based on tolerability and target organ evaluation. [^1]\n\n*Research Prototype Disclaimer: For evaluation and research purposes only. This software is not an approved medical device and does not replace certified clinical judgment.*"
+    },
+    {
+      "turn_index": 2,
+      "user_message": "Which antihypertensive medications are strictly contraindicated in pregnancy, and what first-line agents are recommended?",
+      "action_type": "recommendation",
+      "is_abstention": false,
+      "patient_state_delta": {},
+      "patient_state_summary": "Age: 32; Sex: female; Status: Pregnant; BP: 155/95 mmHg; Conditions: hypertension, pregnancy",
+      "retrieved_chunks": [
+        {
+          "chunk_id": "who_htn_001_c0066",
+          "score": 0.0195,
+          "document_name": "WHO Guideline for the Pharmacological Treatment of Hypertension in Adults",
+          "heading": "4.3\t Pregnancy and hypertension (Part 2)",
+          "page": 35
+        },
+        {
+          "chunk_id": "nice_htn_001_c0054",
+          "score": 0.0182,
+          "document_name": "NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management",
+          "heading": "1.4.29",
+          "page": 18
+        },
+        {
+          "chunk_id": "who_htn_001_c0075",
+          "score": 0.0181,
+          "document_name": "WHO Guideline for the Pharmacological Treatment of Hypertension in Adults",
+          "heading": "IMPLEMENTATION TOOLS > 6.2\t Drug- and dose-specific protocols",
+          "page": 39
+        },
+        {
+          "chunk_id": "nice_htn_001_c0051",
+          "score": 0.0173,
+          "document_name": "NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management",
+          "heading": "Treatment review when type 2 diabetes is diagnosed > 1.4.25",
+          "page": 17
+        },
+        {
+          "chunk_id": "nice_htn_001_c0073",
+          "score": 0.0168,
+          "document_name": "NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management",
+          "heading": "1.4.48",
+          "page": 23
+        }
+      ],
+      "disputed_facts_count": 0,
+      "citations_verified": 4,
+      "citations_total": 4,
+      "response_text": "### Guideline Recommendation(s)\n\n1. **4.3\t Pregnancy and hypertension (Part 2)** [WHO Guideline for the Pharmacological Treatment of Hypertension in Adults, p. 35, \u00a74.3\t Pregnancy and hypertension (Part 2), 2021]:\n   Thus, since medications are not studied specifically for efficacy and safety in pregnancy, medication selection is usually based on long-term clinical use and experience. This usually means older medications that have had a substantial long-term track record of efficacy and safety are to be consi... [^1]\n\n2. **1.4.29** [NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management, p. 18, \u00a71.4.29, 2019/2022]:\n   1.4.29 Offer antihypertensive drug treatment to women of childbearing potential with diagnosed hypertension in line with the recommendations in this guideline. For women considering pregnancy or who are pregnant or breastfeeding, manage hypertension in line with the recommendations on management ... [^2]\n\n3. **IMPLEMENTATION TOOLS > 6.2\t Drug- and dose-specific protocols** [WHO Guideline for the Pharmacological Treatment of Hypertension in Adults, p. 39, \u00a7IMPLEMENTATION TOOLS > 6.2\t Drug- and dose-specific protocols, 2021]:\n   IMPLEMENTATION TOOLS 6.2\t Drug- and dose-specific protocols Two examples of suggested drug and dose-specific protocols are presented below (Figs 5 and 6). These should be viewed as examples and other approaches are possible. Algorithm 1: Initiation of treatment with a single-pill combination [ [ ... [^3]\n\n4. **Treatment review when type 2 diabetes is diagnosed > 1.4.25** [NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management, p. 17, \u00a7Treatment review when type 2 diabetes is diagnosed > 1.4.25, 2019/2022]:\n   Treatment review when type 2 diabetes is diagnosed 1.4.25 For an adult with type 2 diabetes on antihypertensive drug treatment when diabetes is diagnosed, review blood pressure control and medications used. Make changes only if there is poor control or if current drug treatment is not appropriate... [^4]\n\n\n### Patient Applicability & Context Analysis\n\n- **Recorded Clinic BP (155/95 mmHg)**: Evaluated against threshold criteria in retrieved guideline recommendations [^1].\n- **Patient Age (32 years)**: Evaluated against age-stratified criteria in retrieved recommendations [^1].\n- **Pregnancy Status**: Evaluated against guideline contraindications and pregnancy-specific management [^1].\n\n### Missing Patient Information & Recommended Workup\n\n- **Renal Function (eGFR / Serum Creatinine)**: Referenced in retrieved dosing criteria and contraindication exceptions.\n- **Serum Potassium and Electrolytes**: Required prior to RAAS blocker or diuretic initiation per retrieved drug guidance.\n- **Glycemic Status (HbA1c / Fasting Glucose)**: Referenced in retrieved criteria to assess diabetic comorbidity and glycemic control.\n\n### General Clinical Rationale\n\n*General Clinical Rationale \u2014 Not a Formal Guideline Recommendation*:\nStepwise blood pressure and glycemic management provides synergistic protection against microvascular and macrovascular events. Treatment decisions should be individualized based on tolerability and target organ evaluation. [^1]\n\n*Research Prototype Disclaimer: For evaluation and research purposes only. This software is not an approved medical device and does not replace certified clinical judgment.*"
+    },
+    {
+      "turn_index": 3,
+      "user_message": "What is the recommended blood pressure target during pregnancy management?",
+      "action_type": "recommendation",
+      "is_abstention": false,
+      "patient_state_delta": {},
+      "patient_state_summary": "Age: 32; Sex: female; Status: Pregnant; BP: 155/95 mmHg; Conditions: hypertension, pregnancy",
+      "retrieved_chunks": [
+        {
+          "chunk_id": "who_htn_001_c0066",
+          "score": 0.0192,
+          "document_name": "WHO Guideline for the Pharmacological Treatment of Hypertension in Adults",
+          "heading": "4.3\t Pregnancy and hypertension (Part 2)",
+          "page": 35
+        },
+        {
+          "chunk_id": "who_htn_001_c0075",
+          "score": 0.0178,
+          "document_name": "WHO Guideline for the Pharmacological Treatment of Hypertension in Adults",
+          "heading": "IMPLEMENTATION TOOLS > 6.2\t Drug- and dose-specific protocols",
+          "page": 39
+        },
+        {
+          "chunk_id": "nice_htn_001_c0054",
+          "score": 0.0174,
+          "document_name": "NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management",
+          "heading": "1.4.29",
+          "page": 18
+        },
+        {
+          "chunk_id": "who_htn_001_c0065",
+          "score": 0.0163,
+          "document_name": "WHO Guideline for the Pharmacological Treatment of Hypertension in Adults",
+          "heading": "4.3\t Pregnancy and hypertension",
+          "page": 34
+        },
+        {
+          "chunk_id": "who_htn_001_c0004",
+          "score": 0.0145,
+          "document_name": "WHO Guideline for the Pharmacological Treatment of Hypertension in Adults",
+          "heading": "3\t Recommendations",
+          "page": 5
+        }
+      ],
+      "disputed_facts_count": 0,
+      "citations_verified": 4,
+      "citations_total": 4,
+      "response_text": "### Guideline Recommendation(s)\n\n1. **4.3\t Pregnancy and hypertension (Part 2)** [WHO Guideline for the Pharmacological Treatment of Hypertension in Adults, p. 35, \u00a74.3\t Pregnancy and hypertension (Part 2), 2021]:\n   Thus, since medications are not studied specifically for efficacy and safety in pregnancy, medication selection is usually based on long-term clinical use and experience. This usually means older medications that have had a substantial long-term track record of efficacy and safety are to be consi... [^1]\n\n2. **IMPLEMENTATION TOOLS > 6.2\t Drug- and dose-specific protocols** [WHO Guideline for the Pharmacological Treatment of Hypertension in Adults, p. 39, \u00a7IMPLEMENTATION TOOLS > 6.2\t Drug- and dose-specific protocols, 2021]:\n   IMPLEMENTATION TOOLS 6.2\t Drug- and dose-specific protocols Two examples of suggested drug and dose-specific protocols are presented below (Figs 5 and 6). These should be viewed as examples and other approaches are possible. Algorithm 1: Initiation of treatment with a single-pill combination [ [ ... [^2]\n\n3. **1.4.29** [NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management, p. 18, \u00a71.4.29, 2019/2022]:\n   1.4.29 Offer antihypertensive drug treatment to women of childbearing potential with diagnosed hypertension in line with the recommendations in this guideline. For women considering pregnancy or who are pregnant or breastfeeding, manage hypertension in line with the recommendations on management ... [^3]\n\n4. **4.3\t Pregnancy and hypertension** [WHO Guideline for the Pharmacological Treatment of Hypertension in Adults, p. 34, \u00a74.3\t Pregnancy and hypertension, 2021]:\n   4.3\t Pregnancy and hypertension Hypertension, including chronic HTN, gestational HTN, pre-eclampsia, and eclampsia, is a very common medical condition in pregnancy (99). Due to the adverse consequences of increased morbidity and mortality to both the women and fetus, HTN in pregnancy must be diag... [^4]\n\n\n### Patient Applicability & Context Analysis\n\n- **Recorded Clinic BP (155/95 mmHg)**: Evaluated against threshold criteria in retrieved guideline recommendations [^1].\n- **Patient Age (32 years)**: Evaluated against age-stratified criteria in retrieved recommendations [^1].\n- **Pregnancy Status**: Evaluated against guideline contraindications and pregnancy-specific management [^1].\n\n### Missing Patient Information & Recommended Workup\n\n- **Renal Function (eGFR / Serum Creatinine)**: Referenced in retrieved dosing criteria and contraindication exceptions.\n- **Serum Potassium and Electrolytes**: Required prior to RAAS blocker or diuretic initiation per retrieved drug guidance.\n\n### General Clinical Rationale\n\n*General Clinical Rationale \u2014 Not a Formal Guideline Recommendation*:\nStepwise blood pressure and glycemic management provides synergistic protection against microvascular and macrovascular events. Treatment decisions should be individualized based on tolerability and target organ evaluation. [^1]\n\n*Research Prototype Disclaimer: For evaluation and research purposes only. This software is not an approved medical device and does not replace certified clinical judgment.*"
+    }
+  ]
+}

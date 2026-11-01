@@ -9,9 +9,12 @@
 **Clinician/User**: What is the recommended pediatric oral prednisolone dosing for an acute asthma exacerbation in an 8-year-old child?
 
 **Chatbot Action**: `abstain` | **Abstention**: `True`
-**Patient State**: *Age: 8*
+**Patient State Summary**: *Age: 8*
+**Patient State Delta**: `{"age": {"previous": null, "current": 8}}`
 
-**Response**:
+**Retrieved Guideline Evidence (Top-5)**:
+
+**Response (Sentence-by-Sentence Grounding)**:
 ### Clinical Decision Support Notice: Out-of-Scope Query
 
 **Guideline Scope Limitation**: This decision support system is strictly designed for adult Hypertension and Type 2 Diabetes guideline management (MoHFW STG 2016, ICMR STW, WHO HEARTS/Hypertension/HEARTS-D, NICE NG136/NG28).
@@ -30,9 +33,11 @@ The clinical query concerning *"What is the recommended pediatric oral prednisol
 **Clinician/User**: Can you provide the inhaler step-up therapy protocol for childhood wheezing?
 
 **Chatbot Action**: `abstain` | **Abstention**: `True`
-**Patient State**: *Age: 8*
+**Patient State Summary**: *Age: 8*
 
-**Response**:
+**Retrieved Guideline Evidence (Top-5)**:
+
+**Response (Sentence-by-Sentence Grounding)**:
 ### Clinical Decision Support Notice: Out-of-Scope Query
 
 **Guideline Scope Limitation**: This decision support system is strictly designed for adult Hypertension and Type 2 Diabetes guideline management (MoHFW STG 2016, ICMR STW, WHO HEARTS/Hypertension/HEARTS-D, NICE NG136/NG28).

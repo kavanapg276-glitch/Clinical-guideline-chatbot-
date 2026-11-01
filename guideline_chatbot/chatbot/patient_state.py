@@ -30,6 +30,9 @@ class DisputedFact:
     new_value: Any
     explanation: str
     turn_index: int
+    is_resolved: bool = False
+    resolution_turn: int | None = None
+    resolution_note: str | None = None
     timestamp: str = dataclasses.field(default_factory=_utc_timestamp)
 
 
@@ -73,7 +76,12 @@ class PatientState:
     @property
     def has_conflicts(self) -> bool:
         """Return True if unresolved clinical contradictions have been recorded."""
-        return len(self.disputed_facts) > 0
+        return any(not f.is_resolved for f in self.disputed_facts)
+
+    @property
+    def active_conflicts(self) -> list[DisputedFact]:
+        """Return list of active, unresolved clinical contradictions."""
+        return [f for f in self.disputed_facts if not f.is_resolved]
 
     def to_retrieval_context(self) -> dict[str, Any]:
         """Convert state to dictionary format consumed by HybridRetriever."""
@@ -143,6 +151,18 @@ class PatientStateManager:
 
         lower = text.lower()
 
+        # Check if the user is resolving a previously disputed claim
+        clarification_pattern = re.search(
+            r"\b(?:to\s+clarify|confirming\s+that|verified\s+reading|reading\s+today\s+is\s+confirmed|is\s+confirmed|confirmed\s+on\s+repeated|the\s+correct\s+reading)\b",
+            lower,
+        )
+        if clarification_pattern and self.state.has_conflicts:
+            for df in self.state.disputed_facts:
+                if not df.is_resolved:
+                    df.is_resolved = True
+                    df.resolution_turn = turn_idx
+                    df.resolution_note = f"Resolved by clinician clarification in Turn {turn_idx}."
+
         # 1. Blood Pressure Extraction & Conflict Detection
         # Pattern: 140/90, 165 / 105, BP 150/95
         bp_match = re.search(
@@ -155,13 +175,23 @@ class PatientStateManager:
                 lower,
             )
         )
+        is_past_normotension = bool(
+            re.search(
+                r"\b(?:was\s+normal|previously\s+normal|used\s+to\s+be\s+normal|normal\s+in\s+the\s+past|past\s+normal)\b",
+                lower,
+            )
+        )
 
         if bp_match:
             new_sbp = float(bp_match.group(1))
             new_dbp = float(bp_match.group(2))
 
-            # Contradiction check: previously claimed normal BP, but new reading is Grade 1/2/3 HTN (>= 140/90)
-            if "normotensive_claim" in self.state.conditions and (new_sbp >= 140 or new_dbp >= 90):
+            # Contradiction check: only flag if claiming normal BP in the SAME time frame without clarification
+            if (
+                "normotensive_claim" in self.state.conditions
+                and not is_past_normotension
+                and (new_sbp >= 140 or new_dbp >= 90)
+            ):
                 conflict = DisputedFact(
                     field="blood_pressure",
                     previous_value="Claimed normal blood pressure",
@@ -179,7 +209,7 @@ class PatientStateManager:
             self.state.sbp = new_sbp
             self.state.dbp = new_dbp
             self.state.conditions.add("hypertension")
-        elif claims_normotension:
+        elif claims_normotension and not is_past_normotension:
             if self.state.sbp and self.state.sbp >= 140:
                 conflict = DisputedFact(
                     field="blood_pressure",
@@ -256,12 +286,24 @@ class PatientStateManager:
         if creat_match:
             self.state.creatinine = float(creat_match.group(1))
 
-        if re.search(
-            r"\b(?:microalbuminuria|proteinuria|albuminuria|urine\s+acr|high\s+protein\s+in\s+urine)\b",
+        acr_match = re.search(
+            r"\b(?:urine\s+acr|acr)\s*(?:of|is|came\s+back\s+at|[:=])?\s*(\d+(?:\.\d+)?)\s*(?:mg/mmol|mg/g)?\b",
             lower,
+        )
+        if acr_match:
+            self.state.urine_acr = float(acr_match.group(1))
+            self.state.conditions.add("microalbuminuria")
+
+        if (
+            re.search(
+                r"\b(?:microalbuminuria|proteinuria|albuminuria|high\s+protein\s+in\s+urine)\b",
+                lower,
+            )
+            and not acr_match
         ):
             self.state.conditions.add("microalbuminuria")
-            self.state.conditions.add("chronic_kidney_disease")
+            # NOTE: Strict guideline rule: A single ACR test is microalbuminuria, not diagnosed CKD.
+            # Do NOT infer chronic_kidney_disease from a single ACR/microalbuminuria test.
 
         # 6. Condition Keywords & Conflict Detection
         if re.search(r"\b(?:diabetes|diabetic|t2dm|type\s*2\s*diabetes|sugar)\b", lower):
@@ -413,3 +455,19 @@ class PatientStateManager:
         self.state.state_history.append(self.state.to_retrieval_context())
 
         return self.state, new_conflicts
+
+    @staticmethod
+    def compute_state_delta(
+        prev_ctx: dict[str, Any] | None, curr_ctx: dict[str, Any]
+    ) -> dict[str, Any]:
+        """Compute field-level changes between previous and current patient state."""
+        if not prev_ctx:
+            return {k: {"previous": None, "current": v} for k, v in curr_ctx.items() if v}
+        delta: dict[str, Any] = {}
+        all_keys = set(prev_ctx.keys()) | set(curr_ctx.keys())
+        for k in sorted(all_keys):
+            prev_v = prev_ctx.get(k)
+            curr_v = curr_ctx.get(k)
+            if prev_v != curr_v:
+                delta[k] = {"previous": prev_v, "current": curr_v}
+        return delta

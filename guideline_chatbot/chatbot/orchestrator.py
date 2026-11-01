@@ -46,6 +46,7 @@ class TurnResult:
     citation_validation: CitationValidationResult
     is_abstention: bool
     action_type: str  # "recommendation" | "clarify" | "abstain" | "pushback_reaffirm"
+    state_delta: dict[str, Any] = field(default_factory=dict)
     timestamp: str = field(default_factory=_utc_timestamp)
 
 
@@ -115,10 +116,16 @@ class ChatbotOrchestrator:
             TurnResult containing verified response, state, citations, and metadata.
         """
         state_mgr = self.get_or_create_session(session_id)
+        prev_ctx = (
+            state_mgr.state.to_retrieval_context() if state_mgr.state.turn_count > 0 else None
+        )
 
         # 1. Update patient state from message text and detect conflicts
         current_state, new_conflicts = state_mgr.update_from_text(user_message)
         turn_idx = current_state.turn_count
+        state_delta = PatientStateManager.compute_state_delta(
+            prev_ctx, current_state.to_retrieval_context()
+        )
 
         # 2. Retrieve guideline evidence
         retrieval_res = self.retriever.retrieve(
@@ -156,6 +163,7 @@ class ChatbotOrchestrator:
             citation_validation=citation_val,
             is_abstention=is_abstention,
             action_type=action_type,
+            state_delta=state_delta,
         )
 
         self.session_histories[session_id].append(turn_result)

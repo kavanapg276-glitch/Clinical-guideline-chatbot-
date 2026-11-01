@@ -1,0 +1,175 @@
+{
+  "scenario_id": "scenario10_amlodipine_followup",
+  "title": "Scenario 10: Multi-Turn Antihypertensive Follow-Up & Treatment Escalation",
+  "category": "Follow-Up & Escalation",
+  "description": "Patient was started on amlodipine last week; clinic BP today is 145/92 mmHg; clinician asks for next step.",
+  "turns": [
+    {
+      "turn_index": 1,
+      "user_message": "Patient was started on amlodipine 5 mg last week for Stage 1 hypertension; clinic BP today is 145/92 mmHg.",
+      "action_type": "recommendation",
+      "is_abstention": false,
+      "patient_state_delta": {
+        "conditions": {
+          "previous": null,
+          "current": [
+            "hypertension"
+          ]
+        },
+        "medications": {
+          "previous": null,
+          "current": [
+            "amlodipine"
+          ]
+        },
+        "vitals": {
+          "previous": null,
+          "current": {
+            "sbp": 145.0,
+            "dbp": 92.0
+          }
+        }
+      },
+      "patient_state_summary": "BP: 145/92 mmHg; Conditions: hypertension; Medications: amlodipine",
+      "retrieved_chunks": [
+        {
+          "chunk_id": "mohfw_htn_001_c0203",
+          "score": 0.0161,
+          "document_name": "MoHFW STG - Hypertension (Background Document)",
+          "heading": "4.6.12. If the BP is not controlled despite use of 3 anti-hypertensives in optimal doses, then (Part 4)",
+          "page": 87
+        },
+        {
+          "chunk_id": "mohfw_htn_001_c0190",
+          "score": 0.0149,
+          "document_name": "MoHFW STG - Hypertension (Background Document)",
+          "heading": "4.6.1 In patients with Grade 1 or Grade 2 hypertension, therapy can be initiated with one",
+          "page": 82
+        },
+        {
+          "chunk_id": "icmr_htn_001_c0011",
+          "score": 0.0147,
+          "document_name": "ICMR Standard Treatment Workflow - Hypertension in Adults (ICD-11 BA00)",
+          "heading": "Treatment Protocols (ATTACC & AATTCC)",
+          "page": 1
+        },
+        {
+          "chunk_id": "mohfw_htn_001_c0050",
+          "score": 0.0145,
+          "document_name": "MoHFW STG - Hypertension (Background Document)",
+          "heading": "4.6 The treatment regimen and the use of combinations: > 4.6.1 In patients with Grade 1 or Grade 2 hypertension, therapy can be initiated with",
+          "page": 20
+        },
+        {
+          "chunk_id": "who_htn_001_c0076",
+          "score": 0.014,
+          "document_name": "WHO Guideline for the Pharmacological Treatment of Hypertension in Adults",
+          "heading": "IMPLEMENTATION TOOLS > 6.2\t Drug- and dose-specific protocols (Part 2)",
+          "page": 41
+        }
+      ],
+      "disputed_facts_count": 0,
+      "citations_verified": 4,
+      "citations_total": 4,
+      "response_text": "### Guideline Recommendation(s)\n\n1. **4.6.12. If the BP is not controlled despite use of 3 anti-hypertensives in optimal doses, then (Part 4)** [MoHFW STG - Hypertension (Background Document), p. 87, \u00a74.6.12. If the BP is not controlled despite use of 3 anti-hypertensives in optimal doses, then (Part 4), 2016]:\n   *Reduce dose of amlodipine to 2.5 mg once a day when it is started in low body weight elderly patients, and when amlodipine is added to another antihypertensive medication. \u00a7 Reduce dose to enalapril 2.5 mg when it is used in elderly (>65 years) and when the patient has been on diuretic therapy. [^1]\n\n2. **4.6.1 In patients with Grade 1 or Grade 2 hypertension, therapy can be initiated with one** [MoHFW STG - Hypertension (Background Document), p. 82, \u00a74.6.1 In patients with Grade 1 or Grade 2 hypertension, therapy can be initiated with one, 2016]:\n   4.6.1 In patients with Grade 1 or Grade 2 hypertension, therapy can be initiated with one drug (CCBs, ACE inhibitors, thiazide diuretics) in combination with lifestyle modifications.(Step 1 in table 13) Average initial doses can be 5 mg of amlodipine, 5 mg of enalapril and 12.5 mg of hydrochlorot... [^2]\n\n3. **Treatment Protocols (ATTACC & AATTCC)** [ICMR Standard Treatment Workflow - Hypertension in Adults (ICD-11 BA00), p. 1, \u00a7Treatment Protocols (ATTACC & AATTCC), 2026]:\n   SUGGESTED TREATMENT PROTOCOLS FOR BLOOD PRESSURE CONTROL: *High BP >= 140/90 mmHg. At every visit: Check if the patient has been taking medications regularly and correctly. PROTOCOL NO 1 (ATTACC): - Step 1: If BP is high, prescribe Amlodipine 5mg. After 4 weeks measure BP again. - Step 2: If stil... [^3]\n\n4. **4.6 The treatment regimen and the use of combinations: > 4.6.1 In patients with Grade 1 or Grade 2 hypertension, therapy can be initiated with** [MoHFW STG - Hypertension (Background Document), p. 20, \u00a74.6 The treatment regimen and the use of combinations: > 4.6.1 In patients with Grade 1 or Grade 2 hypertension, therapy can be initiated with, 2016]:\n   4.6 The treatment regimen and the use of combinations: 4.6.1 In patients with Grade 1 or Grade 2 hypertension, therapy can be initiated with one drug (CCBs, ACE inhibitors, thiazide diuretics)   in combination with lifestyle modifications. Average initial doses can be 5 mg of amlodipine, 5 mg of ... [^4]\n\n\n### Patient Applicability & Context Analysis\n\n- **Recorded Clinic BP (145/92 mmHg)**: Evaluated against threshold criteria in retrieved guideline recommendations [^1].\n- **Current Pharmacotherapy (amlodipine)**: Evaluated against step-up or combination protocols in retrieved guidance [^1].\n\n### Missing Patient Information & Recommended Workup\n\n- **Renal Function (eGFR / Serum Creatinine)**: Referenced in retrieved dosing criteria and contraindication exceptions.\n- **Serum Potassium and Electrolytes**: Required prior to RAAS blocker or diuretic initiation per retrieved drug guidance.\n- **Urine Albumin-to-Creatinine Ratio (ACR)**: Required to screen for renal target-organ damage and microalbuminuria.\n\n### General Clinical Rationale\n\n*General Clinical Rationale \u2014 Not a Formal Guideline Recommendation*:\nStepwise blood pressure and glycemic management provides synergistic protection against microvascular and macrovascular events. Treatment decisions should be individualized based on tolerability and target organ evaluation. [^1]\n\n*Research Prototype Disclaimer: For evaluation and research purposes only. This software is not an approved medical device and does not replace certified clinical judgment.*"
+    },
+    {
+      "turn_index": 2,
+      "user_message": "Since blood pressure remains above target at 145/92 mmHg on monotherapy, what is the recommended next step?",
+      "action_type": "recommendation",
+      "is_abstention": false,
+      "patient_state_delta": {},
+      "patient_state_summary": "BP: 145/92 mmHg; Conditions: hypertension; Medications: amlodipine",
+      "retrieved_chunks": [
+        {
+          "chunk_id": "mohfw_htn_001_c0204",
+          "score": 0.0157,
+          "document_name": "MoHFW STG - Hypertension (Background Document)",
+          "heading": "Use dose of 25 mg in patients less than 50 kg (Canadian labelling)",
+          "page": 87
+        },
+        {
+          "chunk_id": "nice_htn_001_c0069",
+          "score": 0.0153,
+          "document_name": "NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management",
+          "heading": "Step 3 treatment > 1.4.44",
+          "page": 22
+        },
+        {
+          "chunk_id": "who_htn_001_c0019",
+          "score": 0.0152,
+          "document_name": "WHO Guideline for the Pharmacological Treatment of Hypertension in Adults",
+          "heading": "6.\t RECOMMENDATIONS ON TARGET BLOOD PRESSURE",
+          "page": 10
+        },
+        {
+          "chunk_id": "who_htn_001_c0052",
+          "score": 0.0152,
+          "document_name": "WHO Guideline for the Pharmacological Treatment of Hypertension in Adults",
+          "heading": "RECOMMENDATIONS > 3.6\t Target blood pressure > 6.\t RECOMMENDATION ON TARGET BLOOD PRESSURES",
+          "page": 27
+        },
+        {
+          "chunk_id": "icmr_htn_001_c0011",
+          "score": 0.015,
+          "document_name": "ICMR Standard Treatment Workflow - Hypertension in Adults (ICD-11 BA00)",
+          "heading": "Treatment Protocols (ATTACC & AATTCC)",
+          "page": 1
+        }
+      ],
+      "disputed_facts_count": 0,
+      "citations_verified": 4,
+      "citations_total": 4,
+      "response_text": "### Guideline Recommendation(s)\n\n1. **Use dose of 25 mg in patients less than 50 kg (Canadian labelling)** [MoHFW STG - Hypertension (Background Document), p. 87, \u00a7Use dose of 25 mg in patients less than 50 kg (Canadian labelling), 2016]:\n   # Use dose of 25 mg in patients less than 50 kg (Canadian labelling) Rationale: Use of initial monotherapy: Most of the evidence based guidelines like CHEP, ESC/ESH recommend therapy with a single drug in the case of grade 1 hypertension(19, 21), and with a combination of 2 drugs in patients with... [^1]\n\n2. **Step 3 treatment > 1.4.44** [NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management, p. 22, \u00a7Step 3 treatment > 1.4.44, 2019/2022]:\n   Step 3 treatment 1.4.44 Before considering next step treatment for hypertension: -  review the person's medications to ensure they are being taken at the optimal tolerated doses and -  discuss adherence (see recommendation 1.4.40). [2019] [^2]\n\n3. **6.\t RECOMMENDATIONS ON TARGET BLOOD PRESSURE** [WHO Guideline for the Pharmacological Treatment of Hypertension in Adults, p. 10, \u00a76.\t RECOMMENDATIONS ON TARGET BLOOD PRESSURE, 2021]:\n   6.\t RECOMMENDATIONS ON TARGET BLOOD PRESSURE WHO recommends a target blood pressure treatment goal of <140/90 mmHg in all patients with hypertension without comorbidities. Strong recommendation, moderate-certainty evidence viii WHO recommends a target systolic blood pressure treatment goal of <13... [^3]\n\n4. **RECOMMENDATIONS > 3.6\t Target blood pressure > 6.\t RECOMMENDATION ON TARGET BLOOD PRESSURES** [WHO Guideline for the Pharmacological Treatment of Hypertension in Adults, p. 27, \u00a7RECOMMENDATIONS > 3.6\t Target blood pressure > 6.\t RECOMMENDATION ON TARGET BLOOD PRESSURES, 2021]:\n   RECOMMENDATIONS 3.6\t Target blood pressure 6.\t RECOMMENDATION ON TARGET BLOOD PRESSURES WHO recommends a target blood pressure treatment goal of <140/90 mmHg in all patients with hypertension without comorbidities. Strong recommendation, moderate-certainty evidence WHO recommends a target systoli... [^4]\n\n\n### Patient Applicability & Context Analysis\n\n- **Recorded Clinic BP (145/92 mmHg)**: Evaluated against threshold criteria in retrieved guideline recommendations [^1].\n- **Current Pharmacotherapy (amlodipine)**: Evaluated against step-up or combination protocols in retrieved guidance [^1].\n\n### Missing Patient Information & Recommended Workup\n\n- **Renal Function (eGFR / Serum Creatinine)**: Referenced in retrieved dosing criteria and contraindication exceptions.\n- **Glycemic Status (HbA1c / Fasting Glucose)**: Referenced in retrieved criteria to assess diabetic comorbidity and glycemic control.\n\n### General Clinical Rationale\n\n*General Clinical Rationale \u2014 Not a Formal Guideline Recommendation*:\nStepwise blood pressure and glycemic management provides synergistic protection against microvascular and macrovascular events. Treatment decisions should be individualized based on tolerability and target organ evaluation. [^1]\n\n*Research Prototype Disclaimer: For evaluation and research purposes only. This software is not an approved medical device and does not replace certified clinical judgment.*"
+    },
+    {
+      "turn_index": 3,
+      "user_message": "If we add a second agent, which drug class should be combined with amlodipine according to ICMR and WHO protocols?",
+      "action_type": "recommendation",
+      "is_abstention": false,
+      "patient_state_delta": {},
+      "patient_state_summary": "BP: 145/92 mmHg; Conditions: hypertension; Medications: amlodipine",
+      "retrieved_chunks": [
+        {
+          "chunk_id": "icmr_htn_001_c0010",
+          "score": 0.0203,
+          "document_name": "ICMR Standard Treatment Workflow - Hypertension in Adults (ICD-11 BA00)",
+          "heading": "Pharmacological Strategy",
+          "page": 1
+        },
+        {
+          "chunk_id": "icmr_htn_001_c0011",
+          "score": 0.0202,
+          "document_name": "ICMR Standard Treatment Workflow - Hypertension in Adults (ICD-11 BA00)",
+          "heading": "Treatment Protocols (ATTACC & AATTCC)",
+          "page": 1
+        },
+        {
+          "chunk_id": "icmr_htn_001_c0012",
+          "score": 0.0178,
+          "document_name": "ICMR Standard Treatment Workflow - Hypertension in Adults (ICD-11 BA00)",
+          "heading": "Drug Therapy Table: Doses, Contraindications & Side Effects",
+          "page": 1
+        },
+        {
+          "chunk_id": "mohfw_htn_002_c0052",
+          "score": 0.0144,
+          "document_name": "MoHFW Standard Treatment Guidelines - Hypertension (Quick Reference Guide)",
+          "heading": "4.6.5. If the second drug in a usual dose also fails to reduce BP to target levels then the third class of",
+          "page": 17
+        },
+        {
+          "chunk_id": "mohfw_htn_001_c0194",
+          "score": 0.0142,
+          "document_name": "MoHFW STG - Hypertension (Background Document)",
+          "heading": "4.6.5. If the second drug in a usual dose also fails to reduce BP to target levels then the",
+          "page": 82
+        }
+      ],
+      "disputed_facts_count": 0,
+      "citations_verified": 4,
+      "citations_total": 4,
+      "response_text": "### Guideline Recommendation(s)\n\n1. **Pharmacological Strategy** [ICMR Standard Treatment Workflow - Hypertension in Adults (ICD-11 BA00), p. 1, \u00a7Pharmacological Strategy, 2026]:\n   PHARMACOLOGICAL STRATEGY FOR HYPERTENSION: - Combination therapy (two drugs from two different classes) could be the default initial pharmacological treatment for most adults with hypertension. - Single-pill combinations (SPCs/fixed-dose combinations, FDCs) are preferred over multiple pills to im... [^1]\n\n2. **Treatment Protocols (ATTACC & AATTCC)** [ICMR Standard Treatment Workflow - Hypertension in Adults (ICD-11 BA00), p. 1, \u00a7Treatment Protocols (ATTACC & AATTCC), 2026]:\n   SUGGESTED TREATMENT PROTOCOLS FOR BLOOD PRESSURE CONTROL: *High BP >= 140/90 mmHg. At every visit: Check if the patient has been taking medications regularly and correctly. PROTOCOL NO 1 (ATTACC): - Step 1: If BP is high, prescribe Amlodipine 5mg. After 4 weeks measure BP again. - Step 2: If stil... [^2]\n\n3. **Drug Therapy Table: Doses, Contraindications & Side Effects** [ICMR Standard Treatment Workflow - Hypertension in Adults (ICD-11 BA00), p. 1, \u00a7Drug Therapy Table: Doses, Contraindications & Side Effects, 2026]:\n   ### ANTIHYPERTENSIVE DRUG THERAPY: DOSES, CONTRAINDICATIONS & SIDE EFFECTS [^3]\n\n4. **4.6.5. If the second drug in a usual dose also fails to reduce BP to target levels then the third class of** [MoHFW Standard Treatment Guidelines - Hypertension (Quick Reference Guide), p. 17, \u00a74.6.5. If the second drug in a usual dose also fails to reduce BP to target levels then the third class of, 2016]:\n   4.6.5. If the second drug in a usual dose also fails to reduce BP to target levels then the third class of drug previously unutilised should be added (Step3 in table 13). An optimal 3 drug combination in case it is required is a calcium channel blocker with a low dose thiazide diuretic and an ACE... [^4]\n\n\n### Patient Applicability & Context Analysis\n\n- **Recorded Clinic BP (145/92 mmHg)**: Evaluated against threshold criteria in retrieved guideline recommendations [^1].\n- **Current Pharmacotherapy (amlodipine)**: Evaluated against step-up or combination protocols in retrieved guidance [^1].\n\n### Missing Patient Information & Recommended Workup\n\n- **Renal Function (eGFR / Serum Creatinine)**: Referenced in retrieved dosing criteria and contraindication exceptions.\n- **Serum Potassium and Electrolytes**: Required prior to RAAS blocker or diuretic initiation per retrieved drug guidance.\n- **Glycemic Status (HbA1c / Fasting Glucose)**: Referenced in retrieved criteria to assess diabetic comorbidity and glycemic control.\n\n### General Clinical Rationale\n\n*General Clinical Rationale \u2014 Not a Formal Guideline Recommendation*:\nStepwise blood pressure and glycemic management provides synergistic protection against microvascular and macrovascular events. Treatment decisions should be individualized based on tolerability and target organ evaluation. [^1]\n\n*Research Prototype Disclaimer: For evaluation and research purposes only. This software is not an approved medical device and does not replace certified clinical judgment.*"
+    }
+  ]
+}

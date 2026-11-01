@@ -1,0 +1,173 @@
+{
+  "scenario_id": "scenario1_normal_htn",
+  "title": "Scenario 1: Uncomplicated Stage 1 Essential Hypertension",
+  "category": "Normal Guideline Questions",
+  "description": "Initial diagnosis and management for a 52-year-old with clinic BP 148/92 mmHg.",
+  "turns": [
+    {
+      "turn_index": 1,
+      "user_message": "I have a 52-year-old patient with confirmed clinic blood pressure of 148/92 mmHg on repeated visits. No known chronic conditions.",
+      "action_type": "recommendation",
+      "is_abstention": false,
+      "patient_state_delta": {
+        "conditions": {
+          "previous": null,
+          "current": [
+            "hypertension"
+          ]
+        },
+        "age": {
+          "previous": null,
+          "current": 52
+        },
+        "vitals": {
+          "previous": null,
+          "current": {
+            "sbp": 148.0,
+            "dbp": 92.0
+          }
+        }
+      },
+      "patient_state_summary": "Age: 52; BP: 148/92 mmHg; Conditions: hypertension",
+      "retrieved_chunks": [
+        {
+          "chunk_id": "nice_htn_001_c0047",
+          "score": 0.0146,
+          "document_name": "NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management",
+          "heading": "1.4.21",
+          "page": 16
+        },
+        {
+          "chunk_id": "nice_htn_001_c0046",
+          "score": 0.0145,
+          "document_name": "NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management",
+          "heading": "1.4.20",
+          "page": 16
+        },
+        {
+          "chunk_id": "nice_htn_001_c0013",
+          "score": 0.0143,
+          "document_name": "NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management",
+          "heading": "1.2.3",
+          "page": 7
+        },
+        {
+          "chunk_id": "mohfw_htn_001_c0117",
+          "score": 0.0141,
+          "document_name": "MoHFW STG - Hypertension (Background Document)",
+          "heading": "5 AGREE II Instrument http://www.agreetrust.org/ (Part 2)",
+          "page": 35
+        },
+        {
+          "chunk_id": "nice_htn_001_c0020",
+          "score": 0.0138,
+          "document_name": "NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management",
+          "heading": "1.2.10",
+          "page": 9
+        }
+      ],
+      "disputed_facts_count": 0,
+      "citations_verified": 4,
+      "citations_total": 4,
+      "response_text": "### Guideline Recommendation(s)\n\n1. **1.4.21** [NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management, p. 16, \u00a71.4.21, 2019/2022]:\n   1.4.21 For adults with hypertension aged 80 and over, reduce clinic blood pressure to below 150/90 mmHg and ensure that it is maintained below that level. Use clinical judgement for people with frailty or multimorbidity (see NICE's guideline on multimorbidity). See also table 2 for guidance on cl... [^1]\n\n2. **1.4.20** [NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management, p. 16, \u00a71.4.20, 2019/2022]:\n   1.4.20 For adults with hypertension aged under 80, reduce clinic blood pressure to below 140/90 mmHg and ensure that it is maintained below that level. See also table 1 for guidance on clinic blood pressure targets for people aged under 80 with type 1 diabetes or severe chronic kidney disease. [2... [^2]\n\n3. **1.2.3** [NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management, p. 7, \u00a71.2.3, 2019/2022]:\n   1.2.3 If clinic blood pressure is between 140/90 mmHg and 180/120 mmHg, offer ambulatory blood pressure monitoring (ABPM) to confirm the diagnosis of hypertension. See the section on identifying who to refer for people with a clinic blood pressure 180/120 mmHg or higher. [2019] [^3]\n\n4. **5 AGREE II Instrument http://www.agreetrust.org/ (Part 2)** [MoHFW STG - Hypertension (Background Document), p. 35, \u00a75 AGREE II Instrument http://www.agreetrust.org/ (Part 2), 2016]:\n    [^4]\n\n\n### Patient Applicability & Context Analysis\n\n- **Recorded Clinic BP (148/92 mmHg)**: Evaluated against threshold criteria in retrieved guideline recommendations [^1].\n- **Patient Age (52 years)**: Evaluated against age-stratified criteria in retrieved recommendations [^1].\n\n### Missing Patient Information & Recommended Workup\n\n- **Out-of-office BP Confirmation (ABPM/HBPM)**: Referenced in retrieved applicability criteria to confirm sustained hypertension.\n- **Renal Function (eGFR / Serum Creatinine)**: Referenced in retrieved dosing criteria and contraindication exceptions.\n- **Glycemic Status (HbA1c / Fasting Glucose)**: Referenced in retrieved criteria to assess diabetic comorbidity and glycemic control.\n\n### Cross-Guideline Consensus & Divergence\n\n- **Blood Pressure Target**: Cross-guideline variation detected in blood pressure targets.\n\n### General Clinical Rationale\n\n*General Clinical Rationale \u2014 Not a Formal Guideline Recommendation*:\nStepwise blood pressure and glycemic management provides synergistic protection against microvascular and macrovascular events. Treatment decisions should be individualized based on tolerability and target organ evaluation. [^1]\n\n*Research Prototype Disclaimer: For evaluation and research purposes only. This software is not an approved medical device and does not replace certified clinical judgment.*"
+    },
+    {
+      "turn_index": 2,
+      "user_message": "What is the recommended initial pharmacotherapy and blood pressure target according to NICE and WHO guidelines?",
+      "action_type": "recommendation",
+      "is_abstention": false,
+      "patient_state_delta": {},
+      "patient_state_summary": "Age: 52; BP: 148/92 mmHg; Conditions: hypertension",
+      "retrieved_chunks": [
+        {
+          "chunk_id": "nice_htn_001_c0084",
+          "score": 0.019,
+          "document_name": "NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management",
+          "heading": "3 Blood pressure targets for people aged over 80",
+          "page": 28
+        },
+        {
+          "chunk_id": "mohfw_htn_001_c0204",
+          "score": 0.0138,
+          "document_name": "MoHFW STG - Hypertension (Background Document)",
+          "heading": "Use dose of 25 mg in patients less than 50 kg (Canadian labelling)",
+          "page": 87
+        },
+        {
+          "chunk_id": "mohfw_htn_001_c0202",
+          "score": 0.0133,
+          "document_name": "MoHFW STG - Hypertension (Background Document)",
+          "heading": "4.6.12. If the BP is not controlled despite use of 3 anti-hypertensives in optimal doses, then (Part 3)",
+          "page": 86
+        },
+        {
+          "chunk_id": "nice_htn_001_c0083",
+          "score": 0.0128,
+          "document_name": "NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management",
+          "heading": "2 Thresholds for interventions in adults aged under 40",
+          "page": 27
+        },
+        {
+          "chunk_id": "nice_htn_001_c0100",
+          "score": 0.0119,
+          "document_name": "NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management",
+          "heading": "How the recommendations might affect practice",
+          "page": 39
+        }
+      ],
+      "disputed_facts_count": 0,
+      "citations_verified": 4,
+      "citations_total": 4,
+      "response_text": "### Guideline Recommendation(s)\n\n1. **3 Blood pressure targets for people aged over 80** [NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management, p. 28, \u00a73 Blood pressure targets for people aged over 80, 2019/2022]:\n   3 Blood pressure targets for people aged over 80 What is the optimum blood pressure target for people aged over 80 with treated primary hypertension (with or without cardiovascular disease)? [2022] For a short explanation of why the committee made the recommendation for research, see the rational... [^1]\n\n2. **Use dose of 25 mg in patients less than 50 kg (Canadian labelling)** [MoHFW STG - Hypertension (Background Document), p. 87, \u00a7Use dose of 25 mg in patients less than 50 kg (Canadian labelling), 2016]:\n   # Use dose of 25 mg in patients less than 50 kg (Canadian labelling) Rationale: Use of initial monotherapy: Most of the evidence based guidelines like CHEP, ESC/ESH recommend therapy with a single drug in the case of grade 1 hypertension(19, 21), and with a combination of 2 drugs in patients with... [^2]\n\n3. **4.6.12. If the BP is not controlled despite use of 3 anti-hypertensives in optimal doses, then (Part 3)** [MoHFW STG - Hypertension (Background Document), p. 86, \u00a74.6.12. If the BP is not controlled despite use of 3 anti-hypertensives in optimal doses, then (Part 3), 2016]:\n   *Angiotensin Receptor blockers (ARBs) can be used if there is intolerance to ACE inhibitors (cough, angioedema) Abbreviations: CCB, calcium channel blocker; ACE Inhibitor, Angiotensin converting enzyme inhibitor; ARB, Angiotensin receptor blocker. In patients who qualify for initiation of drug th... [^3]\n\n4. **2 Thresholds for interventions in adults aged under 40** [NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management, p. 27, \u00a72 Thresholds for interventions in adults aged under 40, 2019/2022]:\n   2 Thresholds for interventions in adults aged under 40 In adults aged under 40 with hypertension (with or without type 2 diabetes), what are the appropriate risk and blood pressure thresholds for starting treatment? [2019] For a short explanation of why the committee made the recommendation for r... [^4]\n\n\n### Patient Applicability & Context Analysis\n\n- **Recorded Clinic BP (148/92 mmHg)**: Evaluated against threshold criteria in retrieved guideline recommendations [^1].\n- **Patient Age (52 years)**: Evaluated against age-stratified criteria in retrieved recommendations [^1].\n\n### Missing Patient Information & Recommended Workup\n\n- **Glycemic Status (HbA1c / Fasting Glucose)**: Referenced in retrieved criteria to assess diabetic comorbidity and glycemic control.\n\n### General Clinical Rationale\n\n*General Clinical Rationale \u2014 Not a Formal Guideline Recommendation*:\nStepwise blood pressure and glycemic management provides synergistic protection against microvascular and macrovascular events. Treatment decisions should be individualized based on tolerability and target organ evaluation. [^1]\n\n*Research Prototype Disclaimer: For evaluation and research purposes only. This software is not an approved medical device and does not replace certified clinical judgment.*"
+    },
+    {
+      "turn_index": 3,
+      "user_message": "What baseline monitoring or follow-up laboratory workup should be scheduled?",
+      "action_type": "recommendation",
+      "is_abstention": false,
+      "patient_state_delta": {},
+      "patient_state_summary": "Age: 52; BP: 148/92 mmHg; Conditions: hypertension",
+      "retrieved_chunks": [
+        {
+          "chunk_id": "who_htn_001_c0036",
+          "score": 0.0153,
+          "document_name": "WHO Guideline for the Pharmacological Treatment of Hypertension in Adults",
+          "heading": "3.2\t Laboratory testing before and during pharmacological treatment > 2.\t RECOMMENDATION ON LABORATORY TESTING",
+          "page": 20
+        },
+        {
+          "chunk_id": "who_htn_001_c0015",
+          "score": 0.0143,
+          "document_name": "WHO Guideline for the Pharmacological Treatment of Hypertension in Adults",
+          "heading": "2.\t RECOMMENDATION ON LABORATORY TESTING",
+          "page": 10
+        },
+        {
+          "chunk_id": "icmr_htn_001_c0008",
+          "score": 0.0121,
+          "document_name": "ICMR Standard Treatment Workflow - Hypertension in Adults (ICD-11 BA00)",
+          "heading": "Monitoring of Hypertension",
+          "page": 1
+        },
+        {
+          "chunk_id": "mohfw_htn_001_c0144",
+          "score": 0.012,
+          "document_name": "MoHFW STG - Hypertension (Background Document)",
+          "heading": "2.2 Diagnosis of hypertension should be based on at least 2 measurements taken",
+          "page": 58
+        },
+        {
+          "chunk_id": "mohfw_htn_002_c0014",
+          "score": 0.012,
+          "document_name": "MoHFW Standard Treatment Guidelines - Hypertension (Quick Reference Guide)",
+          "heading": "2.2 Diagnosis of hypertension should be based on at least 2 measurements taken in the clinic or",
+          "page": 7
+        }
+      ],
+      "disputed_facts_count": 0,
+      "citations_verified": 4,
+      "citations_total": 4,
+      "response_text": "### Guideline Recommendation(s)\n\n1. **3.2\t Laboratory testing before and during pharmacological treatment > 2.\t RECOMMENDATION ON LABORATORY TESTING** [WHO Guideline for the Pharmacological Treatment of Hypertension in Adults, p. 20, \u00a73.2\t Laboratory testing before and during pharmacological treatment > 2.\t RECOMMENDATION ON LABORATORY TESTING, 2021]:\n   3.2\t Laboratory testing before and during pharmacological treatment 2.\t RECOMMENDATION ON LABORATORY TESTING When starting pharmacological therapy for hypertension, WHO suggests obtaining tests to screen for comorbidities and secondary hypertension, but only when testing does not delay or impede ... [^1]\n\n2. **2.\t RECOMMENDATION ON LABORATORY TESTING** [WHO Guideline for the Pharmacological Treatment of Hypertension in Adults, p. 10, \u00a72.\t RECOMMENDATION ON LABORATORY TESTING, 2021]:\n   2.\t RECOMMENDATION ON LABORATORY TESTING When starting pharmacological therapy for hypertension, WHO suggests obtaining tests to screen for comorbidities and secondary hypertension, but only when testing does not delay or impede starting treatment. [^2]\n\n3. **Monitoring of Hypertension** [ICMR Standard Treatment Workflow - Hypertension in Adults (ICD-11 BA00), p. 1, \u00a7Monitoring of Hypertension, 2026]:\n   MONITORING OF HYPERTENSION: - BP to be measured at every clinical visit. - Evaluate for diabetes (fasting plasma glucose or HbA1c) and manage accordingly. - Annual evaluations: Serum creatinine, Urine (albumin, sugar, creatinine), Lipid profile, Fundoscopy. - Additional investigations (if require... [^3]\n\n4. **2.2 Diagnosis of hypertension should be based on at least 2 measurements taken** [MoHFW STG - Hypertension (Background Document), p. 58, \u00a72.2 Diagnosis of hypertension should be based on at least 2 measurements taken, 2016]:\n   2.2 Diagnosis of hypertension should be based on at least 2 measurements taken in the clinic or by a healthcare provider on at least 2 visits, which are at least 1-4 weeks apart, except in the case of hypertensive urgencies and hypertensive emergencies, where hypertension is diagnosed during the ... [^4]\n\n\n### Patient Applicability & Context Analysis\n\n- **Recorded Clinic BP (148/92 mmHg)**: Evaluated against threshold criteria in retrieved guideline recommendations [^1].\n- **Patient Age (52 years)**: Evaluated against age-stratified criteria in retrieved recommendations [^1].\n\n### Missing Patient Information & Recommended Workup\n\n- **Out-of-office BP Confirmation (ABPM/HBPM)**: Referenced in retrieved applicability criteria to confirm sustained hypertension.\n- **Renal Function (eGFR / Serum Creatinine)**: Referenced in retrieved dosing criteria and contraindication exceptions.\n- **Serum Potassium and Electrolytes**: Required prior to RAAS blocker or diuretic initiation per retrieved drug guidance.\n- **Glycemic Status (HbA1c / Fasting Glucose)**: Referenced in retrieved criteria to assess diabetic comorbidity and glycemic control.\n\n### General Clinical Rationale\n\n*General Clinical Rationale \u2014 Not a Formal Guideline Recommendation*:\nStepwise blood pressure and glycemic management provides synergistic protection against microvascular and macrovascular events. Treatment decisions should be individualized based on tolerability and target organ evaluation. [^1]\n\n*Research Prototype Disclaimer: For evaluation and research purposes only. This software is not an approved medical device and does not replace certified clinical judgment.*"
+    }
+  ]
+}

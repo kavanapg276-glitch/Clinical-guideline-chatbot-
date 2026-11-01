@@ -20,3 +20,13 @@
 
 3. **Embedding Model:**
    - `sentence-transformers/all-MiniLM-L6-v2` (384 dimensions) downloaded, verified, and cached locally. Tested with inference.
+
+4. **Strictly Evidence-Bound Clinical Response Generator (Stage A2):**
+   - *Design Goal:* Eliminate all ungrounded model hallucinations, hardcoded clinical assertions, and default drug statements from conversational responses.
+   - *Implementation in `guideline_chatbot/chatbot/generator.py`:*
+     - Removed all static clinical assertions (e.g., hardcoded metformin recommendations, dual therapy defaults, ACEi/ARB renal protection paragraphs).
+     - Every recommendation statement is constructed directly from retrieved chunk texts, tagged with an inline citation `[^N]` mapping to retrieved hit `N`.
+     - Standardized citation metadata to use verified publication years (`DOC_YEARS` mapping: MoHFW 2016, WHO HTN 2021, WHO HEARTS 2020, NICE NG136 2019/2022, NICE NG28 2015/2022, ICMR HTN 2026, ICMR T2DM 2022) instead of the vague placeholder `"current"`.
+     - When retrieval yields no in-scope hits, the generator explicitly emits: *"No guideline evidence was retrieved for this point. Please verify primary guideline documentation."*
+     - Derived "Missing Patient Information & Recommended Workup" dynamically via `_derive_missing_info()` by cross-referencing retrieved chunks' `applicability_conditions` and `exceptions` against unknown/unrecorded patient state attributes (e.g. unmeasured ABPM, eGFR, potassium, urine ACR, pregnancy status in reproductive-age females), removing hardcoded disease-specific checklists.
+     - Suppressed introductory conversational boilerplate across multi-turn interactions (`turn_count > 1`).

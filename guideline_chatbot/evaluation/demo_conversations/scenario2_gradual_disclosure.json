@@ -2,40 +2,194 @@
   "scenario_id": "scenario2_gradual_disclosure",
   "title": "Scenario 2: Gradual Clinical Disclosure (HTN -> T2DM -> Microalbuminuria)",
   "category": "Gradual Disclosure & Clinical Reassessment",
-  "description": "Patient reveals hypertension, then type 2 diabetes, then microalbuminuria, altering drug choice.",
+  "description": "Patient reveals hypertension, then type 2 diabetes, then microalbuminuria (ACR 4.2 mg/mmol).",
   "turns": [
     {
       "turn_index": 1,
       "user_message": "58-year-old female presenting with blood pressure of 152/94 mmHg.",
       "action_type": "recommendation",
       "is_abstention": false,
-      "disputed_facts_count": 0,
-      "citations_verified": 3,
-      "citations_total": 3,
+      "patient_state_delta": {
+        "conditions": {
+          "previous": null,
+          "current": [
+            "hypertension"
+          ]
+        },
+        "age": {
+          "previous": null,
+          "current": 58
+        },
+        "vitals": {
+          "previous": null,
+          "current": {
+            "sbp": 152.0,
+            "dbp": 94.0
+          }
+        }
+      },
       "patient_state_summary": "Age: 58; Sex: female; BP: 152/94 mmHg; Conditions: hypertension",
-      "response_text": "### Guideline Recommendation(s)\n\n1. **1.2.3** [NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management, p. 7, \u00a71.2.3, 2019]:\n   1.2.3 If clinic blood pressure is between 140/90 mmHg and 180/120 mmHg, offer ambulatory blood pressure monitoring (ABPM) to confirm the diagnosis of hypertension. See the section on identifying who to refer for people with a clinic blood pressure 180/120 mmHg or higher. [2019]\n\n2. **1.2.8** [NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management, p. 8, \u00a71.2.8, 2019]:\n   1.2.8 Confirm diagnosis of hypertension in people with a: -  clinic blood pressure of 140/90 mmHg or higher and -  ABPM daytime average or HBPM average of 135/85 mmHg or higher. [2019]\n\n3. **DIAGNOSIS, CLASSIFICATION** [MoHFW Standard Treatment Guidelines - Hypertension (Quick Reference Guide), p. 54, \u00a7DIAGNOSIS, CLASSIFICATION, current]:\n   DIAGNOSIS, CLASSIFICATION Hypertension is systolic BP 140 mmHg or higher and diastolic BP 90 mmHg or higher. TWO readings on at least TWO occasions. Valid device and standardised BP measurement procedure. Category Systolic BP mmHg Diastolic BP mmHg Optimal <120 and <80 Normal ...\n\n\n### Patient Applicability & Context Analysis\n\n- **Blood Pressure (152/94 mmHg)**: Grade 1 / Stage 1 hypertension. Pharmacotherapy indicated if sustained on ABPM/HBPM or if target organ damage/diabetes is present.\n- **Age (58 years)**: NICE recommends Calcium Channel Blocker (CCB) as initial monotherapy for uncomplicated hypertension in patients aged \u2265 55.\n\n### Missing Patient Information & Recommended Workup\n\n- **Out-of-office BP Confirmation**: Ambulatory Blood Pressure Monitoring (ABPM) or Home Blood Pressure Monitoring (HBPM) to confirm sustained hypertension and rule out white-coat effect.\n- **Glycemic Evaluation**: Fasting plasma glucose and HbA1c to screen for occult diabetes.\n- **Renal Function**: Serum creatinine, estimated GFR (eGFR), and serum electrolytes (potassium/sodium).\n- **Urinary Albumin**: Urine Albumin-to-Creatinine Ratio (ACR) to detect early diabetic nephropathy.\n\n### General Clinical Rationale\n\n*General Clinical Rationale \u2014 Not a Formal Guideline Recommendation*:\nHypertension and type 2 diabetes represent synergistic cardiovascular risk factors. Antihypertensive pharmacotherapy provides dual protection by reducing vascular sheer stress and preserving glomerular capillary integrity. Stepwise or initial combination therapy should be titrated at 4\u20136 week intervals until therapeutic target is reached.\n\n*Research Prototype Disclaimer: For evaluation and research purposes only. This software is not an approved medical device and does not replace certified clinical judgment.*"
+      "retrieved_chunks": [
+        {
+          "chunk_id": "nice_htn_001_c0013",
+          "score": 0.015,
+          "document_name": "NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management",
+          "heading": "1.2.3",
+          "page": 7
+        },
+        {
+          "chunk_id": "nice_htn_001_c0018",
+          "score": 0.0147,
+          "document_name": "NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management",
+          "heading": "1.2.8",
+          "page": 8
+        },
+        {
+          "chunk_id": "nice_htn_001_c0012",
+          "score": 0.0134,
+          "document_name": "NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management",
+          "heading": "1.2.2",
+          "page": 7
+        },
+        {
+          "chunk_id": "nice_htn_001_c0046",
+          "score": 0.0125,
+          "document_name": "NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management",
+          "heading": "1.4.20",
+          "page": 16
+        },
+        {
+          "chunk_id": "nice_htn_001_c0047",
+          "score": 0.0124,
+          "document_name": "NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management",
+          "heading": "1.4.21",
+          "page": 16
+        }
+      ],
+      "disputed_facts_count": 0,
+      "citations_verified": 4,
+      "citations_total": 4,
+      "response_text": "### Guideline Recommendation(s)\n\n1. **1.2.3** [NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management, p. 7, \u00a71.2.3, 2019/2022]:\n   1.2.3 If clinic blood pressure is between 140/90 mmHg and 180/120 mmHg, offer ambulatory blood pressure monitoring (ABPM) to confirm the diagnosis of hypertension. See the section on identifying who to refer for people with a clinic blood pressure 180/120 mmHg or higher. [2019] [^1]\n\n2. **1.2.8** [NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management, p. 8, \u00a71.2.8, 2019/2022]:\n   1.2.8 Confirm diagnosis of hypertension in people with a: -  clinic blood pressure of 140/90 mmHg or higher and -  ABPM daytime average or HBPM average of 135/85 mmHg or higher. [2019] [^2]\n\n3. **1.2.2** [NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management, p. 7, \u00a71.2.2, 2019/2022]:\n   1.2.2 If blood pressure measured in the clinic is 140/90 mmHg or higher: -  Take a second measurement during the consultation. -  If the second measurement is substantially different from the first, take a third measurement. Record the lower of the last 2 measurements as the clinic blood pressure... [^3]\n\n4. **1.4.20** [NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management, p. 16, \u00a71.4.20, 2019/2022]:\n   1.4.20 For adults with hypertension aged under 80, reduce clinic blood pressure to below 140/90 mmHg and ensure that it is maintained below that level. See also table 1 for guidance on clinic blood pressure targets for people aged under 80 with type 1 diabetes or severe chronic kidney disease. [2... [^4]\n\n\n### Patient Applicability & Context Analysis\n\n- **Recorded Clinic BP (152/94 mmHg)**: Evaluated against threshold criteria in retrieved guideline recommendations [^1].\n- **Patient Age (58 years)**: Evaluated against age-stratified criteria in retrieved recommendations [^1].\n\n### Missing Patient Information & Recommended Workup\n\n- **Out-of-office BP Confirmation (ABPM/HBPM)**: Referenced in retrieved applicability criteria to confirm sustained hypertension.\n- **Renal Function (eGFR / Serum Creatinine)**: Referenced in retrieved dosing criteria and contraindication exceptions.\n- **Glycemic Status (HbA1c / Fasting Glucose)**: Referenced in retrieved criteria to assess diabetic comorbidity and glycemic control.\n\n### General Clinical Rationale\n\n*General Clinical Rationale \u2014 Not a Formal Guideline Recommendation*:\nStepwise blood pressure and glycemic management provides synergistic protection against microvascular and macrovascular events. Treatment decisions should be individualized based on tolerability and target organ evaluation. [^1]\n\n*Research Prototype Disclaimer: For evaluation and research purposes only. This software is not an approved medical device and does not replace certified clinical judgment.*"
     },
     {
       "turn_index": 2,
       "user_message": "I should also mention her recent HbA1c is 8.2% and she was diagnosed with type 2 diabetes last year.",
       "action_type": "recommendation",
       "is_abstention": false,
-      "disputed_facts_count": 0,
-      "citations_verified": 3,
-      "citations_total": 3,
+      "patient_state_delta": {
+        "conditions": {
+          "previous": [
+            "hypertension"
+          ],
+          "current": [
+            "hypertension",
+            "type_2_diabetes"
+          ]
+        }
+      },
       "patient_state_summary": "Age: 58; Sex: female; BP: 152/94 mmHg; Conditions: hypertension, type_2_diabetes; HbA1c: 8.2%",
-      "response_text": "### Guideline Recommendation(s)\n\n1. **1.5.8** [NICE Guideline NG28: Type 2 Diabetes in Adults - Management, p. 13, \u00a71.5.8, 2026]:\n   1.5.8 In adults with type 2 diabetes, if HbA1c levels are not adequately controlled by the initial medication regimen and rise to 58 mmol/mol (7.5%) or higher: -  reinforce advice about diet, healthy living and adherence to medicines and -  support the person to aim for an HbA...\n\n2. **1.5 HbA1c measurement and targets > 1.5.1** [NICE Guideline NG28: Type 2 Diabetes in Adults - Management, p. 12, \u00a71.5 HbA1c measurement and targets > 1.5.1, 2015]:\n   1.5 HbA1c measurement and targets Measurement 1.5.1 Measure HbA1c levels in adults with type 2 diabetes every: -  3 to 6 months (tailored to individual needs) until HbA1c is stable on unchanging therapy -  6 months once the HbA1c level and blood glucose lowering therapy are st...\n\n3. **1.5.7** [NICE Guideline NG28: Type 2 Diabetes in Adults - Management, p. 13, \u00a71.5.7, 2026]:\n   1.5.7 For adults whose type 2 diabetes is managed either by healthy living and diet, or healthy living and diet combined with an initial medication regimen that is not associated with hypoglycaemia (see the section on initial medicines), support them to aim for an HbA1c level ...\n\n\n### Patient Applicability & Context Analysis\n\n- **Blood Pressure (152/94 mmHg)**: Grade 1 / Stage 1 hypertension. Pharmacotherapy indicated if sustained on ABPM/HBPM or if target organ damage/diabetes is present.\n- **Comorbidity (Type 2 Diabetes)**: Presence of diabetes modifies first-line drug selection (ACE inhibitors or ARBs strongly preferred for renal protection) and establishes stricter BP targets.\n- **Age (58 years)**: NICE recommends Calcium Channel Blocker (CCB) as initial monotherapy for uncomplicated hypertension in patients aged \u2265 55.\n\n### Missing Patient Information & Recommended Workup\n\n- **Out-of-office BP Confirmation**: Ambulatory Blood Pressure Monitoring (ABPM) or Home Blood Pressure Monitoring (HBPM) to confirm sustained hypertension and rule out white-coat effect.\n- **Renal Function**: Serum creatinine, estimated GFR (eGFR), and serum electrolytes (potassium/sodium).\n- **Urinary Albumin**: Urine Albumin-to-Creatinine Ratio (ACR) to detect early diabetic nephropathy.\n\n### General Clinical Rationale\n\n*General Clinical Rationale \u2014 Not a Formal Guideline Recommendation*:\nHypertension and type 2 diabetes represent synergistic cardiovascular risk factors. Antihypertensive pharmacotherapy provides dual protection by reducing vascular sheer stress and preserving glomerular capillary integrity. Stepwise or initial combination therapy should be titrated at 4\u20136 week intervals until therapeutic target is reached.\n\n*Research Prototype Disclaimer: For evaluation and research purposes only. This software is not an approved medical device and does not replace certified clinical judgment.*"
+      "retrieved_chunks": [
+        {
+          "chunk_id": "nice_t2dm_001_c0034",
+          "score": 0.0188,
+          "document_name": "NICE Guideline NG28: Type 2 Diabetes in Adults - Management",
+          "heading": "1.5.8",
+          "page": 13
+        },
+        {
+          "chunk_id": "nice_t2dm_001_c0028",
+          "score": 0.0185,
+          "document_name": "NICE Guideline NG28: Type 2 Diabetes in Adults - Management",
+          "heading": "Blood glucose management > 1.5 HbA1c measurement and targets > 1.5.1",
+          "page": 12
+        },
+        {
+          "chunk_id": "nice_t2dm_001_c0033",
+          "score": 0.0184,
+          "document_name": "NICE Guideline NG28: Type 2 Diabetes in Adults - Management",
+          "heading": "1.5.7",
+          "page": 13
+        },
+        {
+          "chunk_id": "nice_t2dm_001_c0036",
+          "score": 0.0183,
+          "document_name": "NICE Guideline NG28: Type 2 Diabetes in Adults - Management",
+          "heading": "1.5.10",
+          "page": 14
+        },
+        {
+          "chunk_id": "nice_t2dm_001_c0031",
+          "score": 0.0177,
+          "document_name": "NICE Guideline NG28: Type 2 Diabetes in Adults - Management",
+          "heading": "1.5.5",
+          "page": 13
+        }
+      ],
+      "disputed_facts_count": 0,
+      "citations_verified": 4,
+      "citations_total": 4,
+      "response_text": "### Guideline Recommendation(s)\n\n1. **1.5.8** [NICE Guideline NG28: Type 2 Diabetes in Adults - Management, p. 13, \u00a71.5.8, 2015/2022]:\n   1.5.8 In adults with type 2 diabetes, if HbA1c levels are not adequately controlled by the initial medication regimen and rise to 58 mmol/mol (7.5%) or higher: -  reinforce advice about diet, healthy living and adherence to medicines and -  support the person to aim for an HbA1c level of 53 mmol/... [^1]\n\n2. **Blood glucose management > 1.5 HbA1c measurement and targets > 1.5.1** [NICE Guideline NG28: Type 2 Diabetes in Adults - Management, p. 12, \u00a7Blood glucose management > 1.5 HbA1c measurement and targets > 1.5.1, 2015/2022]:\n   Blood glucose management 1.5 HbA1c measurement and targets Measurement 1.5.1 Measure HbA1c levels in adults with type 2 diabetes every: -  3 to 6 months (tailored to individual needs) until HbA1c is stable on unchanging therapy -  6 months once the HbA1c level and blood glucose lowering therapy a... [^2]\n\n3. **1.5.7** [NICE Guideline NG28: Type 2 Diabetes in Adults - Management, p. 13, \u00a71.5.7, 2015/2022]:\n   1.5.7 For adults whose type 2 diabetes is managed either by healthy living and diet, or healthy living and diet combined with an initial medication regimen that is not associated with hypoglycaemia (see the section on initial medicines), support them to aim for an HbA1c level of 48 mmol/mol (6.5%... [^3]\n\n4. **1.5.10** [NICE Guideline NG28: Type 2 Diabetes in Adults - Management, p. 14, \u00a71.5.10, 2015/2022]:\n   1.5.10 If adults with type 2 diabetes reach an HbA1c level that is lower than their target and they are not experiencing hypoglycaemia, encourage them to maintain it. Be aware that there are other possible reasons for a low HbA1c level, for example deteriorating renal function or sudden weight lo... [^4]\n\n\n### Patient Applicability & Context Analysis\n\n- **Recorded Clinic BP (152/94 mmHg)**: Evaluated against threshold criteria in retrieved guideline recommendations [^1].\n- **Patient Age (58 years)**: Evaluated against age-stratified criteria in retrieved recommendations [^1].\n- **Comorbidity (Type 2 Diabetes)**: Matches diabetic population criteria and target thresholds in retrieved guidance [^1].\n\n### Missing Patient Information & Recommended Workup\n\n- **Renal Function (eGFR / Serum Creatinine)**: Referenced in retrieved dosing criteria and contraindication exceptions.\n\n### General Clinical Rationale\n\n*General Clinical Rationale \u2014 Not a Formal Guideline Recommendation*:\nStepwise blood pressure and glycemic management provides synergistic protection against microvascular and macrovascular events. Treatment decisions should be individualized based on tolerability and target organ evaluation. [^1]\n\n*Research Prototype Disclaimer: For evaluation and research purposes only. This software is not an approved medical device and does not replace certified clinical judgment.*"
     },
     {
       "turn_index": 3,
       "user_message": "Her urine ACR came back elevated at 4.2 mg/mmol indicating microalbuminuria. Does this change the drug recommendation?",
       "action_type": "recommendation",
       "is_abstention": false,
+      "patient_state_delta": {
+        "conditions": {
+          "previous": [
+            "hypertension",
+            "type_2_diabetes"
+          ],
+          "current": [
+            "hypertension",
+            "microalbuminuria",
+            "type_2_diabetes"
+          ]
+        }
+      },
+      "patient_state_summary": "Age: 58; Sex: female; BP: 152/94 mmHg; Conditions: hypertension, microalbuminuria, type_2_diabetes; HbA1c: 8.2%",
+      "retrieved_chunks": [
+        {
+          "chunk_id": "nice_htn_001_c0094",
+          "score": 0.016,
+          "document_name": "NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management",
+          "heading": "Starting antihypertensive drug treatment (Part 2)",
+          "page": 35
+        },
+        {
+          "chunk_id": "nice_htn_001_c0106",
+          "score": 0.0143,
+          "document_name": "NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management",
+          "heading": "Return to recommendation > Step 1 treatment (Part 2)",
+          "page": 43
+        },
+        {
+          "chunk_id": "icmr_t2dm_001_c0011",
+          "score": 0.0132,
+          "document_name": "ICMR Standard Treatment Workflow - Diabetes Mellitus Type 2 (ICD-10-E11)",
+          "heading": "Monitoring and Referrals",
+          "page": 1
+        },
+        {
+          "chunk_id": "mohfw_htn_001_c0069",
+          "score": 0.0124,
+          "document_name": "MoHFW STG - Hypertension (Background Document)",
+          "heading": "4.8.3.2",
+          "page": 22
+        },
+        {
+          "chunk_id": "mohfw_htn_002_c0067",
+          "score": 0.0109,
+          "document_name": "MoHFW Standard Treatment Guidelines - Hypertension (Quick Reference Guide)",
+          "heading": "4.8.1.3",
+          "page": 23
+        }
+      ],
       "disputed_facts_count": 0,
-      "citations_verified": 3,
+      "citations_verified": 4,
       "citations_total": 4,
-      "patient_state_summary": "Age: 58; Sex: female; BP: 152/94 mmHg; Conditions: chronic_kidney_disease, hypertension, microalbuminuria, type_2_diabetes; HbA1c: 8.2%",
-      "response_text": "### Guideline Recommendation(s)\n\n1. **Recommendation** [NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management, p. 14, \u00a7Recommendation, current]:\n   See also table 1 for clinic blood pressure targets for people aged under 80 and table 2 for clinic blood pressure targets for people aged 80 and over. The tables cover people with hypertension (with or without type 2 diabetes) as well as people with chronic kidney disease or t...\n\n2. **6 Using routinely collected real-world data to assess the (Part 2)** [NICE Guideline NG28: Type 2 Diabetes in Adults - Management, p. 130, \u00a76 Using routinely collected real-world data to assess the (Part 2), 2022]:\n   recommendations, to make it clear that recommendations apply to adults who are using capillary blood glucose monitoring rather than CGM. These recommendations are marked [2015, amended 2022]. Recommendations are marked to show when they last had an evidence review, for example...\n\n3. **1 Intramuscular injection of glucagon can also resolve hypoglycaemia, but it is rarely available in (Part 2)** [WHO HEARTS-D: Diagnosis and Management of Type 2 Diabetes, p. 21, \u00a71 Intramuscular injection of glucagon can also resolve hypoglycaemia, but it is rarely available in (Part 2), current]:\n   advanced proliferative retinopathy, some recovery of visual acuity can be achieved by vitrectomy. Intravitreal injections of anti-vascular endothelial growth factor (anti-VEGF) can prevent some visual loss in diabetic macular oedema. Diabetic kidney disease Diabetic kidney dis...\n\n\n### Patient Applicability & Context Analysis\n\n- **Blood Pressure (152/94 mmHg)**: Grade 1 / Stage 1 hypertension. Pharmacotherapy indicated if sustained on ABPM/HBPM or if target organ damage/diabetes is present.\n- **Comorbidity (Type 2 Diabetes)**: Presence of diabetes modifies first-line drug selection (ACE inhibitors or ARBs strongly preferred for renal protection) and establishes stricter BP targets.\n- **Renal Status (Microalbuminuria/CKD)**: Renin-angiotensin system blockers (ACEi/ARB) are the mandatory initial class to slow progression of nephropathy.\n- **Age (58 years)**: NICE recommends Calcium Channel Blocker (CCB) as initial monotherapy for uncomplicated hypertension in patients aged \u2265 55.\n\n### Missing Patient Information & Recommended Workup\n\n- **Out-of-office BP Confirmation**: Ambulatory Blood Pressure Monitoring (ABPM) or Home Blood Pressure Monitoring (HBPM) to confirm sustained hypertension and rule out white-coat effect.\n- **Renal Function**: Serum creatinine, estimated GFR (eGFR), and serum electrolytes (potassium/sodium).\n- **Urinary Albumin**: Urine Albumin-to-Creatinine Ratio (ACR) to detect early diabetic nephropathy.\n\n### General Clinical Rationale\n\n*General Clinical Rationale \u2014 Not a Formal Guideline Recommendation*:\nHypertension and type 2 diabetes represent synergistic cardiovascular risk factors. Antihypertensive pharmacotherapy provides dual protection by reducing vascular sheer stress and preserving glomerular capillary integrity. Stepwise or initial combination therapy should be titrated at 4\u20136 week intervals until therapeutic target is reached.\n\n*Research Prototype Disclaimer: For evaluation and research purposes only. This software is not an approved medical device and does not replace certified clinical judgment.*"
+      "response_text": "### Guideline Recommendation(s)\n\n1. **Starting antihypertensive drug treatment (Part 2)** [NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management, p. 35, \u00a7Starting antihypertensive drug treatment (Part 2), 2019/2022]:\n   the recommendation for research on thresholds for interventions in adults aged under 40). The committee agreed that there was no evidence to suggest that thresholds for starting treatment should be different in people with type 2 diabetes. The previous recommendations for people with type 2 diabe... [^1]\n\n2. **Return to recommendation > Step 1 treatment (Part 2)** [NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management, p. 43, \u00a7Return to recommendation > Step 1 treatment (Part 2), 2019/2022]:\n   recommendations were based on monotherapy studies and when the committee looked at this evidence alongside the new dual therapy evidence review, they concluded that it was insufficient to recommend starting dual therapy in any subgroup of people with type 2 diabetes. The committee noted that peop... [^2]\n\n3. **Monitoring and Referrals** [ICMR Standard Treatment Workflow - Diabetes Mellitus Type 2 (ICD-10-E11), p. 1, \u00a7Monitoring and Referrals, 2022]:\n   MONITORING AND SPECIALIST REFERRALS: - Blood glucose: FPG and 2 hours PPG once monthly (more frequent as required including SMBG or CGM). - HbA1c: every 6\u201312 months (3 monthly if uncontrolled). - Annual monitoring: ECG, urine ACR (albumin creatinine ratio), dilated fundoscopy, foot examination (p... [^3]\n\n4. **4.8.3.2** [MoHFW STG - Hypertension (Background Document), p. 22, \u00a74.8.3.2, 2016]:\n   4.8.3.2 ACE inhibitors /ARBs are effective in reducing albuminuria and   should be used in patients with hypertension and overt proteinuria (or microalbuminuria). Monitoring serum creatinine and potassium in the first week of therapy is advisable after initiation of therapy or any increase in the... [^4]\n\n\n### Patient Applicability & Context Analysis\n\n- **Recorded Clinic BP (152/94 mmHg)**: Evaluated against threshold criteria in retrieved guideline recommendations [^1].\n- **Patient Age (58 years)**: Evaluated against age-stratified criteria in retrieved recommendations [^1].\n- **Comorbidity (Type 2 Diabetes)**: Matches diabetic population criteria and target thresholds in retrieved guidance [^1].\n- **Laboratory Finding (Microalbuminuria)**: Laboratory microalbuminuria findings evaluated against renal protection criteria [^1].\n\n### Missing Patient Information & Recommended Workup\n\n- **Renal Function (eGFR / Serum Creatinine)**: Referenced in retrieved dosing criteria and contraindication exceptions.\n- **Serum Potassium and Electrolytes**: Required prior to RAAS blocker or diuretic initiation per retrieved drug guidance.\n- **Urine Albumin-to-Creatinine Ratio (ACR)**: Required to screen for renal target-organ damage and microalbuminuria.\n\n### General Clinical Rationale\n\n*General Clinical Rationale \u2014 Not a Formal Guideline Recommendation*:\nStepwise blood pressure and glycemic management provides synergistic protection against microvascular and macrovascular events. Treatment decisions should be individualized based on tolerability and target organ evaluation. [^1]\n\n*Research Prototype Disclaimer: For evaluation and research purposes only. This software is not an approved medical device and does not replace certified clinical judgment.*"
     }
   ]
 }

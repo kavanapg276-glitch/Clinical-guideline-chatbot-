@@ -315,5 +315,62 @@ class TestOrchestratorMultiTurn:
         )
         assert res3.turn_index == 3
         assert "microalbuminuria" in res3.patient_state.conditions
-        assert "chronic_kidney_disease" in res3.patient_state.conditions
+        assert "chronic_kidney_disease" not in res3.patient_state.conditions
         assert res3.citation_validation.valid is True
+
+    def test_single_acr_does_not_infer_ckd(self) -> None:
+        mgr = PatientStateManager()
+        state, conflicts = mgr.update_from_text(
+            "Patient with hypertension; recent urine ACR is 4.2 mg/mmol and eGFR is 82 mL/min."
+        )
+        assert state.urine_acr == 4.2
+        assert "microalbuminuria" in state.conditions
+        assert "chronic_kidney_disease" not in state.conditions
+        assert state.egfr == 82.0
+
+    def test_past_bp_vs_present_bp_not_a_contradiction(self) -> None:
+        mgr = PatientStateManager()
+        # Turn 1: historical normal BP
+        mgr.update_from_text("Patient reports blood pressure was normal in the past.")
+        # Turn 2: today's reading
+        state, conflicts = mgr.update_from_text("Today in clinic, BP is 152/94 mmHg.")
+        assert len(conflicts) == 0
+        assert state.sbp == 152.0
+        assert state.has_conflicts is False
+
+    def test_contradiction_resolution_marks_resolved(self) -> None:
+        mgr = PatientStateManager()
+        # Turn 1
+        mgr.update_from_text("Patient reports normal blood pressure.")
+        # Turn 2: unclarified contradiction
+        mgr.update_from_text("BP measured 168/104 mmHg today.")
+        assert mgr.state.has_conflicts is True
+        assert len(mgr.state.active_conflicts) == 1
+
+        # Turn 3: clinician resolves/confirms
+        state, conflicts = mgr.update_from_text(
+            "To clarify, the 168/104 mmHg reading today is confirmed on repeat measurement."
+        )
+        assert state.has_conflicts is False
+        assert len(state.active_conflicts) == 0
+        assert state.disputed_facts[0].is_resolved is True
+        assert state.disputed_facts[0].resolution_turn == 3
+
+    def test_dynamic_missing_info_derivation(self) -> None:
+        gen = ClinicalResponseGenerator()
+        from guideline_chatbot.chatbot.patient_state import PatientState
+
+        p_state = PatientState(sbp=150.0, dbp=92.0)
+        hits = [
+            {
+                "text": "Offer ABPM to confirm diagnosis. Check serum potassium and eGFR prior to initiating ACEi.",
+                "metadata": {
+                    "applicability_conditions": "For adults with clinic BP >= 140/90, confirm with ABPM",
+                    "exceptions": "Avoid if eGFR < 30 or serum potassium > 5.0",
+                },
+            }
+        ]
+        missing = gen._derive_missing_info(hits, p_state)
+        assert any("ABPM" in m for m in missing)
+        assert any("Renal Function" in m or "eGFR" in m for m in missing)
+        assert any("Potassium" in m for m in missing)

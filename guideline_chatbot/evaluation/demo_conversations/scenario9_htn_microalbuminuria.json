@@ -1,0 +1,167 @@
+{
+  "scenario_id": "scenario9_htn_microalbuminuria",
+  "title": "Scenario 9: Hypertension with Newly Reported Microalbuminuria",
+  "category": "Target Organ Damage & Renal Protection",
+  "description": "Patient with hypertension and newly reported urine ACR 4.2 mg/mmol; clinician asks about ACEi/ARB and CKD classification.",
+  "turns": [
+    {
+      "turn_index": 1,
+      "user_message": "A 56-year-old hypertensive patient has a newly reported urine ACR of 4.2 mg/mmol and eGFR of 82 mL/min.",
+      "action_type": "recommendation",
+      "is_abstention": false,
+      "patient_state_delta": {
+        "conditions": {
+          "previous": null,
+          "current": [
+            "hypertension",
+            "microalbuminuria"
+          ]
+        },
+        "age": {
+          "previous": null,
+          "current": 56
+        }
+      },
+      "patient_state_summary": "Age: 56; Conditions: hypertension, microalbuminuria; eGFR: 82 mL/min",
+      "retrieved_chunks": [
+        {
+          "chunk_id": "nice_t2dm_001_c0103",
+          "score": 0.016,
+          "document_name": "NICE Guideline NG28: Type 2 Diabetes in Adults - Management",
+          "heading": "1.18.1",
+          "page": 62
+        },
+        {
+          "chunk_id": "nice_htn_001_c0027",
+          "score": 0.0152,
+          "document_name": "NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management",
+          "heading": "1.3.3",
+          "page": 10
+        },
+        {
+          "chunk_id": "nice_t2dm_001_c0104",
+          "score": 0.0152,
+          "document_name": "NICE Guideline NG28: Type 2 Diabetes in Adults - Management",
+          "heading": "1.18.2",
+          "page": 62
+        },
+        {
+          "chunk_id": "nice_t2dm_001_c0105",
+          "score": 0.014,
+          "document_name": "NICE Guideline NG28: Type 2 Diabetes in Adults - Management",
+          "heading": "1.18.3",
+          "page": 62
+        },
+        {
+          "chunk_id": "icmr_t2dm_001_c0011",
+          "score": 0.0138,
+          "document_name": "ICMR Standard Treatment Workflow - Diabetes Mellitus Type 2 (ICD-10-E11)",
+          "heading": "Monitoring and Referrals",
+          "page": 1
+        }
+      ],
+      "disputed_facts_count": 0,
+      "citations_verified": 4,
+      "citations_total": 4,
+      "response_text": "### Guideline Recommendation(s)\n\n1. **1.18.1** [NICE Guideline NG28: Type 2 Diabetes in Adults - Management, p. 62, \u00a71.18.1, 2015/2022]:\n   1.18.1 For adults with type 2 diabetes and an estimated glomerular filtration rate (eGFR) of 30 ml/min/1.73 m 2 or more: -  Offer modified-release metformin and an SGLT-2 inhibitor. -  If metformin is contraindicated or not tolerated, offer monotherapy with an SGLT-2 inhibitor. [2026] [^1]\n\n2. **1.3.3** [NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management, p. 10, \u00a71.3.3, 2019/2022]:\n   1.3.3 For all people with hypertension offer to: -  test for the presence of protein in the urine by sending a urine sample for estimation of the albumin:creatinine ratio and test for haematuria using a reagent strip -  take a blood sample to measure glycated haemoglobin (HbA1C), electrolytes, cr... [^2]\n\n3. **1.18.2** [NICE Guideline NG28: Type 2 Diabetes in Adults - Management, p. 62, \u00a71.18.2, 2015/2022]:\n   1.18.2 For adults with type 2 diabetes and an eGFR of 20 ml/min/1.73 m 2 or more and less than 30 ml/min/1.73 m 2, offer: -  either dapagliflozin or empagliflozin and -  a DPP-4 inhibitor. [2026] [^3]\n\n4. **1.18.3** [NICE Guideline NG28: Type 2 Diabetes in Adults - Management, p. 62, \u00a71.18.3, 2015/2022]:\n   1.18.3 For adults with type 2 diabetes and an eGFR of less than 20 ml/min/1.73 m 2, consider a DPP-4 inhibitor. [2026] [^4]\n\n\n### Patient Applicability & Context Analysis\n\n- **Patient Age (56 years)**: Evaluated against age-stratified criteria in retrieved recommendations [^1].\n- **Laboratory Finding (Microalbuminuria)**: Laboratory microalbuminuria findings evaluated against renal protection criteria [^1].\n\n### Missing Patient Information & Recommended Workup\n\n- **Serum Potassium and Electrolytes**: Required prior to RAAS blocker or diuretic initiation per retrieved drug guidance.\n- **Glycemic Status (HbA1c / Fasting Glucose)**: Referenced in retrieved criteria to assess diabetic comorbidity and glycemic control.\n\n### General Clinical Rationale\n\n*General Clinical Rationale \u2014 Not a Formal Guideline Recommendation*:\nStepwise blood pressure and glycemic management provides synergistic protection against microvascular and macrovascular events. Treatment decisions should be individualized based on tolerability and target organ evaluation. [^1]\n\n*Research Prototype Disclaimer: For evaluation and research purposes only. This software is not an approved medical device and does not replace certified clinical judgment.*"
+    },
+    {
+      "turn_index": 2,
+      "user_message": "Does a single urine ACR of 4.2 mg/mmol constitute a diagnosis of chronic kidney disease?",
+      "action_type": "recommendation",
+      "is_abstention": false,
+      "patient_state_delta": {},
+      "patient_state_summary": "Age: 56; Conditions: hypertension, microalbuminuria; eGFR: 82 mL/min",
+      "retrieved_chunks": [
+        {
+          "chunk_id": "mohfw_htn_001_c0266",
+          "score": 0.0143,
+          "document_name": "MoHFW STG - Hypertension (Background Document)",
+          "heading": "DM: A /C, D > CAD: B + A#, C > CHF: D+ A+ B, MRA > CKD: A, C, D\u00a7",
+          "page": 112
+        },
+        {
+          "chunk_id": "mohfw_htn_001_c0276",
+          "score": 0.0138,
+          "document_name": "MoHFW STG - Hypertension (Background Document)",
+          "heading": "CHEP",
+          "page": 118
+        },
+        {
+          "chunk_id": "nice_htn_001_c0052",
+          "score": 0.0138,
+          "document_name": "NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management",
+          "heading": "1.4.26",
+          "page": 18
+        },
+        {
+          "chunk_id": "icmr_t2dm_001_c0011",
+          "score": 0.0138,
+          "document_name": "ICMR Standard Treatment Workflow - Diabetes Mellitus Type 2 (ICD-10-E11)",
+          "heading": "Monitoring and Referrals",
+          "page": 1
+        },
+        {
+          "chunk_id": "mohfw_htn_001_c0162",
+          "score": 0.0135,
+          "document_name": "MoHFW STG - Hypertension (Background Document)",
+          "heading": "3.8  All patients should be asked about tobacco use and advised to stop it. (Part 4)",
+          "page": 67
+        }
+      ],
+      "disputed_facts_count": 0,
+      "citations_verified": 4,
+      "citations_total": 4,
+      "response_text": "### Guideline Recommendation(s)\n\n1. **DM: A /C, D > CAD: B + A#, C > CHF: D+ A+ B, MRA > CKD: A, C, D\u00a7** [MoHFW STG - Hypertension (Background Document), p. 112, \u00a7DM: A /C, D > CAD: B + A#, C > CHF: D+ A+ B, MRA > CKD: A, C, D\u00a7, 2016]:\n   DM: A /C, D CAD: B + A#, C CHF: D+ A+ B, MRA CKD: A, C, D\u00a7 Grade 1 hypertension with TOD/DM/associated clinical conditions or > 3 risk factors ! Grade 2 HT and Grade 3 HT Patients with CAD and history of myocardial infarction should receive both beta-blockers and ACE inhibitors.\u00a7 Patients with CK... [^1]\n\n2. **CHEP** [MoHFW STG - Hypertension (Background Document), p. 118, \u00a7CHEP, 2016]:\n   CHEP Canadian Hypertension Education Program CKD Chronic kidney disease: disease in which kidneys start failing in their function of filtering waste, removing water and salt. It can result from a variety of causes, among which hypertension and diabetes are common. CVD Cardiovascular disease. It i... [^2]\n\n3. **1.4.26** [NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management, p. 18, \u00a71.4.26, 2019/2022]:\n   1.4.26 For guidance on choice of antihypertensive medicine in people with chronic kidney disease, see NICE's guideline on chronic kidney disease. If possible, offer treatment with drugs taken only once a day. [2004] [^3]\n\n4. **Monitoring and Referrals** [ICMR Standard Treatment Workflow - Diabetes Mellitus Type 2 (ICD-10-E11), p. 1, \u00a7Monitoring and Referrals, 2022]:\n   MONITORING AND SPECIALIST REFERRALS: - Blood glucose: FPG and 2 hours PPG once monthly (more frequent as required including SMBG or CGM). - HbA1c: every 6\u201312 months (3 monthly if uncontrolled). - Annual monitoring: ECG, urine ACR (albumin creatinine ratio), dilated fundoscopy, foot examination (p... [^4]\n\n\n### Patient Applicability & Context Analysis\n\n- **Patient Age (56 years)**: Evaluated against age-stratified criteria in retrieved recommendations [^1].\n- **Laboratory Finding (Microalbuminuria)**: Laboratory microalbuminuria findings evaluated against renal protection criteria [^1].\n\n### Missing Patient Information & Recommended Workup\n\n- **Serum Potassium and Electrolytes**: Required prior to RAAS blocker or diuretic initiation per retrieved drug guidance.\n- **Glycemic Status (HbA1c / Fasting Glucose)**: Referenced in retrieved criteria to assess diabetic comorbidity and glycemic control.\n\n### General Clinical Rationale\n\n*General Clinical Rationale \u2014 Not a Formal Guideline Recommendation*:\nStepwise blood pressure and glycemic management provides synergistic protection against microvascular and macrovascular events. Treatment decisions should be individualized based on tolerability and target organ evaluation. [^1]\n\n*Research Prototype Disclaimer: For evaluation and research purposes only. This software is not an approved medical device and does not replace certified clinical judgment.*"
+    },
+    {
+      "turn_index": 3,
+      "user_message": "Should an ACE inhibitor or ARB be initiated for this patient based on the microalbuminuria finding?",
+      "action_type": "recommendation",
+      "is_abstention": false,
+      "patient_state_delta": {},
+      "patient_state_summary": "Age: 56; Conditions: hypertension, microalbuminuria; eGFR: 82 mL/min",
+      "retrieved_chunks": [
+        {
+          "chunk_id": "nice_htn_001_c0066",
+          "score": 0.0153,
+          "document_name": "NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management",
+          "heading": "1.4.41",
+          "page": 21
+        },
+        {
+          "chunk_id": "nice_htn_001_c0057",
+          "score": 0.0147,
+          "document_name": "NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management",
+          "heading": "Step 1 treatment > 1.4.32",
+          "page": 19
+        },
+        {
+          "chunk_id": "nice_htn_001_c0060",
+          "score": 0.0146,
+          "document_name": "NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management",
+          "heading": "1.4.34 > 1.4.35",
+          "page": 20
+        },
+        {
+          "chunk_id": "nice_htn_001_c0068",
+          "score": 0.0146,
+          "document_name": "NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management",
+          "heading": "1.4.43",
+          "page": 21
+        },
+        {
+          "chunk_id": "nice_htn_001_c0071",
+          "score": 0.0144,
+          "document_name": "NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management",
+          "heading": "Step 4 treatment > 1.4.46",
+          "page": 22
+        }
+      ],
+      "disputed_facts_count": 0,
+      "citations_verified": 4,
+      "citations_total": 4,
+      "response_text": "### Guideline Recommendation(s)\n\n1. **1.4.41** [NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management, p. 21, \u00a71.4.41, 2019/2022]:\n   1.4.41 If hypertension is not controlled in adults taking step 1 treatment of an ACE inhibitor or ARB, offer the choice of 1 of the following drugs in addition to step 1 treatment: -  a CCB or -  a thiazide-like diuretic. [2019] [^1]\n\n2. **Step 1 treatment > 1.4.32** [NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management, p. 19, \u00a7Step 1 treatment > 1.4.32, 2019/2022]:\n   Step 1 treatment 1.4.32 Offer an ACE inhibitor or an ARB to adults starting step 1 antihypertensive treatment who: -  have type 2 diabetes and are of any age or family origin (see also [^2]\n\n3. **1.4.34 > 1.4.35** [NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management, p. 20, \u00a71.4.34 > 1.4.35, 2019/2022]:\n   1.4.34 Do not combine an ACE inhibitor with an ARB to treat hypertension. [2019] 1.4.35 Offer a calcium-channel blocker (CCB) to adults starting step 1 antihypertensive treatment who: -  are aged 55 or over and do not have type 2 diabetes or -  are of Black African or African-Caribbean family ori... [^3]\n\n4. **1.4.43** [NICE Guideline NG136: Hypertension in Adults - Diagnosis and Management, p. 21, \u00a71.4.43, 2019/2022]:\n   1.4.43 If hypertension is not controlled in adults of Black African or African-Caribbean family origin who do not have type 2 diabetes taking step 1 treatment, consider an ARB, in preference to an ACE inhibitor, in addition to step 1 treatment. [2019] [^4]\n\n\n### Patient Applicability & Context Analysis\n\n- **Patient Age (56 years)**: Evaluated against age-stratified criteria in retrieved recommendations [^1].\n- **Laboratory Finding (Microalbuminuria)**: Laboratory microalbuminuria findings evaluated against renal protection criteria [^1].\n\n### Missing Patient Information & Recommended Workup\n\n- **Glycemic Status (HbA1c / Fasting Glucose)**: Referenced in retrieved criteria to assess diabetic comorbidity and glycemic control.\n\n### General Clinical Rationale\n\n*General Clinical Rationale \u2014 Not a Formal Guideline Recommendation*:\nStepwise blood pressure and glycemic management provides synergistic protection against microvascular and macrovascular events. Treatment decisions should be individualized based on tolerability and target organ evaluation. [^1]\n\n*Research Prototype Disclaimer: For evaluation and research purposes only. This software is not an approved medical device and does not replace certified clinical judgment.*"
+    }
+  ]
+}
