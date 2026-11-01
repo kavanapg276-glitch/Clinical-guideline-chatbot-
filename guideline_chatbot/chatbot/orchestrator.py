@@ -21,6 +21,8 @@ from guideline_chatbot.chatbot.citation_validator import (
 from guideline_chatbot.chatbot.generator import ClinicalResponseGenerator
 from guideline_chatbot.chatbot.llm_client import LLMClient, get_llm_client
 from guideline_chatbot.chatbot.patient_state import DisputedFact, PatientState, PatientStateManager
+from guideline_chatbot.coherence.interfaces import CaseState, Turn, VerificationResult
+from guideline_chatbot.coherence.pipeline import ArmMode, CoherencePipeline
 from guideline_chatbot.retrieval.hybrid import HybridRetriever
 
 logger = logging.getLogger(__name__)
@@ -47,6 +49,7 @@ class TurnResult:
     is_abstention: bool
     action_type: str  # "recommendation" | "clarify" | "abstain" | "pushback_reaffirm"
     state_delta: dict[str, Any] = field(default_factory=dict)
+    verification_result: VerificationResult | None = None
     timestamp: str = field(default_factory=_utc_timestamp)
 
 
@@ -60,6 +63,7 @@ class ChatbotOrchestrator:
         chroma_dir: str = "chroma",
         model_name: str = "sentence-transformers/all-MiniLM-L6-v2",
         llm_client: LLMClient | None = None,
+        arm_mode: ArmMode = ArmMode.ARM3_CLINCOHERENCE,
     ) -> ChatbotOrchestrator:
         """Create orchestrator with default pre-indexed hybrid retriever and mock or configured LLM."""
         retriever = HybridRetriever.load_default(
@@ -70,10 +74,12 @@ class ChatbotOrchestrator:
         client = llm_client or get_llm_client()
         generator = ClinicalResponseGenerator(llm_client=client)
         citation_validator = CitationValidator()
+        pipeline = CoherencePipeline(mode=arm_mode)
         return cls(
             retriever=retriever,
             generator=generator,
             citation_validator=citation_validator,
+            coherence_pipeline=pipeline,
         )
 
     def __init__(
@@ -81,10 +87,12 @@ class ChatbotOrchestrator:
         retriever: HybridRetriever,
         generator: ClinicalResponseGenerator,
         citation_validator: CitationValidator | None = None,
+        coherence_pipeline: CoherencePipeline | None = None,
     ) -> None:
         self.retriever = retriever
         self.generator = generator
         self.citation_validator = citation_validator or CitationValidator()
+        self.coherence_pipeline = coherence_pipeline or CoherencePipeline()
         self.sessions: dict[str, PatientStateManager] = {}
         self.session_histories: dict[str, list[TurnResult]] = {}
 
@@ -145,7 +153,28 @@ class ChatbotOrchestrator:
         action_type = gen_res["action_type"]
         is_abstention = gen_res["is_abstention"]
 
-        # 4. Validate citations against retrieved evidence
+        # 4. Clinical Coherence Verification Layer
+        case_state = CaseState.from_patient_state(current_state)
+        history_turns = [
+            Turn(
+                turn_index=tr.turn_index,
+                user_message=tr.user_message,
+                response_text=tr.response_text,
+                patient_state_summary=tr.patient_state.to_summary_string(),
+                retrieved_chunk_ids=[c.get("chunk_id", "") for c in tr.retrieved_chunks],
+            )
+            for tr in self.session_histories.get(session_id, [])
+        ]
+        ver_result = self.coherence_pipeline.process(
+            case_state=case_state,
+            draft_response=response_text,
+            retrieved_chunks=retrieval_res.get("hits", []),
+            conversation_history=history_turns,
+        )
+        if ver_result.modified_response is not None:
+            response_text = ver_result.modified_response
+
+        # 5. Validate citations against retrieved evidence
         citation_val = self.citation_validator.validate(
             text=response_text,
             retrieved_chunks=retrieval_res.get("hits", []),
@@ -164,6 +193,7 @@ class ChatbotOrchestrator:
             is_abstention=is_abstention,
             action_type=action_type,
             state_delta=state_delta,
+            verification_result=ver_result,
         )
 
         self.session_histories[session_id].append(turn_result)
